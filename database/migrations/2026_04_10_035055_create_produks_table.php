@@ -20,7 +20,11 @@ return new class extends Migration
             $table->integer('stok_akhir');
             $table->boolean('isactive')->default(true);
 
-            $table->timestampscustom();
+            $table->timestamps();
+            $table->string('deleted_at')->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
+            $table->string('deleted_by')->nullable();
         });
     }
 

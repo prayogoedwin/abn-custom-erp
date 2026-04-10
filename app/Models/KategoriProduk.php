@@ -13,5 +13,8 @@ class KategoriProduk extends Model
     // });
     protected $fillable = ['nama'];
 
+
+    
+
     
 }

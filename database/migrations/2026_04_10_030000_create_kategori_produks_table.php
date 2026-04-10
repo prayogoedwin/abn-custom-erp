@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('kategori_produks', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->timestampscustom();
+            $table->timestamps();
+            $table->string('deleted_at')->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
+            $table->string('deleted_by')->nullable();
         });
     }
 

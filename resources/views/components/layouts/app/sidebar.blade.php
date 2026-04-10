@@ -18,6 +18,14 @@
                                     :active="request()->routeIs('permissions*')">Permissions</x-layouts.sidebar-two-level-link>
                             </x-layouts.sidebar-two-level-link-parent>
 
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Produk" icon="fas-box"
+                                :active="request()->routeIs('produks*') || request()->routeIs('kategoris*')">
+                                <x-layouts.sidebar-two-level-link href="{{ route('produks.index') }}" icon='fas-box'
+                                    :active="request()->routeIs('produks*')">Menu Produk</x-layouts.sidebar-two-level-link>
+                                <x-layouts.sidebar-two-level-link href="{{ route('kategoris.index') }}" icon='fas-box'
+                                    :active="request()->routeIs('kategoris*')">Menu Kategori</x-layouts.sidebar-two-level-link>
+                            </x-layouts.sidebar-two-level-link-parent>
+
                             <x-layouts.sidebar-two-level-link-parent title="Example two level" icon="fas-house"
                                 :active="request()->routeIs('two-level*')">
                                 <x-layouts.sidebar-two-level-link href="#" icon='fas-house'

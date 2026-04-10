@@ -31,6 +31,22 @@ class RolePermissionSeeder extends Seeder
             'edit-permissions',
             'download-permissions',
             'delete-permissions',
+            // Produk permissions
+            'view-produks',
+            'show-produks',
+            'create-produks',
+            'edit-produks',
+            'download-produks',
+            'delete-produks',
+                // Kategori permissions
+            'view-kategoris',
+            'show-kategoris',
+            'create-kategoris',
+            'edit-kategoris',
+            'update-kategoris',
+            'download-kategoris',
+            'delete-kategoris',
+
         ];
 
         foreach ($permissions as $permissionName) {

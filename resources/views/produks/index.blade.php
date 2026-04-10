@@ -6,17 +6,17 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">{{ __('Users') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">{{ __('Produks') }}</span>
     </div>
 
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Users') }}</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage system users') }}</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Produks') }}</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage system produks') }}</p>
         </div>
         <div class="flex gap-2">
-            @if(auth()->user()->hasPermission('download-users'))
-                <a href="{{ route('users.export') }}">
+            @if(auth()->user()->hasPermission('download-produks'))
+                <a href="{{ route('produks.export') }}">
                     <x-button type="secondary">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -25,9 +25,9 @@
                     </x-button>
                 </a>
             @endif
-            @if(auth()->user()->hasPermission('create-users'))
-                <a href="{{ route('users.create') }}">
-                    <x-button type="primary">{{ __('Create User') }}</x-button>
+            @if(auth()->user()->hasPermission('create-produks'))
+                <a href="{{ route('produks.create') }}">
+                    <x-button type="primary">{{ __('Create Produk') }}</x-button>
                 </a>
             @endif
         </div>
@@ -35,13 +35,13 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-4">
-            <table id="users-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <table id="produks-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Name') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Email') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Roles') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Created') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Produk') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Kategori') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Stok') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Harga') }}</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
@@ -56,27 +56,27 @@
 
     <script>
         $(document).ready(function() {
-            $('#users-table').DataTable({
+            $('#produks-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route("users.index") }}',
+                ajax: '{{ route("produks.index") }}',
                 columns: [
-                    { data: 'name', name: 'name' },
-                    { data: 'email', name: 'email' },
-                    { data: 'roles', name: 'roles', orderable: false, searchable: false },
-                    { data: 'created_at', name: 'created_at' },
+                    { data: 'nama_produk', name: 'nama_produk' },
+                    { data: 'kategori', name: 'kategori' },
+                    { data: 'stok_akhir', name: 'stok_akhir' },
+                    { data: 'harga_basis_pembelian', name: 'harga_basis_pembelian' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-right whitespace-nowrap' }
                 ],
                 order: [[3, 'desc']],
                 language: {
                     search: "_INPUT_",
-                    searchPlaceholder: "Search users...",
+                    searchPlaceholder: "Search produks...",
                     lengthMenu: "Show _MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ users",
-                    infoEmpty: "No users found",
-                    infoFiltered: "(filtered from _MAX_ total users)",
-                    zeroRecords: "No matching users found",
-                    emptyTable: "No users available"
+                    info: "Showing _START_ to _END_ of _TOTAL_ produks",
+                    infoEmpty: "No produks found",
+                    infoFiltered: "(filtered from _MAX_ total produks)",
+                    zeroRecords: "No matching produks found",
+                    emptyTable: "No produks available"
                 },
                 dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"lf>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip>',
                 pageLength: 10,

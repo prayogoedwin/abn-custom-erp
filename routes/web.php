@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\KategoriProdukController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Settings;
 use App\Http\Controllers\UserController;
@@ -52,6 +54,26 @@ Route::middleware(['auth'])->group(function () {
     Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit')->middleware('permission:edit-users');
     Route::put('users/{user}', [UserController::class, 'update'])->name('users.update')->middleware('permission:edit-users');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy')->middleware('permission:delete-users');
+
+    // Produk Management - dengan permission check
+    Route::get('produks', [ProdukController::class, 'index'])->name('produks.index')->middleware('permission:view-produks');
+    Route::get('produks/export', [ProdukController::class, 'export'])->name('produks.export')->middleware('permission:download-produks');
+    Route::get('produks/create', [ProdukController::class, 'create'])->name('produks.create')->middleware('permission:create-produks');
+    Route::post('produks', [ProdukController::class, 'store'])->name('produks.store')->middleware('permission:create-produks');
+    Route::get('produks/{produk}', [ProdukController::class, 'show'])->name('produks.show')->middleware('permission:show-produks');
+    Route::get('produks/{produk}/edit', [ProdukController::class, 'edit'])->name('produks.edit')->middleware('permission:edit-produks');
+    Route::put('produks/{produk}', [ProdukController::class, 'update'])->name('produks.update')->middleware('permission:edit-produks');
+    Route::delete('produks/{produk}', [ProdukController::class, 'destroy'])->name('produks.destroy')->middleware('permission:delete-produks');
+
+    // Kategori Produk Management - dengan permission check
+    Route::get('kategoris', [KategoriProdukController::class, 'index'])->name('kategoris.index');
+    Route::get('kategoris/export', [KategoriProdukController::class, 'export'])->name('kategoris.export')->middleware('permission:download-kategoris');
+    Route::get('kategoris/create', [KategoriProdukController::class, 'create'])->name('kategoris.create')->middleware('permission:create-kategoris');
+    Route::post('kategoris', [KategoriProdukController::class, 'store'])->name('kategoris.store')->middleware('permission:create-kategoris'); 
+    Route::get('kategoris/{kategori}', [KategoriProdukController::class, 'show'])->name('kategoris.show')->middleware('permission:show-kategoris');
+    Route::get('kategoris/{kategori}/edit', [KategoriProdukController::class, 'edit'])->name('kategoris.edit')->middleware('permission:edit-kategoris');
+    Route::put('kategoris/{kategori}', [KategoriProdukController::class, 'update'])->name('kategoris.update')->middleware('permission:edit-kategoris');
+    Route::delete('kategoris/{kategori}', [KategoriProdukController::class, 'destroy'])->name('kategoris.destroy')->middleware('permission:delete-kategoris');
 });
 
 require __DIR__.'/auth.php';
