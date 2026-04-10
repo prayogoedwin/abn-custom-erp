@@ -10,9 +10,8 @@ use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProdukExport;
-
-
-
+use App\Models\HistoryHargaBasis;
+use App\Models\Stok;
 
 class ProdukController extends Controller
 {
@@ -87,9 +86,26 @@ class ProdukController extends Controller
             'harga_basis_pembelian' => ['required', 'numeric'],
             'stok_akhir' => ['required', 'integer'],
             'isactive' => ['boolean'],
+
+            'created_by' => ['integer', 'exists:users,id'],
         ]);
 
         $produk = Produk::create($validated);
+        // // log stok change
+        // Stok::create([
+        //     'produk_id' => $produk->id,
+        //     'tipe_stok' => 'masuk',
+        //     'satuan' => $validated['satuan'],
+        //     'stok' => $validated['stok_akhir'],
+        // ]);
+
+        // // log historyharga
+        // HistoryHargaBasis::create([
+        //     'produk_id' => $produk->id,
+        //     'satuan' => $validated['satuan'],
+        //     'harga_basis' => $validated['harga_basis_pembelian'],
+        //     'tanggal' => now(),
+        // ]);
 
         return to_route('produks.index')->with('status', 'Produk created successfully.');
     }
@@ -114,23 +130,50 @@ class ProdukController extends Controller
 
     public function update(Request $request, Produk $produk): RedirectResponse
     {
+        // dd($request->all());
+
+        $current_user_id = auth()->id();
+
+        // dd("current user id: " . $current_user_id);
         $validated = $request->validate([
             'nama_produk' => ['required', 'string', 'max:255'],
-            'kategori_produk_id' => ['required', 'exists:kategori_produks,id'],
+            'kategoris_id' => ['required'],
             'satuan' => ['required', 'string', 'max:50'],
             'harga_basis_pembelian' => ['required', 'numeric'],
             'stok_akhir' => ['required', 'integer'],
             'isactive' => ['boolean'],
-        ]);
 
-        $produk->update($validated);
+        ]);
+        
+
+        // dd("validated data: " . json_encode($validated));
+        
+
+        $data = [
+            'nama_produk' => $validated['nama_produk'],
+            'kategori_produk_id' => $validated['kategoris_id'],
+            'satuan' => $validated['satuan'],
+            'harga_basis_pembelian' => $validated['harga_basis_pembelian'],
+            'stok_akhir' => $validated['stok_akhir'],
+        ];
+
+        // dd($data);
+
+        $produk->update($data);
+
+        
+        // dd("produk updated: " . json_encode($produk));
+
+
 
         return to_route('produks.index')->with('status', 'Produk updated successfully.');
     }
 
+    //soft delete
     public function destroy(Produk $produk): RedirectResponse
     {
-        $produk->delete();
+        $produk->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
+        
 
         return to_route('produks.index')->with('status', 'Produk deleted successfully.');
     }

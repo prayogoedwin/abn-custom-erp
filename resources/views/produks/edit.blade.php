@@ -38,11 +38,11 @@
                     </label>
 
                     <select
-                        name="kategoris[]"
+                        name="kategoris_id"
                         class="block w-full mt-1 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                         <option value="">{{ __('Pilih Kategori') }}</option>
                         @forelse($kategoris as $kategori)
-                        <option value="{{ $kategori->id }}" {{ old('kategoris.0') == $kategori->id ? 'selected' : '' }}>
+                        <option value="{{ $kategori->id }}" {{ old('kategoris_id') == $kategori->id ? 'selected' : '' }}>
                             {{ $kategori->nama }}
                         </option>
                         @empty
@@ -55,11 +55,15 @@
                     @enderror
                 </div>
                 <div class="mb-4">
-                    <x-forms.input label="Harga" name="harga" type="number" step="0.01" value="{{ old('harga', $produk->harga_basis_pembelian) }}" required />
+                    <x-forms.input label="Harga" name="harga_basis_pembelian" type="number" step="0.01" value="{{ old('harga_basis_pembelian', $produk->harga_basis_pembelian) }}" required />
                 </div>
 
                 <div class="mb-4">
-                    <x-forms.input label="Stok" name="stok" type="number" value="{{ old('stok', $produk->stok_akhir) }}" required />
+                    <x-forms.input label="Satuan" name="satuan" type="text" value="{{ old('satuan', $produk->satuan) }}" required />
+                </div>
+
+                <div class="mb-4">
+                    <x-forms.input label="Stok" name="stok_akhir" type="number" value="{{ old('stok_akhir', $produk->stok_akhir) }}" required />
                 </div>
 
                 <div class="flex gap-3">
