@@ -63,6 +63,23 @@ class ProdukSeeder extends Seeder
                 'stok_akhir' => 80,
                 'isactive' => true,
             ],
+            [
+                'kategori_produk_id' => 6,
+                'nama_produk' => 'Kopi',
+                'satuan' => 'gram',
+                'harga_basis_pembelian' => 10000,
+                'stok_akhir' => 100,
+                'isactive' => true,
+            ],
+            [
+                'kategori_produk_id' => 6,
+                'nama_produk' => 'Lada',
+                'satuan' => 'gram',
+                'harga_basis_pembelian' => 10000,
+                'stok_akhir' => 100,
+                'isactive' => true,
+            ],
+
         ];
 
         foreach ($data as $item) {

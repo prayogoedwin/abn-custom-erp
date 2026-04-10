@@ -18,6 +18,11 @@ class KategoriProdukSeeder extends Seeder
             ['nama' => 'Makanan'],
             ['nama' => 'Minuman'],
             ['nama' => 'Peralatan Rumah Tangga'],
+            ['nama' => 'Bahan Makanan'],
+            ['nama' => 'Kendaraan'],
+            ['nama' => 'Alat Tulis'],
+            ['nama' => 'Mainan'],
+            ['nama' => 'Peralatan Olahraga'],
         ];
 
         foreach ($data as $item) {
