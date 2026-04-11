@@ -26,6 +26,16 @@
                                     :active="request()->routeIs('kategoris*')">Menu Kategori</x-layouts.sidebar-two-level-link>
                             </x-layouts.sidebar-two-level-link-parent>
 
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Entitas" icon="fas-box"
+                                :active="request()->routeIs('produks*') || request()->routeIs('kategoris*')">
+                                <x-layouts.sidebar-two-level-link href="{{ route('suppliers.index') }}" icon='fas-box'
+                                    :active="request()->routeIs('Suppliers*')">Menu Suppliers</x-layouts.sidebar-two-level-link>
+                                <x-layouts.sidebar-two-level-link href="{{ route('customers.index') }}" icon='fas-box'
+                                    :active="request()->routeIs('customers*')">Menu Customers</x-layouts.sidebar-two-level-link>
+                                <x-layouts.sidebar-two-level-link href="{{ route('pihak3s.index') }}" icon='fas-box'
+                                    :active="request()->routeIs('pihak3s*')">Menu Pihak 3</x-layouts.sidebar-two-level-link>
+                            </x-layouts.sidebar-two-level-link-parent>
+
                             <x-layouts.sidebar-two-level-link-parent title="Example two level" icon="fas-house"
                                 :active="request()->routeIs('two-level*')">
                                 <x-layouts.sidebar-two-level-link href="#" icon='fas-house'

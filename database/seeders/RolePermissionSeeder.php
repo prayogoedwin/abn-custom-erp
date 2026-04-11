@@ -46,6 +46,38 @@ class RolePermissionSeeder extends Seeder
             'update-kategoris',
             'download-kategoris',
             'delete-kategoris',
+            //Supplier permission
+            'view-suppliers',
+            'show-suppliers',
+            'create-suppliers',
+            'edit-suppliers',
+            'update-suppliers',
+            'download-suppliers',
+            'delete-suppliers',
+            //customer permission
+            'view-customers',
+            'show-customers',
+            'create-customers',
+            'edit-customers',
+            'update-customers',
+            'download-customers',
+            'delete-customers',
+            //pihak3s permission
+            'view-pihak3s',
+            'show-pihak3s',
+            'create-pihak3s',
+            'edit-pihak3s',
+            'update-pihak3s',
+            'download-pihak3s',
+            'delete-pihak3s',
+            //karyawans permission
+            'view-karyawans',
+            'show-karyawans',
+            'create-karyawans',
+            'edit-karyawans',
+            'update-karyawans',
+            'download-karyawans',
+            'delete-karyawans',
 
         ];
 

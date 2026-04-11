@@ -185,48 +185,50 @@ class ProdukController extends Controller
         $kategoris = KategoriProduk::get();
 
         $produk->kategori_nama = KategoriProduk::find($produk->kategori_produk_id)->nama;
+        $data = $produk;
 
         $kategori = KategoriProduk::get();
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.edit', compact('produk', 'kategoris'), $pagedata);
+        return view('dynamiccrud.edit', compact('data', 'kategoris'), $pagedata);
     }
 
     public function update(Request $request, Produk $produk): RedirectResponse
     {
         // dd($request->all());
 
-        $current_user_id = auth()->id();
 
         // dd("current user id: " . $current_user_id);
-        $validated = $request->validate([
+        $store_data = [
+            'nama_produk' => $request->input('nama_produk'),
+            'kategori_produk_id' => $request->input('kategori_produk_id'),
+            'satuan' => $request->input('satuan'),
+            'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
+            'stok_akhir' => $request->input('stok_akhir'),
+
+            'updated_by' => auth()->id(),
+        ];
+
+        
+        $validate = Validator::make($store_data, [
             'nama_produk' => ['required', 'string', 'max:255'],
-            'kategoris_id' => ['required'],
+            'kategori_produk_id' => ['required'],
             'satuan' => ['required', 'string', 'max:50'],
             'harga_basis_pembelian' => ['required', 'numeric'],
             'stok_akhir' => ['required', 'integer'],
-            'isactive' => ['boolean'],
-
+            'created_by' => ['required', 'integer']
         ]);
 
 
-        // dd("validated data: " . json_encode($validated));
+        // dd("validated data: " . json_encode($validate));
 
 
-        $data = [
-            'nama_produk' => $validated['nama_produk'],
-            'kategori_produk_id' => $validated['kategoris_id'],
-            'satuan' => $validated['satuan'],
-            'harga_basis_pembelian' => $validated['harga_basis_pembelian'],
-            'stok_akhir' => $validated['stok_akhir'],
-
-            'updated_by' => $current_user_id,
-        ];
+        
 
         // dd($data);
 
-        $produk->update($data);
+        $produk->update($store_data);
 
 
         // dd("produk updated: " . json_encode($produk));

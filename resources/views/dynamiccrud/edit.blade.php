@@ -22,20 +22,24 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-6">
-            <form action="{{ route($tablename . '.store') }}" method="POST" class="max-w-2xl">
+            <form action="{{ route($tablename . '.update', $data) }}" method="POST" class="max-w-2xl">
                 @csrf
-                @method('POST')
+                @method('PUT')
 
                 @foreach($columns as $column)
+                @if(!$column['inform'] )
+                @continue
+                @endif
+
                 @if($column['type'] === 'text')
                 <div class="mb-4">
-                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="text" value="{{ old($column['name'], $produk->{$column['name']}) }}" required />
+                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="text" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
                 </div>
                 @elseif($column['type'] === 'number')
 
 
                 <div class="mb-4">
-                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="0.01" value="{{ old($column['name'], $produk->{$column['name']}) }}" required />
+                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="0.01" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
                 </div>
                 @elseif($column['type'] === 'select')
                 <div class="mb-6">
@@ -49,7 +53,7 @@
 
                         
                         @foreach($column['options'] as $option)
-                        @if(old($column['value'], $produk->{$column['name']}) == $option['value'])
+                        @if(old($column['value'], $data->{$column['name']}) == $option['value'])
                             <option value="{{ $option['value'] }}" selected>
                             {{ $option['label'] }}
                             </option>
@@ -69,9 +73,6 @@
                 @endif
                 @endforeach
 
-                <div class="mb-4">
-                    <x-forms.input label="Stok" name="stok_akhir" type="number" value="{{ old('stok_akhir', $produk->stok_akhir) }}" required />
-                </div>
 
                 <div class="flex gap-3">
                     <x-button type="primary">{{ __('Update') }}</x-button>

@@ -15,7 +15,7 @@ class KategoriProdukController extends Controller
 {
     private function getPagedata(){
         $pagedata = [
-            'title' => 'Create Kategori',
+            'title' => 'Kategori',
             'tablename' => 'kategoris',
             'columns' => [
                 ['name' => 'nama', 'value' => 'nama', 'title' => 'Nama Kategori', 'type' => 'text', 'inform' => true],
@@ -96,14 +96,16 @@ class KategoriProdukController extends Controller
     {
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.show', compact('kategori'), $pagedata);
+        return view('kategoris.show', compact('kategori'), $pagedata);
     }
 
     public function edit(KategoriProduk $kategori): View
     {
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.show', compact('kategori'), $pagedata);
+        $data = $kategori;
+
+        return view('dynamiccrud.edit', compact('data'), $pagedata);
 
         
     }
