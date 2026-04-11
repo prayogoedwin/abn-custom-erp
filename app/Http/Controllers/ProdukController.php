@@ -12,9 +12,37 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProdukExport;
 use App\Models\HistoryHargaBasis;
 use App\Models\Stok;
+use Illuminate\Support\Facades\Validator;
 
 class ProdukController extends Controller
 {
+    private function getPagedata()
+    {
+        $kategoris = KategoriProduk::get();
+
+        $pagedata = [
+            'title' => 'Produk',
+            'tablename' => 'produks',
+            
+            'columns' => [
+                ['name' => 'nama_produk','value' => 'nama_produk',  'title' => 'Nama Produk', 'type' => 'text', 'inform' => true],
+                ['name' => 'kategori_produk_id', 'value' => 'kategori', 'title' => 'Kategori', 'type' => 'select', 'inform' => true, 'options' => [
+                    // Ambil data kategori dari database
+                    ['value' => '', 'label' => 'Pilih Kategori'],
+                    ...$kategoris->map(function ($kategori) {
+                        return ['value' => $kategori->id, 'label' => $kategori->nama];
+                    })->toArray(),
+                    
+                ]],
+                ['name' => 'satuan', 'value' => 'satuan', 'title' => 'Satuan', 'type' => 'text', 'inform' => true],
+                ['name' => 'harga_basis_pembelian', 'value' => 'harga_basis_pembelian', 'title' => 'Harga Basis Pembelian', 'type' => 'number', 'inform' => true],
+                ['name' => 'stok_akhir', 'value' => 'stok_akhir', 'title' => 'Stok Akhir', 'type' => 'number', 'inform' => true],
+            ],
+        ];
+
+        return $pagedata;
+    }
+
     public function index(Request $request)
     {
         // dd($request->headers->all());
@@ -25,6 +53,7 @@ class ProdukController extends Controller
                     'produks.*',
                     'kategori_produks.nama as kategori'
                 )
+                ->where('produks.isactive', true)
                 ->get();
             // dd($produks);
 
@@ -35,7 +64,7 @@ class ProdukController extends Controller
                 // ->filterColumn('kategori', function ($query, $keyword) {
                 //     $query->where('kategori_produks.nama', 'like', "%{$keyword}%");
                 // })
-                
+
 
 
                 ->addColumn('actions', function ($produk) {
@@ -62,8 +91,14 @@ class ProdukController extends Controller
                 ->make(true);
         }
 
-        return view('produks.index');
+        $pagedata = $this->getPagedata();
+
+        return view('dynamiccrud.index', $pagedata);
     }
+
+    
+
+
 
     public function export()
     {
@@ -72,25 +107,43 @@ class ProdukController extends Controller
 
     public function create(): View
     {
-        $kategori = KategoriProduk::orderBy('name')->get();
+        $kategoris = KategoriProduk::get();
 
-        return view('produks.create', compact('kategori'));
+        $pagedata = $this->getPagedata();
+
+        return view('dynamiccrud.create', compact('kategoris'), $pagedata);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $store_data = [
+            'nama_produk' => $request->input('nama_produk'),
+            'kategori_produk_id' => $request->input('kategori_produk_id'),
+            'satuan' => $request->input('satuan'),
+            'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
+            'stok_akhir' => $request->input('stok_akhir'),
+
+            'created_by' => auth()->id(),
+        ];
+
+        
+        $validate = Validator::make($store_data, [
             'nama_produk' => ['required', 'string', 'max:255'],
-            'kategori_produk_id' => ['required', 'exists:kategori_produks,id'],
+            'kategori_produk_id' => ['required'],
             'satuan' => ['required', 'string', 'max:50'],
             'harga_basis_pembelian' => ['required', 'numeric'],
             'stok_akhir' => ['required', 'integer'],
-            'isactive' => ['boolean'],
-
-            'created_by' => ['integer', 'exists:users,id'],
+            'created_by' => ['required', 'integer']
         ]);
 
-        $produk = Produk::create($validated);
+        
+        if ($validate->fails()) {
+            return back()->withErrors($validate)->withInput();
+        }
+        
+        
+
+        $produk = Produk::create($store_data);
         // // log stok change
         // Stok::create([
         //     'produk_id' => $produk->id,
@@ -107,25 +160,37 @@ class ProdukController extends Controller
         //     'tanggal' => now(),
         // ]);
 
-        return to_route('produks.index')->with('status', 'Produk created successfully.');
+        return to_route('produks.index')->with('status', 'Produk updated successfully.');
     }
 
     public function show(Produk $produk): View
     {
         $produk->kategori_nama = KategoriProduk::find($produk->kategori_produk_id)->nama;
-        
+
+        $data = $produk;
+
+        $kategori = KategoriProduk::get();
+
+        $pagedata = $this->getPagedata();
+
+       //TO DO: asdfasdfwe
+
         
 
-        return view('produks.show', compact('produk'));
+        return view('produks.show', compact('produk'), $pagedata);
     }
 
     public function edit(Produk $produk): View
     {
         $kategoris = KategoriProduk::get();
-        
+
         $produk->kategori_nama = KategoriProduk::find($produk->kategori_produk_id)->nama;
 
-        return view('produks.edit', compact('produk', 'kategoris'));
+        $kategori = KategoriProduk::get();
+
+        $pagedata = $this->getPagedata();
+
+        return view('dynamiccrud.edit', compact('produk', 'kategoris'), $pagedata);
     }
 
     public function update(Request $request, Produk $produk): RedirectResponse
@@ -144,10 +209,10 @@ class ProdukController extends Controller
             'isactive' => ['boolean'],
 
         ]);
-        
+
 
         // dd("validated data: " . json_encode($validated));
-        
+
 
         $data = [
             'nama_produk' => $validated['nama_produk'],
@@ -155,13 +220,15 @@ class ProdukController extends Controller
             'satuan' => $validated['satuan'],
             'harga_basis_pembelian' => $validated['harga_basis_pembelian'],
             'stok_akhir' => $validated['stok_akhir'],
+
+            'updated_by' => $current_user_id,
         ];
 
         // dd($data);
 
         $produk->update($data);
 
-        
+
         // dd("produk updated: " . json_encode($produk));
 
 
@@ -173,7 +240,7 @@ class ProdukController extends Controller
     public function destroy(Produk $produk): RedirectResponse
     {
         $produk->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
-        
+
 
         return to_route('produks.index')->with('status', 'Produk deleted successfully.');
     }

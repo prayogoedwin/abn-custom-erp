@@ -6,17 +6,17 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">{{ __('Kategoris') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">{{ $title }}</span>
     </div>
 
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Kategoris') }}</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage system kategoris') }}</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $title }}</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">Manage System {{ $title }}</p>
         </div>
         <div class="flex gap-2">
-            @if(auth()->user()->hasPermission('download-kategoris'))
-                <a href="{{ route('kategoris.export') }}">
+            @if(auth()->user()->hasPermission('download-{{ $title }}'))
+                <a href="{{ route(strtolower($title) . '.export') }}">
                     <x-button type="secondary">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -25,22 +25,26 @@
                     </x-button>
                 </a>
             @endif
-            @if(auth()->user()->hasPermission(''))
-                <a href="{{ route('kategoris.create') }}">
-                    <x-button type="primary">{{ __('Create Kategori') }}</x-button>
+            @if(auth()->user()->hasPermission('create-' . strtolower($tablename)))
+                <a href="{{ route(strtolower($tablename) . '.create') }}">
+                    <x-button type="primary">{{ __('Create ' . $title) }}</x-button>
                 </a>
             @endif
+            
+            
         </div>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-4">
-            <table id="kategoris-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <table id="dynamic-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Nama') }}</th>
+                        @foreach($columns as $column)
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ $column['title'] }}</th>
+                        @endforeach
                         
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Created at') }}</th>
+                        
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
@@ -54,28 +58,33 @@
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
     <script>
+
+        $columnsdata = [
+            @foreach($columns as $column)
+                { data: '{{ $column["value"] }}' },
+            @endforeach
+            { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-right whitespace-nowrap' }
+            
+        ];
+
+        console.log('$columnsdata:', $columnsdata);
+
         $(document).ready(function() {
-            $('#kategoris-table').DataTable({
+            $('#dynamic-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route("kategoris.index") }}',
-                columns: [
-                    { data: 'nama', name: 'nama' },
-                    
-                    
-                    { data: 'created_at', name: 'created_at' },
-                    { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-right whitespace-nowrap' }
-                ],
-                order: [[1, 'desc']],
+                ajax: '{{ route(strtolower($tablename) . ".index") }}',
+                columns: $columnsdata,
+                order: [[0, 'desc']],
                 language: {
                     search: "_INPUT_",
-                    searchPlaceholder: "Search produks...",
+                    searchPlaceholder: "Search " + "{{ $title }}",
                     lengthMenu: "Show _MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ produks",
-                    infoEmpty: "No produks found",
-                    infoFiltered: "(filtered from _MAX_ total produks)",
-                    zeroRecords: "No matching produks found",
-                    emptyTable: "No produks available"
+                    info: "Showing _START_ to _END_ of _TOTAL_ {{ strtolower($title) }}",
+                    infoEmpty: "No {{ strtolower($title) }} found",
+                    infoFiltered: "(filtered from _MAX_ total {{ strtolower($title) }})",
+                    zeroRecords: "No matching {{ strtolower($title) }} found",
+                    emptyTable: "No {{ strtolower($title) }} available"
                 },
                 dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"lf>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip>',
                 pageLength: 10,
@@ -87,82 +96,82 @@
 
     <style>
         /* Table borders and styling */
-        #kategoris-table {
+        #dynamic-table {
             border-collapse: separate !important;
             border-spacing: 0;
         }
         
-        #kategoris-table thead th {
+        #dynamic-table thead th {
             border-bottom: 2px solid #e5e7eb;
             background-color: #f9fafb;
         }
         
-        .dark #kategoris-table thead th {
+        .dark #dynamic-table thead th {
             border-bottom-color: #374151;
             background-color: #1f2937;
         }
         
-        #kategoris-table tbody tr {
+        #dynamic-table tbody tr {
             border-bottom: 1px solid #e5e7eb;
         }
         
-        .dark #kategoris-table tbody tr {
+        .dark #dynamic-table tbody tr {
             border-bottom-color: #374151;
         }
         
         /* Alternating row colors (striping) */
-        #kategoris-table tbody tr.odd {
+        #dynamic-table tbody tr.odd {
             background-color: #ffffff;
         }
         
-        #kategoris-table tbody tr.even {
+        #dynamic-table tbody tr.even {
             background-color: #f9fafb;
         }
         
-        .dark #kategoris-table tbody tr.odd {
+        .dark #dynamic-table tbody tr.odd {
             background-color: #1f2937;
         }
         
-        .dark #kategoris-table tbody tr.even {
+        .dark #dynamic-table tbody tr.even {
             background-color: #111827;
         }
         
-        #kategoris-table tbody tr:hover {
+        #dynamic-table tbody tr:hover {
             background-color: #e5e7eb !important;
         }
         
-        .dark #kategoris-table tbody tr:hover {
+        .dark #dynamic-table tbody tr:hover {
             background-color: #374151 !important;
         }
         
-        #kategoris-table tbody td {
+        #dynamic-table tbody td {
             border-right: 1px solid #e5e7eb;
             padding: 12px 24px;
         }
         
-        .dark #kategoris-table tbody td {
+        .dark #dynamic-table tbody td {
             border-right-color: #374151;
         }
         
-        #kategoris-table tbody td:last-child {
+        #dynamic-table tbody td:last-child {
             border-right: none;
         }
         
-        #kategoris-table thead th {
+        #dynamic-table thead th {
             border-right: 1px solid #e5e7eb;
         }
         
-        .dark #kategoris-table thead th {
+        .dark #dynamic-table thead th {
             border-right-color: #374151;
         }
         
-        #kategoris-table thead th:last-child {
+        #dynamic-table thead th:last-child {
             border-right: none;
         }
         
         /* Action links styling - keep inline */
-        #kategoris-table tbody td a,
-        #kategoris-table tbody td form {
+        #dynamic-table tbody td a,
+        #dynamic-table tbody td form {
             display: inline;
             white-space: nowrap;
         }

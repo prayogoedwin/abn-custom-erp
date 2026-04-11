@@ -66,7 +66,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('produks/{produk}', [ProdukController::class, 'destroy'])->name('produks.destroy')->middleware('permission:delete-produks');
 
     // Kategori Produk Management - dengan permission check
-    Route::get('kategoris', [KategoriProdukController::class, 'index'])->name('kategoris.index');
+    Route::get('kategoris', [KategoriProdukController::class, 'index'])->name('kategoris.index')->middleware('permission:view-kategoris');
     Route::get('kategoris/export', [KategoriProdukController::class, 'export'])->name('kategoris.export')->middleware('permission:download-kategoris');
     Route::get('kategoris/create', [KategoriProdukController::class, 'create'])->name('kategoris.create')->middleware('permission:create-kategoris');
     Route::post('kategoris', [KategoriProdukController::class, 'store'])->name('kategoris.store')->middleware('permission:create-kategoris'); 

@@ -13,17 +13,32 @@ use App\Exports\KategoriExport;
 
 class KategoriProdukController extends Controller
 {
+    private function getPagedata(){
+        $pagedata = [
+            'title' => 'Create Kategori',
+            'tablename' => 'kategoris',
+            'columns' => [
+                ['name' => 'nama', 'value' => 'nama', 'title' => 'Nama Kategori', 'type' => 'text', 'inform' => true],
+                ['name' => 'created_at', 'value' => 'created_at', 'title' => 'Dibuat pada', 'type' => 'text', 'inform' => false],
+
+                
+            ],
+        ];
+
+        return $pagedata;
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
             $kategoris = KategoriProduk::get();
-            
+
 
             return DataTables::of($kategoris)
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->format('Y-m-d H:i');
                 })
-                
+
 
                 ->addColumn('actions', function ($kategori) {
                     $actions = '';
@@ -49,7 +64,9 @@ class KategoriProdukController extends Controller
                 ->make(true);
         }
 
-        return view('kategoris.index');
+        $pagedata = $this->getPagedata();
+
+        return view('dynamiccrud.index', $pagedata);
     }
 
     public function export()
@@ -59,9 +76,9 @@ class KategoriProdukController extends Controller
 
     public function create(): View
     {
-        
+        $pagedata = $this->getPagedata();
 
-        return view('kategoris.create');
+        return view('dynamiccrud.create', $pagedata);
     }
 
     public function store(Request $request): RedirectResponse
@@ -77,16 +94,18 @@ class KategoriProdukController extends Controller
 
     public function show(KategoriProduk $kategori): View
     {
-        
+        $pagedata = $this->getPagedata();
 
-        return view('kategoris.show', compact('kategori'));
+        return view('dynamiccrud.show', compact('kategori'), $pagedata);
     }
 
     public function edit(KategoriProduk $kategori): View
     {
-        
+        $pagedata = $this->getPagedata();
 
-        return view('kategoris.edit', compact('kategori'));
+        return view('dynamiccrud.show', compact('kategori'), $pagedata);
+
+        
     }
 
     public function update(Request $request, KategoriProduk $kategori): RedirectResponse
@@ -106,6 +125,4 @@ class KategoriProdukController extends Controller
 
         return to_route('kategoris.index')->with('status', 'Kategori deleted successfully.');
     }
-
-
 }

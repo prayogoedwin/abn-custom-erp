@@ -32,7 +32,7 @@ class Produk extends Model
 
     protected static function booted()
     {
-        // Terjadi saat stok diupdate di database
+        // Terjadi update di database
         static::updated(function ($produk) {
             if (auth()->check()) {
                 $produk->updated_by = auth()->id();
@@ -67,6 +67,7 @@ class Produk extends Model
             }
         });
     }
+
 
     public function kategori(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
