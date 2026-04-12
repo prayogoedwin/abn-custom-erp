@@ -18,23 +18,29 @@
                                     :active="request()->routeIs('permissions*')">Permissions</x-layouts.sidebar-two-level-link>
                             </x-layouts.sidebar-two-level-link-parent>
 
-                            <x-layouts.sidebar-two-level-link-parent title="Menu Produk" icon="fas-box"
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Produk" icon="fas-boxes"
                                 :active="request()->routeIs('produks*') || request()->routeIs('kategoris*')">
-                                <x-layouts.sidebar-two-level-link href="{{ route('produks.index') }}" icon='fas-box'
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('produks.index') }}" icon='fas-cube'
                                     :active="request()->routeIs('produks*')">Menu Produk</x-layouts.sidebar-two-level-link>
-                                <x-layouts.sidebar-two-level-link href="{{ route('kategoris.index') }}" icon='fas-box'
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('kategoris.index') }}" icon='fas-tags'
                                     :active="request()->routeIs('kategoris*')">Menu Kategori</x-layouts.sidebar-two-level-link>
                             </x-layouts.sidebar-two-level-link-parent>
 
-                            <x-layouts.sidebar-two-level-link-parent title="Menu Entitas" icon="fas-box"
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Entitas" icon="fas-users-cog"
                                 :active="request()->routeIs('suppliers*') || request()->routeIs('customers*') || request()->routeIs('pihak3s*') || request()->routeIs('karyawans*')">
-                                <x-layouts.sidebar-two-level-link href="{{ route('suppliers.index') }}" icon='fas-box'
-                                    :active="request()->routeIs('Suppliers*')">Menu Supplier</x-layouts.sidebar-two-level-link>
-                                <x-layouts.sidebar-two-level-link href="{{ route('customers.index') }}" icon='fas-box'
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('suppliers.index') }}" icon='fas-truck'
+                                    :active="request()->routeIs('suppliers*')">Menu Supplier</x-layouts.sidebar-two-level-link>
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('customers.index') }}" icon='fas-user-tie'
                                     :active="request()->routeIs('customers*')">Menu Customer</x-layouts.sidebar-two-level-link>
-                                <x-layouts.sidebar-two-level-link href="{{ route('pihak3s.index') }}" icon='fas-box'
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('pihak3s.index') }}" icon='fas-handshake'
                                     :active="request()->routeIs('pihak3s*')">Menu Pihak 3</x-layouts.sidebar-two-level-link>
-                                <x-layouts.sidebar-two-level-link href="{{ route('karyawans.index') }}" icon='fas-box'
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('karyawans.index') }}" icon='fas-id-card'
                                     :active="request()->routeIs('karyawans*')">Menu Karyawan</x-layouts.sidebar-two-level-link>
                             </x-layouts.sidebar-two-level-link-parent>
 

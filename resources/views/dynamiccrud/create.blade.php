@@ -34,7 +34,7 @@
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="text" value="{{ old($column['name']) }}" required />
                 </div>
 
-                @if($column['type'] === 'email')
+                @elseif($column['type'] === 'email')
                 
                 <div class="mb-4">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="email" value="{{ old($column['name']) }}" required />

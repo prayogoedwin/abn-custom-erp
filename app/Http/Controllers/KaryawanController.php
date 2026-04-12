@@ -27,10 +27,9 @@ class KaryawanController extends Controller
                 ['name' => 'nama', 'value' => 'nama',  'title' => 'Nama Karyawan', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'email', 'value' => 'email',  'title' => 'Email', 'type' => 'email', 'inform' => true, 'intable' => true],
                 ['name' => 'password', 'value' => 'password',  'title' => 'Password', 'type' => 'password', 'inform' => true, 'intable' => false],
-
+                ['name' => 'noPegawai', 'value' => 'noPegawai',  'title' => 'No Pegawai', 'type' => 'text', 'inform' => false, 'intable' => true],
                 ['name' => 'kontak', 'value' => 'kontak', 'title' => 'Kontak', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'alamat', 'value' => 'alamat', 'title' => 'Alamat', 'type' => 'text', 'inform' => true, 'intable' => true],
-
             ],
         ];
 
@@ -43,7 +42,8 @@ class KaryawanController extends Controller
         if ($request->ajax()) {
             // dd('masuk ajax');
             $karyawans = Karyawan::join('users', 'karyawans.user_id', '=', 'users.id')
-
+                // Select everything from karyawan, and specific fields from users
+                ->select('karyawans.*', 'users.name as user_name', 'users.email')
                 ->where('karyawans.isactive', true)
                 ->get();
             // dd($karyawans);
@@ -102,13 +102,14 @@ class KaryawanController extends Controller
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.create', compact('kategoris'), $pagedata);
+        return view('dynamiccrud.create', $pagedata);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $store_data = [
             'nama' => $request->input('nama'),
+            'email' => $request->input('email'),
             'password' => $request->input('password'),
             'kontak' => $request->input('kontak'),
             'alamat' => $request->input('alamat'),
@@ -119,6 +120,7 @@ class KaryawanController extends Controller
 
         $validate = Validator::make($store_data, [
             'nama' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', 'string', 'max:255'],
             'kontak' => ['required'],
             'alamat' => ['required', 'string', 'max:50'],
@@ -138,6 +140,12 @@ class KaryawanController extends Controller
                 'password' => Hash::make($store_data['password']),
             ]
         );
+
+
+        $lastId = Karyawan::max('id') ?? 0;
+
+        $nextId = $lastId + 1;
+        $store_data['noPegawai'] = str_pad($nextId, 4, '0', STR_PAD_LEFT);
 
         $store_data['user_id'] = $user->id;
 
@@ -184,7 +192,6 @@ class KaryawanController extends Controller
         $data = $karyawan;
 
 
-
         $pagedata = $this->getPagedata();
 
         return view('dynamiccrud.edit', compact('data'), $pagedata);
@@ -198,19 +205,23 @@ class KaryawanController extends Controller
         // dd("current user id: " . $current_user_id);
         $store_data = [
             'nama' => $request->input('nama'),
+            'email' => $request->input('email'),
+            'password' => $request->input('password'),
             'kontak' => $request->input('kontak'),
             'alamat' => $request->input('alamat'),
 
-            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
         ];
 
 
         $validate = Validator::make($store_data, [
             'nama' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'password' => ['required', 'string', 'max:255'],
             'kontak' => ['required'],
             'alamat' => ['required', 'string', 'max:50'],
 
-            'created_by' => ['required', 'integer']
+            'updated_by' => ['required', 'integer']
         ]);
 
 
@@ -218,15 +229,18 @@ class KaryawanController extends Controller
             return back()->withErrors($validate)->withInput();
         }
 
+        $user = User::find($karyawan->user_id);
 
-        // dd("validated data: " . json_encode($validate));
-
-
-
-
-        // dd($data);
+        $user->update(
+            [
+                'name' => $store_data['nama'],
+                'email' => $store_data['email'],
+                'password' => Hash::make($store_data['password']),
+            ]
+        );
 
         $karyawan->update($store_data);
+
 
 
         // dd("karyawan updated: " . json_encode($karyawan));
