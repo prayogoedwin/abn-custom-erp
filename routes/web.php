@@ -84,40 +84,40 @@ Route::middleware(['auth'])->group(function () {
     Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export')->middleware('permission:download-kategoris');
     Route::get('suppliers/create', [SupplierController::class, 'create'])->name('suppliers.create')->middleware('permission:create-suppliers');
     Route::post('suppliers', [SupplierController::class, 'store'])->name('suppliers.store')->middleware('permission:create-suppliers'); 
-    Route::get('suppliers/{kategori}', [SupplierController::class, 'show'])->name('suppliers.show')->middleware('permission:show-suppliers');
-    Route::get('suppliers/{kategori}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit')->middleware('permission:edit-suppliers');
-    Route::put('suppliers/{kategori}', [SupplierController::class, 'update'])->name('suppliers.update')->middleware('permission:edit-suppliers');
-    Route::delete('suppliers/{kategori}', [SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('permission:delete-suppliers');
+    Route::get('suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show')->middleware('permission:show-suppliers');
+    Route::get('suppliers/{supplier}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit')->middleware('permission:edit-suppliers');
+    Route::put('suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update')->middleware('permission:edit-suppliers');
+    Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('permission:delete-suppliers');
 
     // Karyawan Produk Management - dengan permission check
     Route::get('karyawans', [KaryawanController::class, 'index'])->name('karyawans.index')->middleware('permission:view-karyawans');
     Route::get('karyawans/export', [KaryawanController::class, 'export'])->name('karyawans.export')->middleware('permission:download-kategoris');
     Route::get('karyawans/create', [KaryawanController::class, 'create'])->name('karyawans.create')->middleware('permission:create-karyawans');
     Route::post('karyawans', [KaryawanController::class, 'store'])->name('karyawans.store')->middleware('permission:create-karyawans'); 
-    Route::get('karyawans/{kategori}', [KaryawanController::class, 'show'])->name('karyawans.show')->middleware('permission:show-karyawans');
-    Route::get('karyawans/{kategori}/edit', [KaryawanController::class, 'edit'])->name('karyawans.edit')->middleware('permission:edit-karyawans');
-    Route::put('karyawans/{kategori}', [KaryawanController::class, 'update'])->name('karyawans.update')->middleware('permission:edit-karyawans');
-    Route::delete('karyawans/{kategori}', [KaryawanController::class, 'destroy'])->name('karyawans.destroy')->middleware('permission:delete-karyawans');
+    Route::get('karyawans/{karyawan}', [KaryawanController::class, 'show'])->name('karyawans.show')->middleware('permission:show-karyawans');
+    Route::get('karyawans/{karyawan}/edit', [KaryawanController::class, 'edit'])->name('karyawans.edit')->middleware('permission:edit-karyawans');
+    Route::put('karyawans/{karyawan}', [KaryawanController::class, 'update'])->name('karyawans.update')->middleware('permission:edit-karyawans');
+    Route::delete('karyawans/{karyawan}', [KaryawanController::class, 'destroy'])->name('karyawans.destroy')->middleware('permission:delete-karyawans');
 
     // pihak3s Produk Management - dengan permission check
     Route::get('pihak3s', [Pihak3Controller::class, 'index'])->name('pihak3s.index')->middleware('permission:view-pihak3s');
     Route::get('pihak3s/export', [Pihak3Controller::class, 'export'])->name('pihak3s.export')->middleware('permission:download-kategoris');
     Route::get('pihak3s/create', [Pihak3Controller::class, 'create'])->name('pihak3s.create')->middleware('permission:create-pihak3s');
     Route::post('pihak3s', [Pihak3Controller::class, 'store'])->name('pihak3s.store')->middleware('permission:create-pihak3s'); 
-    Route::get('pihak3s/{kategori}', [Pihak3Controller::class, 'show'])->name('pihak3s.show')->middleware('permission:show-pihak3s');
-    Route::get('pihak3s/{kategori}/edit', [Pihak3Controller::class, 'edit'])->name('pihak3s.edit')->middleware('permission:edit-pihak3s');
-    Route::put('pihak3s/{kategori}', [Pihak3Controller::class, 'update'])->name('pihak3s.update')->middleware('permission:edit-pihak3s');
-    Route::delete('pihak3s/{kategori}', [Pihak3Controller::class, 'destroy'])->name('pihak3s.destroy')->middleware('permission:delete-pihak3s');
+    Route::get('pihak3s/{pihak3}', [Pihak3Controller::class, 'show'])->name('pihak3s.show')->middleware('permission:show-pihak3s');
+    Route::get('pihak3s/{pihak3}/edit', [Pihak3Controller::class, 'edit'])->name('pihak3s.edit')->middleware('permission:edit-pihak3s');
+    Route::put('pihak3s/{pihak3}', [Pihak3Controller::class, 'update'])->name('pihak3s.update')->middleware('permission:edit-pihak3s');
+    Route::delete('pihak3s/{pihak3}', [Pihak3Controller::class, 'destroy'])->name('pihak3s.destroy')->middleware('permission:delete-pihak3s');
 
     // Supplier Produk Management - dengan permission check
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index')->middleware('permission:view-customers');
     Route::get('customers/export', [CustomerController::class, 'export'])->name('customers.export')->middleware('permission:download-kategoris');
     Route::get('customers/create', [CustomerController::class, 'create'])->name('customers.create')->middleware('permission:create-customers');
     Route::post('customers', [CustomerController::class, 'store'])->name('customers.store')->middleware('permission:create-customers'); 
-    Route::get('customers/{kategori}', [CustomerController::class, 'show'])->name('customers.show')->middleware('permission:show-customers');
-    Route::get('customers/{kategori}/edit', [CustomerController::class, 'edit'])->name('customers.edit')->middleware('permission:edit-customers');
-    Route::put('customers/{kategori}', [CustomerController::class, 'update'])->name('customers.update')->middleware('permission:edit-customers');
-    Route::delete('customers/{kategori}', [CustomerController::class, 'destroy'])->name('customers.destroy')->middleware('permission:delete-customers');
+    Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show')->middleware('permission:show-customers');
+    Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit')->middleware('permission:edit-customers');
+    Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update')->middleware('permission:edit-customers');
+    Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy')->middleware('permission:delete-customers');
 });
 
 require __DIR__.'/auth.php';

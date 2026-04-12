@@ -12,6 +12,26 @@ class Pihak3Seeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $data = [
+            [
+            'nama' => 'kar1',
+            'kontak' => 'kontak1',
+            'alamat' => 'alamat1',
+            ],
+            [
+            'nama' => 'kar2',
+            'kontak' => 'kontak2',
+            'alamat' => 'alamat2',
+            ],
+            [
+            'nama' => 'kar3',
+            'alamat' => 'alamat3',
+            'kontak' => 'kontak3',
+            ],
+        ];
+
+        foreach ($data as $item) {
+            \App\Models\Pihak3::create($item);
+        }
     }
 }

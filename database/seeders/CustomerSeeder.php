@@ -12,6 +12,26 @@ class CustomerSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $data = [
+            [
+            'nama' => 'cus1',
+            'kontak' => 'kontak1',
+            'alamat' => 'alamat1',
+            ],
+            [
+            'nama' => 'cus2',
+            'kontak' => 'kontak2',
+            'alamat' => 'alamat2',
+            ],
+            [
+            'nama' => 'cus3',
+            'alamat' => 'alamat3',
+            'kontak' => 'kontak3',
+            ],
+        ];
+
+        foreach ($data as $item) {
+            \App\Models\Customer::create($item);
+        }
     }
 }

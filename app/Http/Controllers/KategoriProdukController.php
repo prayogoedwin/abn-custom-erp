@@ -18,8 +18,8 @@ class KategoriProdukController extends Controller
             'title' => 'Kategori',
             'tablename' => 'kategoris',
             'columns' => [
-                ['name' => 'nama', 'value' => 'nama', 'title' => 'Nama Kategori', 'type' => 'text', 'inform' => true],
-                ['name' => 'created_at', 'value' => 'created_at', 'title' => 'Dibuat pada', 'type' => 'text', 'inform' => false],
+                ['name' => 'nama', 'value' => 'nama', 'title' => 'Nama Kategori', 'type' => 'text', 'inform' => true, 'intable' => true],
+                ['name' => 'created_at', 'value' => 'created_at', 'title' => 'Dibuat pada', 'type' => 'text', 'inform' => false, 'intable' => true],
 
                 
             ],

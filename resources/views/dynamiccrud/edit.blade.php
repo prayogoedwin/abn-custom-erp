@@ -6,7 +6,7 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <a href="{{ route('produks.index') }}"
+        <a href="{{ route($tablename . '.index') }}"
             class="text-blue-600 dark:text-blue-400 hover:underline">{{ $title ?? __('Produks') }}</a>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
@@ -16,8 +16,8 @@
     </div>
 
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Edit Produk') }}</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Update produk details') }}</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit {{ $title }}</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Update {{ $title }} details</p>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -35,12 +35,34 @@
                 <div class="mb-4">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="text" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
                 </div>
-                @elseif($column['type'] === 'number')
 
+                
+                @elseif($column['type'] === 'email')
+                
+                <div class="mb-4">
+                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="email" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
+                </div>
+
+
+                @elseif($column['type'] === 'password')
+
+                <div class="mb-4">
+                    <x-forms.input label="Password" name="password" type="password" required />
+                </div>
+
+                <div class="mb-6">
+                    <x-forms.input label="Confirm Password" name="password_confirmation" type="password" required />
+                </div>
+
+                @elseif($column['type'] === 'number')
 
                 <div class="mb-4">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="0.01" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
                 </div>
+
+                
+
+
                 @elseif($column['type'] === 'select')
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

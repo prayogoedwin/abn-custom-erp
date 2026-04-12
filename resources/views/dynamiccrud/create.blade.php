@@ -27,13 +27,30 @@
                 @foreach($columns as $column)
                 @if(!$column['inform'] )
                 @continue
+                @endif
                 
                 @if($column['type'] === 'text')
                 <div class="mb-4">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="text" value="{{ old($column['name']) }}" required />
                 </div>
-                @elseif($column['type'] === 'number')
 
+                @if($column['type'] === 'email')
+                
+                <div class="mb-4">
+                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="email" value="{{ old($column['name']) }}" required />
+                </div>
+
+                @elseif($column['type'] === 'password')
+
+                <div class="mb-4">
+                    <x-forms.input label="Password" name="password" type="password" required />
+                </div>
+
+                <div class="mb-6">
+                    <x-forms.input label="Confirm Password" name="password_confirmation" type="password" required />
+                </div>
+
+                @elseif($column['type'] === 'number')
 
                 <div class="mb-4">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="0.01" value="{{ old($column['name']) }}" required />

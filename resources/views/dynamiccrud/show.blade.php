@@ -6,7 +6,7 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <a href="{{ route('produks.index') }}"
+        <a href="{{ route($tablename . '.index') }}"
             class="text-blue-600 dark:text-blue-400 hover:underline">{{ $title }}</a>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
@@ -21,12 +21,12 @@
             <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $title }} details</p>
         </div>
         <div class="flex gap-2">
-            @if(auth()->user()->hasPermission('edit-produks'))
-            <a href="{{ route('produks.edit', $produk) }}">
+            @if(auth()->user()->hasPermission('edit-' . $tablename))
+            <a href="{{ route($tablename . '.edit', $data) }}">
                 <x-button type="primary">{{ __('Edit Produk') }}</x-button>
             </a>
             @endif
-            <a href="{{ route('produks.index') }}">
+            <a href="{{ route($tablename . '.index') }}">
                 <x-button type="secondary">{{ __('Back') }}</x-button>
             </a>
         </div>
@@ -38,16 +38,19 @@
 
 
                 @foreach($columns as $column)
-                
+                @if($column['type'] === 'password' )
+                @continue
+                @endif
+
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {{ $column['title']}}
                     </label>
                     <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        {{ $title->$column['value'] }}
+                        {{ $data->{$column['value']} }}
                     </div>
                 </div>
-                
+
 
                 @endforeach
 

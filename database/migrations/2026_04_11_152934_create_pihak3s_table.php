@@ -17,8 +17,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('kontak')->nullable();
             $table->string('alamat')->nullable();
-            $table->boolean('isactive')->nullable();
-
+            $table->boolean('isactive')->nullable()->default(true);
             $table->timestamps();
             $table->string('deleted_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

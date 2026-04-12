@@ -25,8 +25,8 @@ class ProdukController extends Controller
             'tablename' => 'produks',
             
             'columns' => [
-                ['name' => 'nama_produk','value' => 'nama_produk',  'title' => 'Nama Produk', 'type' => 'text', 'inform' => true],
-                ['name' => 'kategori_produk_id', 'value' => 'kategori', 'title' => 'Kategori', 'type' => 'select', 'inform' => true, 'options' => [
+                ['name' => 'nama_produk','value' => 'nama_produk',  'title' => 'Nama Produk', 'type' => 'text', 'inform' => true, 'intable' => true],
+                ['name' => 'kategori_produk_id', 'value' => 'kategori', 'title' => 'Kategori', 'type' => 'select', 'inform' => true, 'intable' => true, 'options' => [
                     // Ambil data kategori dari database
                     ['value' => '', 'label' => 'Pilih Kategori'],
                     ...$kategoris->map(function ($kategori) {
@@ -34,9 +34,9 @@ class ProdukController extends Controller
                     })->toArray(),
                     
                 ]],
-                ['name' => 'satuan', 'value' => 'satuan', 'title' => 'Satuan', 'type' => 'text', 'inform' => true],
-                ['name' => 'harga_basis_pembelian', 'value' => 'harga_basis_pembelian', 'title' => 'Harga Basis Pembelian', 'type' => 'number', 'inform' => true],
-                ['name' => 'stok_akhir', 'value' => 'stok_akhir', 'title' => 'Stok Akhir', 'type' => 'number', 'inform' => true],
+                ['name' => 'satuan', 'value' => 'satuan', 'title' => 'Satuan', 'type' => 'text', 'inform' => true, 'intable' => true],
+                ['name' => 'harga_basis_pembelian', 'value' => 'harga_basis_pembelian', 'title' => 'Harga Basis Pembelian', 'type' => 'number', 'inform' => true, 'intable' => true],
+                ['name' => 'stok_akhir', 'value' => 'stok_akhir', 'title' => 'Stok Akhir', 'type' => 'number', 'inform' => true, 'intable' => true],
             ],
         ];
 

@@ -23,6 +23,10 @@ class DatabaseSeeder extends Seeder
         $this->call(RolePermissionSeeder::class);
         $this->call(KategoriProdukSeeder::class);
         $this->call(ProdukSeeder::class);
+        $this->call(CustomerSeeder::class);
+        $this->call(SupplierSeeder::class);
+        $this->call(Pihak3Seeder::class);
+        $this->call(KaryawanSeeder::class);
         
 
 
