@@ -79,6 +79,15 @@ class RolePermissionSeeder extends Seeder
             'download-karyawans',
             'delete-karyawans',
 
+            //dinamisvariables
+            'view-dinamisvariables',
+            'show-dinamisvariables',
+            'create-dinamisvariables',
+            'edit-dinamisvariables',
+            'update-dinamisvariables',
+            'download-dinamisvariables',
+            'delete-dinamisvariables',
+
         ];
 
         foreach ($permissions as $permissionName) {

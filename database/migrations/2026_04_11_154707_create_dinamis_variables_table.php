@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('nama_variable');
             $table->string('jenis');
-            $table->string('variable_value');
+            $table->integer('variable_value');
             $table->text('keterangan');
-            $table->boolean('isactive')->nullable();
+            $table->boolean('isactive')->nullable()->default(true);
             $table->timestamps();
             $table->string('deleted_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

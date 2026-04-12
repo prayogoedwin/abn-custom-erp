@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DinamisVariableController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\KategoriProdukController;
 use App\Http\Controllers\PermissionController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Settings;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
+use App\Models\DinamisVariable;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -118,6 +120,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit')->middleware('permission:edit-customers');
     Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update')->middleware('permission:edit-customers');
     Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy')->middleware('permission:delete-customers');
+
+    // DinamisVariable Produk Management - dengan permission check
+    Route::get('dinamisvariables', [DinamisVariableController::class, 'index'])->name('dinamisvariables.index')->middleware('permission:view-dinamisvariables');
+    Route::get('dinamisvariables/export', [DinamisVariableController::class, 'export'])->name('dinamisvariables.export')->middleware('permission:download-kategoris');
+    Route::get('dinamisvariables/create', [DinamisVariableController::class, 'create'])->name('dinamisvariables.create')->middleware('permission:create-dinamisvariables');
+    Route::post('dinamisvariables', [DinamisVariableController::class, 'store'])->name('dinamisvariables.store')->middleware('permission:create-dinamisvariables'); 
+    Route::get('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'show'])->name('dinamisvariables.show')->middleware('permission:show-dinamisvariables');
+    Route::get('dinamisvariables/{dinamisvariable}/edit', [DinamisVariableController::class, 'edit'])->name('dinamisvariables.edit')->middleware('permission:edit-dinamisvariables');
+    Route::put('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'update'])->name('dinamisvariables.update')->middleware('permission:edit-dinamisvariables');
+    Route::delete('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'destroy'])->name('dinamisvariables.destroy')->middleware('permission:delete-dinamisvariables');
 });
 
 require __DIR__.'/auth.php';

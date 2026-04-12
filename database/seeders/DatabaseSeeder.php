@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SupplierSeeder::class);
         $this->call(Pihak3Seeder::class);
         $this->call(KaryawanSeeder::class);
+        $this->call(DinamisVariableSeeder::class);
         
 
 

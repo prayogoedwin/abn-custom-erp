@@ -183,7 +183,7 @@ class CustomerController extends Controller
             'kontak' => $request->input('kontak'),
             'alamat' => $request->input('alamat'),
             
-            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
         ];
 
 
@@ -192,7 +192,7 @@ class CustomerController extends Controller
             'kontak' => ['required'],
             'alamat' => ['required', 'string', 'max:50'],
             
-            'created_by' => ['required', 'integer']
+            'updated_by' => ['required', 'integer']
         ]);
 
 

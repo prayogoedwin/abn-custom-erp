@@ -44,6 +44,15 @@
                                     :active="request()->routeIs('karyawans*')">Menu Karyawan</x-layouts.sidebar-two-level-link>
                             </x-layouts.sidebar-two-level-link-parent>
 
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Setting" icon="fas-cog"
+                                :active="request()->routeIs('dinamisvariables*')">
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('dinamisvariables.index') }}" icon='fas-cogs'
+                                    :active="request()->routeIs('dinamisvariables*')">Menu Dinamic Variable</x-layouts.sidebar-two-level-link>
+
+                                
+                            </x-layouts.sidebar-two-level-link-parent>
+
                             <x-layouts.sidebar-two-level-link-parent title="Example two level" icon="fas-house"
                                 :active="request()->routeIs('two-level*')">
                                 <x-layouts.sidebar-two-level-link href="#" icon='fas-house'
