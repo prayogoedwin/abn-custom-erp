@@ -4,8 +4,10 @@ namespace App\Exports;
 
 use App\Models\Supplier;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class SupplierExport implements FromCollection
+class SupplierExport implements FromCollection, WithHeadings, WithMapping
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -37,6 +39,7 @@ class SupplierExport implements FromCollection
     {
         return [
             $supplier->id,
+            $supplier->user_id,
             $supplier->nama,
             $supplier->kontak,
             $supplier->alamat,
