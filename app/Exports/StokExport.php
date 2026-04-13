@@ -4,8 +4,10 @@ namespace App\Exports;
 
 use App\Models\Stok;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class StokExport implements FromCollection
+class StokExport implements FromCollection, WithHeadings, WithMapping
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -20,6 +22,9 @@ class StokExport implements FromCollection
     {
         return [
             'Produk',
+            'Tipe',
+            'Satuan',
+            'Stok'
         ];
     }
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DinamisVariableController;
+use App\Http\Controllers\HistoryHargaBasisController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\KategoriProdukController;
 use App\Http\Controllers\PermissionController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\StokController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Models\DinamisVariable;
+use App\Models\HistoryHargaBasis;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -91,6 +93,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('stoks/{stok}/edit', [StokController::class, 'edit'])->name('stoks.edit')->middleware('permission:edit-stoks');
     Route::put('stoks/{stok}', [StokController::class, 'update'])->name('stoks.update')->middleware('permission:edit-stoks');
     Route::delete('stoks/{stok}', [StokController::class, 'destroy'])->name('stoks.destroy')->middleware('permission:delete-stoks');
+
+    // History harga Produk Management - dengan permission check
+    Route::get('history_harga_bases', [HistoryHargaBasisController::class, 'index'])->name('history_harga_bases.index')->middleware('permission:view-history_harga_bases');
+    Route::get('history_harga_bases/export', [HistoryHargaBasisController::class, 'export'])->name('history_harga_bases.export')->middleware('permission:download-history_harga_bases');
+    Route::get('history_harga_bases/create', [HistoryHargaBasisController::class, 'create'])->name('history_harga_bases.create')->middleware('permission:create-history_harga_bases');
+    Route::post('history_harga_bases', [HistoryHargaBasisController::class, 'store'])->name('history_harga_bases.store')->middleware('permission:create-history_harga_bases'); 
+    Route::get('history_harga_bases/{historyhargabasis}', [HistoryHargaBasisController::class, 'show'])->name('history_harga_bases.show')->middleware('permission:show-history_harga_bases');
+    Route::get('history_harga_bases/{historyhargabasis}/edit', [HistoryHargaBasisController::class, 'edit'])->name('history_harga_bases.edit')->middleware('permission:edit-history_harga_bases');
+    Route::put('history_harga_bases/{historyhargabasis}', [HistoryHargaBasisController::class, 'update'])->name('history_harga_bases.update')->middleware('permission:edit-history_harga_bases');
+    Route::delete('history_harga_bases/{historyhargabasis}', [HistoryHargaBasisController::class, 'destroy'])->name('history_harga_bases.destroy')->middleware('permission:delete-history_harga_bases');
 
     // Supplier Produk Management - dengan permission check
     Route::get('suppliers', [SupplierController::class, 'index'])->name('suppliers.index')->middleware('permission:view-suppliers');
