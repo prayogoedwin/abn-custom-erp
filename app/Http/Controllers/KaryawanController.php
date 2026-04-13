@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
@@ -121,7 +122,7 @@ class KaryawanController extends Controller
         $validate = Validator::make($store_data, [
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'confirmed', Password::default()],
             'kontak' => ['required'],
             'alamat' => ['required', 'string', 'max:50'],
 
@@ -217,7 +218,7 @@ class KaryawanController extends Controller
         $validate = Validator::make($store_data, [
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['required', 'string', 'max:255'],
+            'password' => ['nullable', 'confirmed', Password::default()],
             'kontak' => ['required'],
             'alamat' => ['required', 'string', 'max:50'],
 
@@ -235,9 +236,14 @@ class KaryawanController extends Controller
             [
                 'name' => $store_data['nama'],
                 'email' => $store_data['email'],
-                'password' => Hash::make($store_data['password']),
             ]
         );
+
+        if (! empty($store_data['password'])) {
+            $user->update([
+                'password' => Hash::make($store_data['password']),
+            ]);
+        }
 
         $karyawan->update($store_data);
 

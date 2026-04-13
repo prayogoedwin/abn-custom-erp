@@ -47,12 +47,14 @@
                 @elseif($column['type'] === 'password')
 
                 <div class="mb-4">
-                    <x-forms.input label="Password" name="password" type="password" required />
+                    <x-forms.input label="Password" name="password" type="password" />
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('Leave blank to keep current password') }}</p>
                 </div>
 
                 <div class="mb-6">
-                    <x-forms.input label="Confirm Password" name="password_confirmation" type="password" required />
+                    <x-forms.input label="Confirm Password" name="password_confirmation" type="password" />
                 </div>
+
 
                 @elseif($column['type'] === 'number')
 
