@@ -17,6 +17,7 @@ class KategoriProdukController extends Controller
         $pagedata = [
             'title' => 'Kategori',
             'tablename' => 'kategoris',
+            'tableaction' => true,
             'columns' => [
                 ['name' => 'nama', 'value' => 'nama', 'title' => 'Nama Kategori', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'created_at', 'value' => 'created_at', 'title' => 'Dibuat pada', 'type' => 'text', 'inform' => false, 'intable' => true],

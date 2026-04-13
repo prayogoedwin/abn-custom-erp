@@ -20,7 +20,7 @@ class Pihak3Controller extends Controller
         $pagedata = [
             'title' => 'Pihak3',
             'tablename' => 'pihak3s',
-
+            'tableaction' => true,
             'columns' => [
                 ['name' => 'nama', 'value' => 'nama',  'title' => 'Nama Pihak3', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'kontak', 'value' => 'kontak', 'title' => 'Kontak', 'type' => 'text', 'inform' => true, 'intable' => true],

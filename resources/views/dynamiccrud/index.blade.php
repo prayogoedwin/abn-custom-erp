@@ -46,8 +46,9 @@
                             @endif
                         @endforeach
                         
-                        
+                        @if($tableaction)
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('Actions') }}</th>
+                        @endif
                     </tr>
                 </thead>
             </table>
@@ -67,7 +68,10 @@
                 { data: '{{ $column["value"] }}' },
                 @endif
             @endforeach
+            @if($tableaction)
             { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-right whitespace-nowrap' }
+            @endif
+
             
         ];
 

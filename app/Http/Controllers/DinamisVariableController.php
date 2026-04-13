@@ -19,7 +19,7 @@ class DinamisVariableController extends Controller
         $pagedata = [
             'title' => 'Variable Dinamis',
             'tablename' => 'dinamisvariables',
-
+            'tableaction' => true,
             'columns' => [
                 ['name' => 'nama_variable', 'value' => 'nama_variable',  'title' => 'Nama Variable Dinamis', 'type' => 'text', 'inform' => true, 'intable' => true],
 

@@ -23,7 +23,7 @@ class KaryawanController extends Controller
         $pagedata = [
             'title' => 'Karyawan',
             'tablename' => 'karyawans',
-
+            'tableaction' => true,
             'columns' => [
                 ['name' => 'nama', 'value' => 'nama',  'title' => 'Nama Karyawan', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'email', 'value' => 'email',  'title' => 'Email', 'type' => 'email', 'inform' => true, 'intable' => true],

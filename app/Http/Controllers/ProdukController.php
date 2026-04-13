@@ -23,7 +23,7 @@ class ProdukController extends Controller
         $pagedata = [
             'title' => 'Produk',
             'tablename' => 'produks',
-            
+            'tableaction' => true,
             'columns' => [
                 ['name' => 'nama_produk','value' => 'nama_produk',  'title' => 'Nama Produk', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'kategori_produk_id', 'value' => 'kategori', 'title' => 'Kategori', 'type' => 'select', 'inform' => true, 'intable' => true, 'options' => [

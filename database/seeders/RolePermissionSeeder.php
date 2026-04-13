@@ -54,6 +54,16 @@ class RolePermissionSeeder extends Seeder
             'update-suppliers',
             'download-suppliers',
             'delete-suppliers',
+
+            //stoks permission
+            'view-stoks',
+            'show-stoks',
+            // 'create-stoks',
+            // 'edit-stoks',
+            // 'update-stoks',
+            'download-stoks',
+            // 'delete-stoks',
+
             //customer permission
             'view-customers',
             'show-customers',

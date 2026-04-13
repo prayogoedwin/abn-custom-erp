@@ -9,6 +9,7 @@ use App\Http\Controllers\Pihak3Controller;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Settings;
+use App\Http\Controllers\StokController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Models\DinamisVariable;
@@ -81,9 +82,19 @@ Route::middleware(['auth'])->group(function () {
     Route::put('kategoris/{kategori}', [KategoriProdukController::class, 'update'])->name('kategoris.update')->middleware('permission:edit-kategoris');
     Route::delete('kategoris/{kategori}', [KategoriProdukController::class, 'destroy'])->name('kategoris.destroy')->middleware('permission:delete-kategoris');
 
+    // Stoks Produk Management - dengan permission check
+    Route::get('stoks', [StokController::class, 'index'])->name('stoks.index')->middleware('permission:view-stoks');
+    Route::get('stoks/export', [StokController::class, 'export'])->name('stoks.export')->middleware('permission:download-stoks');
+    Route::get('stoks/create', [StokController::class, 'create'])->name('stoks.create')->middleware('permission:create-stoks');
+    Route::post('stoks', [StokController::class, 'store'])->name('stoks.store')->middleware('permission:create-stoks'); 
+    Route::get('stoks/{stok}', [StokController::class, 'show'])->name('stoks.show')->middleware('permission:show-stoks');
+    Route::get('stoks/{stok}/edit', [StokController::class, 'edit'])->name('stoks.edit')->middleware('permission:edit-stoks');
+    Route::put('stoks/{stok}', [StokController::class, 'update'])->name('stoks.update')->middleware('permission:edit-stoks');
+    Route::delete('stoks/{stok}', [StokController::class, 'destroy'])->name('stoks.destroy')->middleware('permission:delete-stoks');
+
     // Supplier Produk Management - dengan permission check
     Route::get('suppliers', [SupplierController::class, 'index'])->name('suppliers.index')->middleware('permission:view-suppliers');
-    Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export')->middleware('permission:download-kategoris');
+    Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export')->middleware('permission:download-suppliers');
     Route::get('suppliers/create', [SupplierController::class, 'create'])->name('suppliers.create')->middleware('permission:create-suppliers');
     Route::post('suppliers', [SupplierController::class, 'store'])->name('suppliers.store')->middleware('permission:create-suppliers'); 
     Route::get('suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show')->middleware('permission:show-suppliers');
@@ -93,7 +104,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Karyawan Produk Management - dengan permission check
     Route::get('karyawans', [KaryawanController::class, 'index'])->name('karyawans.index')->middleware('permission:view-karyawans');
-    Route::get('karyawans/export', [KaryawanController::class, 'export'])->name('karyawans.export')->middleware('permission:download-kategoris');
+    Route::get('karyawans/export', [KaryawanController::class, 'export'])->name('karyawans.export')->middleware('permission:download-karyawans');
     Route::get('karyawans/create', [KaryawanController::class, 'create'])->name('karyawans.create')->middleware('permission:create-karyawans');
     Route::post('karyawans', [KaryawanController::class, 'store'])->name('karyawans.store')->middleware('permission:create-karyawans'); 
     Route::get('karyawans/{karyawan}', [KaryawanController::class, 'show'])->name('karyawans.show')->middleware('permission:show-karyawans');
@@ -103,7 +114,7 @@ Route::middleware(['auth'])->group(function () {
 
     // pihak3s Produk Management - dengan permission check
     Route::get('pihak3s', [Pihak3Controller::class, 'index'])->name('pihak3s.index')->middleware('permission:view-pihak3s');
-    Route::get('pihak3s/export', [Pihak3Controller::class, 'export'])->name('pihak3s.export')->middleware('permission:download-kategoris');
+    Route::get('pihak3s/export', [Pihak3Controller::class, 'export'])->name('pihak3s.export')->middleware('permission:download-pihak3s');
     Route::get('pihak3s/create', [Pihak3Controller::class, 'create'])->name('pihak3s.create')->middleware('permission:create-pihak3s');
     Route::post('pihak3s', [Pihak3Controller::class, 'store'])->name('pihak3s.store')->middleware('permission:create-pihak3s'); 
     Route::get('pihak3s/{pihak3}', [Pihak3Controller::class, 'show'])->name('pihak3s.show')->middleware('permission:show-pihak3s');
@@ -113,7 +124,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Supplier Produk Management - dengan permission check
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index')->middleware('permission:view-customers');
-    Route::get('customers/export', [CustomerController::class, 'export'])->name('customers.export')->middleware('permission:download-kategoris');
+    Route::get('customers/export', [CustomerController::class, 'export'])->name('customers.export')->middleware('permission:download-customers');
     Route::get('customers/create', [CustomerController::class, 'create'])->name('customers.create')->middleware('permission:create-customers');
     Route::post('customers', [CustomerController::class, 'store'])->name('customers.store')->middleware('permission:create-customers'); 
     Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show')->middleware('permission:show-customers');
@@ -123,7 +134,7 @@ Route::middleware(['auth'])->group(function () {
 
     // DinamisVariable Produk Management - dengan permission check
     Route::get('dinamisvariables', [DinamisVariableController::class, 'index'])->name('dinamisvariables.index')->middleware('permission:view-dinamisvariables');
-    Route::get('dinamisvariables/export', [DinamisVariableController::class, 'export'])->name('dinamisvariables.export')->middleware('permission:download-kategoris');
+    Route::get('dinamisvariables/export', [DinamisVariableController::class, 'export'])->name('dinamisvariables.export')->middleware('permission:download-dinamisvariables');
     Route::get('dinamisvariables/create', [DinamisVariableController::class, 'create'])->name('dinamisvariables.create')->middleware('permission:create-dinamisvariables');
     Route::post('dinamisvariables', [DinamisVariableController::class, 'store'])->name('dinamisvariables.store')->middleware('permission:create-dinamisvariables'); 
     Route::get('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'show'])->name('dinamisvariables.show')->middleware('permission:show-dinamisvariables');

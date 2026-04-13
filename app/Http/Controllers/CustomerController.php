@@ -19,7 +19,7 @@ class CustomerController extends Controller
         $pagedata = [
             'title' => 'Customer',
             'tablename' => 'customers',
-
+            'tableaction' => true,
             'columns' => [
                 ['name' => 'nama', 'value' => 'nama',  'title' => 'Nama Customer', 'type' => 'text', 'inform' => true, 'intable' => true],
                 

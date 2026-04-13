@@ -20,7 +20,7 @@ class SupplierController extends Controller
         $pagedata = [
             'title' => 'Supplier',
             'tablename' => 'suppliers',
-
+            'tableaction' => true,
             'columns' => [
                 ['name' => 'nama', 'value' => 'nama',  'title' => 'Nama Supplier', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'kontak', 'value' => 'kontak', 'title' => 'Kontak', 'type' => 'text', 'inform' => true, 'intable' => true],
