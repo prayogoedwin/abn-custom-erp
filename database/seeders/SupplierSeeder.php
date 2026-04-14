@@ -13,20 +13,26 @@ class SupplierSeeder extends Seeder
     public function run(): void
     {
         $data = [
+            
             [
-            'nama' => 'kar1',
-            'kontak' => 'kontak1',
-            'alamat' => 'alamat1',
+                'nama' => 'UD. Maju Bersama ATK',
+                'kontak' => '0819-0011-2233',
+                'alamat' => 'Jl. Pemuda No. 12, Medan',
             ],
             [
-            'nama' => 'kar2',
-            'kontak' => 'kontak2',
-            'alamat' => 'alamat2',
+                'nama' => 'PT. Pangan Lestari Mandiri',
+                'kontak' => '031-334455',
+                'alamat' => 'Jl. Margomulyo Indah Blok B-5, Surabaya',
             ],
             [
-            'nama' => 'kar3',
-            'alamat' => 'alamat3',
-            'kontak' => 'kontak3',
+                'nama' => 'CV. Grafika Kreatif Solusi',
+                'kontak' => '022-667788',
+                'alamat' => 'Jl. Lengkong Besar No. 88, Bandung',
+            ],
+            [
+                'nama' => 'PT. Sentra Medika Distribusi',
+                'kontak' => '021-445522',
+                'alamat' => 'Kawasan Marunda Center Blok A-2, Bekasi',
             ],
         ];
 

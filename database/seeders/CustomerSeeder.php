@@ -14,19 +14,19 @@ class CustomerSeeder extends Seeder
     {
         $data = [
             [
-            'nama' => 'cus1',
-            'kontak' => 'kontak1',
-            'alamat' => 'alamat1',
+                'nama' => 'Putri Rahayu',
+                'kontak' => '081234567897',
+                'alamat' => 'Jl. Tulip No. 7, Medan',
             ],
             [
-            'nama' => 'cus2',
-            'kontak' => 'kontak2',
-            'alamat' => 'alamat2',
+                'nama' => 'Eko Prasetyo',
+                'kontak' => '081234567898',
+                'alamat' => 'Jl. Flamboyan No. 22, Makassar',
             ],
             [
-            'nama' => 'cus3',
-            'alamat' => 'alamat3',
-            'kontak' => 'kontak3',
+                'nama' => 'Maya Indah',
+                'kontak' => '081234567899',
+                'alamat' => 'Jl. Sakura No. 11, Palembang',
             ],
         ];
 

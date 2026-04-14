@@ -134,22 +134,10 @@ class KaryawanController extends Controller
             return back()->withErrors($validate)->withInput();
         }
 
-        $user = User::create(
-            [
-                'name' => $store_data['nama'],
-                'email' => $store_data['email'],
-                'password' => Hash::make($store_data['password']),
-            ]
-        );
+        
 
 
-        $lastId = Karyawan::max('id') ?? 0;
-
-        $nextId = $lastId + 1;
-        $store_data['noPegawai'] = str_pad($nextId, 4, '0', STR_PAD_LEFT);
-
-        $store_data['user_id'] = $user->id;
-
+        
         $karyawan = Karyawan::create($store_data);
         // // log stok change
         // Stok::create([

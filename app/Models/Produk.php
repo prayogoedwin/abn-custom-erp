@@ -32,6 +32,25 @@ class Produk extends Model
 
     protected static function booted()
     {
+        static::created(function ($produk) {
+
+            Stok::create([
+                'produk_id' => $produk->id,
+                'tipe_stok' =>  'masuk',
+                'satuan' => $produk->satuan,
+                'stok' => $produk->stok_akhir,
+            ]);
+
+            HistoryHargaBasis::create([
+                'produk_id' => $produk->id,
+                'satuan' => $produk->satuan,
+                'harga_basis' => $produk->harga_basis_pembelian,
+                'tanggal' => now(),
+            ]);
+        });
+
+
+
         // Terjadi update di database
         static::updated(function ($produk) {
             if (auth()->check()) {
