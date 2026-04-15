@@ -100,7 +100,7 @@
 
                 <div class="flex gap-3">
                     <x-button type="primary">{{ __('Update') }}</x-button>
-                    <a href="{{ route('produks.index') }}">
+                    <a href="{{ route($tablename . '.index') }}">
                         <x-button type="secondary">{{ __('Cancel') }}</x-button>
                     </a>
                 </div>

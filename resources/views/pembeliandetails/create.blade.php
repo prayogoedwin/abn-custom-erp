@@ -5,7 +5,7 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <a href="{{ route($tablename . '.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $title ?? __('Produks') }}</a>
+        <a href="{{ route('produks.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $title ?? __('Produks') }}</a>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -18,9 +18,9 @@
         <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Fill in the details below') }}</p>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div class="p-6">
-            <form action="{{ route($tablename . '.store') }}" method="POST" class="max-w-2xl">
+    <div class=" overflow-hidden">
+        <div class="">
+            <form action="{{ route($tablename . '.store') }}" method="POST" class="">
                 @csrf
                 @method('POST')
 
@@ -28,14 +28,14 @@
                 @if(!$column['inform'] )
                 @continue
                 @endif
-                
+
                 @if($column['type'] === 'text')
                 <div class="mb-4">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="text" value="{{ old($column['name']) }}" required />
                 </div>
 
                 @elseif($column['type'] === 'email')
-                
+
                 <div class="mb-4">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="email" value="{{ old($column['name']) }}" required />
                 </div>
@@ -82,9 +82,10 @@
 
 
 
+
                 <div class="flex gap-3">
                     <x-button type="primary">{{ __('Create') }}</x-button>
-                    <a href="{{ route($tablename . '.index') }}">
+                    <a href="{{ route('pembelians.index') }}">
                         <x-button type="secondary">{{ __('Cancel') }}</x-button>
                     </a>
                 </div>

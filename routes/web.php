@@ -5,6 +5,8 @@ use App\Http\Controllers\DinamisVariableController;
 use App\Http\Controllers\HistoryHargaBasisController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\KategoriProdukController;
+use App\Http\Controllers\PembelianController;
+use App\Http\Controllers\PembelianDetailController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Pihak3Controller;
 use App\Http\Controllers\ProdukController;
@@ -153,6 +155,26 @@ Route::middleware(['auth'])->group(function () {
     Route::get('dinamisvariables/{dinamisvariable}/edit', [DinamisVariableController::class, 'edit'])->name('dinamisvariables.edit')->middleware('permission:edit-dinamisvariables');
     Route::put('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'update'])->name('dinamisvariables.update')->middleware('permission:edit-dinamisvariables');
     Route::delete('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'destroy'])->name('dinamisvariables.destroy')->middleware('permission:delete-dinamisvariables');
+
+    // Pembelians Management - dengan permission check
+    Route::get('pembelians', [PembelianController::class, 'index'])->name('pembelians.index')->middleware('permission:view-pembelians');
+    Route::get('pembelians/export', [PembelianController::class, 'export'])->name('pembelians.export')->middleware('permission:download-pembelians');
+    Route::get('pembelians/create', [PembelianController::class, 'create'])->name('pembelians.create')->middleware('permission:create-pembelians');
+    Route::post('pembelians', [PembelianController::class, 'store'])->name('pembelians.store')->middleware('permission:create-pembelians'); 
+    Route::get('pembelians/{pembelian}', [PembelianController::class, 'show'])->name('pembelians.show')->middleware('permission:show-pembelians');
+    Route::get('pembelians/{pembelian}/edit', [PembelianController::class, 'edit'])->name('pembelians.edit')->middleware('permission:edit-pembelians');
+    Route::put('pembelians/{pembelian}', [PembelianController::class, 'update'])->name('pembelians.update')->middleware('permission:edit-pembelians');
+    Route::delete('pembelians/{pembelian}', [PembelianController::class, 'destroy'])->name('pembelians.destroy')->middleware('permission:delete-pembelians');
+
+    // PembeliansDetails Management - dengan permission check
+    Route::get('pembeliandetails', [PembelianDetailController::class, 'index'])->name('pembeliandetails.index')->middleware('permission:view-pembeliandetails');
+    Route::get('pembeliandetails/export', [PembelianDetailController::class, 'export'])->name('pembeliandetails.export')->middleware('permission:download-pembeliandetails');
+    Route::get('pembeliandetails/create', [PembelianDetailController::class, 'create'])->name('pembeliandetails.create')->middleware('permission:create-pembeliandetails');
+    Route::post('pembeliandetails', [PembelianDetailController::class, 'store'])->name('pembeliandetails.store')->middleware('permission:create-pembeliandetails'); 
+    Route::get('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'show'])->name('pembeliandetails.show')->middleware('permission:show-pembeliandetails');
+    Route::get('pembeliandetails/{pembeliandetail}/edit', [PembelianDetailController::class, 'edit'])->name('pembeliandetails.edit')->middleware('permission:edit-pembeliandetails');
+    Route::put('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'update'])->name('pembeliandetails.update')->middleware('permission:edit-pembeliandetails');
+    Route::delete('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'destroy'])->name('pembeliandetails.destroy')->middleware('permission:delete-pembeliandetails');
 });
 
 require __DIR__.'/auth.php';

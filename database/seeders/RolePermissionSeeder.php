@@ -107,6 +107,24 @@ class RolePermissionSeeder extends Seeder
             'download-dinamisvariables',
             'delete-dinamisvariables',
 
+            //pembelians
+            'view-pembelians',
+            'show-pembelians',
+            'create-pembelians',
+            'edit-pembelians',
+            'update-pembelians',
+            'download-pembelians',
+            'delete-pembelians',
+
+            //pembeliansdetails
+            'view-pembeliandetails',
+            'show-pembeliandetails',
+            'create-pembeliandetails',
+            'edit-pembeliandetails',
+            'update-pembeliandetails',
+            'download-pembeliandetails',
+            'delete-pembeliandetails',
+
         ];
 
         foreach ($permissions as $permissionName) {

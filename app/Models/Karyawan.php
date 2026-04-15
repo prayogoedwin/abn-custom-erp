@@ -24,19 +24,9 @@ class Karyawan extends Model
     {
         static::creating(function ($karyawan) {
 
+            
 
-            $user = User::create(
-                [
-                    'name' => $karyawan['nama'],
-                    'email' => $karyawan['email'],
-                    'password' => Hash::make($karyawan['password']),
-                ]
-            );
-
-            $karyawan->user_id = $user->id;
-
-            unset($karyawan->email);
-            unset($karyawan->password);
+            
 
             $lastKaryawan = self::orderBy('id', 'desc')->first();
 

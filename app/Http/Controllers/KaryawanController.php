@@ -108,37 +108,31 @@ class KaryawanController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $store_data = [
-            'nama' => $request->input('nama'),
-            'email' => $request->input('email'),
-            'password' => $request->input('password'),
-            'kontak' => $request->input('kontak'),
-            'alamat' => $request->input('alamat'),
-
-            'created_by' => auth()->id(),
-        ];
-
-
-        $validate = Validator::make($store_data, [
+        $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['required', 'confirmed', Password::default()],
+            'password' => ['required', 'confirmed', Password::defaults()],
             'kontak' => ['required'],
             'alamat' => ['required', 'string', 'max:50'],
-
-            'created_by' => ['required', 'integer']
         ]);
 
+        // 2. Add the extra data after validation
+        $validated['created_by'] = auth()->id();
+        $validated['password'] = Hash::make($request->password); 
+        // 3. Create the record
+        $user = User::create([
+            'name' => $validated['nama'],
+            'email' =>$validated['email'],
+            'password' =>$validated['password'],
+        ]);
 
-        if ($validate->fails()) {
-            return back()->withErrors($validate)->withInput();
-        }
-
-        
+        $validated['user_id'] = $user->id;
 
 
-        
-        $karyawan = Karyawan::create($store_data);
+
+
+
+        $karyawan = Karyawan::create($validated);
         // // log stok change
         // Stok::create([
         //     'karyawan_id' => $karyawan->id,

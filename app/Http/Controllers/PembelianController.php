@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\PembelianExport;
 use App\Models\Pembelian;
+use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -28,13 +29,22 @@ class PembelianController extends Controller
         // 'kekurangan',
         // 'status_pembayaran',
 
+        $suppliers = Supplier::where('isActive', true)->get();
+        // dd($suppliers);
+
         $pagedata = [
             'title' => 'Pembelian',
             'tablename' => 'pembelians',
             'tableaction' => true,
             'columns' => [
-                ['name' => 'no_transaksi', 'value' => 'no_transaksi',  'title' => 'No Transaksi', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
-                ['name' => 'supplier_name', 'value' => 'supplier_name',  'title' => 'Supplier', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'no_transaksi', 'value' => 'no_transaksi',  'title' => 'No Transaksi', 'type' => 'text', 'inform' => false, 'inshow' => true, 'intable' => true],
+                ['name' => 'supplier_id', 'value' => 'supplier',  'title' => 'Supplier', 'type' => 'select', 'inform' => true, 'intable' => true, 'options' => [
+                    // Ambil data kategori dari database
+                    
+                    ...$suppliers->map(function ($supplier) {
+                        return ['value' => $supplier->id, 'label' => $supplier->nama];
+                    })->toArray(),
+                ]],
                 ['name' => 'nopol', 'value' => 'nopol',  'title' => 'Nopol', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
                 ['name' => 'tipe_transaksi_pembelian', 'value' => 'tipe_transaksi_pembelian',  'title' => 'Tipe Transaksi Pembelian', 'type' => 'select', 'inform' => true, 'inshow' => true, 'intable' => true, 'options' => [
                     ['value' => 'Titip', 'label' => 'Titip'],
@@ -43,7 +53,7 @@ class PembelianController extends Controller
                 ['name' => 'total_nominal_pembelian', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Pembelian', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => true],
                 ['name' => 'total_nominal_terbayar', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Terbayar', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => true],
                 ['name' => 'kekurangan', 'value' => 'kekurangan',  'title' => 'Kekurangan', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => true],
-                ['name' => 'status_pembayaran', 'value' => 'status_pembayaran',  'title' => 'Status Pembayaran', 'type' => 'select', 'inform' => true, 'inshow' => true, 'intable' => true, 'options' => [
+                ['name' => 'status_pembayaran', 'value' => 'status_pembayaran',  'title' => 'Status Pembayaran', 'type' => 'select', 'inform' => false, 'inshow' => true, 'intable' => true, 'options' => [
                     ['value' => 'Lunas', 'label' => 'Lunas'],
                     ['value' => 'Belum Lunas', 'label' => 'Belum Lunas'],
                 ]],
@@ -57,11 +67,17 @@ class PembelianController extends Controller
     public function index(Request $request)
     {
         // dd($request->headers->all());
+        // $pembelians = Pembelian::join('suppliers', 'pembelians.supplier_id', '=', 'suppliers.id')
+        //     // Select everything from karyawan, and specific fields from users
+        //     ->select('pembelians.*', 'suppliers.nama as supplier_name')
+        //     ->where('pembelians.isactive', true)
+        //     ->get();
+        // dd($pembelians);
         if ($request->ajax()) {
             // dd('masuk ajax');
             $pembelians = Pembelian::join('suppliers', 'pembelians.supplier_id', '=', 'suppliers.id')
                 // Select everything from karyawan, and specific fields from users
-                ->select('pembelians.*', 'suppliers.name as supplier_name')
+                ->select('pembelians.*', 'suppliers.nama as supplier_name')
                 ->where('pembelians.isactive', true)
                 ->get();
             // dd($pembelians);
@@ -116,33 +132,32 @@ class PembelianController extends Controller
 
     public function create(): View
     {
-
+        $suppliers = Supplier::where('isActive', true)->get();
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.create', $pagedata);
+        return view('dynamiccrud.create',compact('suppliers'), $pagedata);
     }
 
     public function store(Request $request): RedirectResponse
     {
+
         $store_data = [
-            'nama' => $request->input('nama'),
-            'email' => $request->input('email'),
-            'password' => $request->input('password'),
-            'kontak' => $request->input('kontak'),
-            'alamat' => $request->input('alamat'),
+            'nopol' => $request->input('nopol'),
+            'supplier_id' => $request->input('supplier_id'),
+            'tipe_transaksi_pembelian' => $request->input('tipe_transaksi_pembelian'),
 
             'created_by' => auth()->id(),
         ];
 
+        
+
 
         $validate = Validator::make($store_data, [
-            'nama' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['required', 'confirmed', Password::default()],
-            'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
-
+            'nopol' => ['required', 'string', 'max:255'],
+            'supplier_id' => ['required', 'integer', 'max:255'],
+            'tipe_transaksi_pembelian' => ['required', 'string'],
+            
             'created_by' => ['required', 'integer']
         ]);
 
@@ -152,10 +167,10 @@ class PembelianController extends Controller
         }
 
 
+        // dd($store_data);
 
 
-
-        $karyawan = Pembelian::create($store_data);
+        Pembelian::create($store_data);
         // // log stok change
         // Stok::create([
         //     'karyawan_id' => $karyawan->id,
@@ -172,7 +187,7 @@ class PembelianController extends Controller
         //     'tanggal' => now(),
         // ]);
 
-        return to_route('pembelians.index')->with('status', 'Pembelian updated successfully.');
+        return to_route('pembeliandetails.create');
     }
 
     public function show(Pembelian $karyawan): View

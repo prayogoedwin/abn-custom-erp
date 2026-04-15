@@ -35,6 +35,15 @@
 
                             </x-layouts.sidebar-two-level-link-parent>
 
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Transaksi" icon="fas-boxes-packing"
+                                :active="request()->routeIs('pembelians*')">
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('pembelians.index') }}" icon='fas-cube'
+                                    :active="request()->routeIs('pembelians*')">Menu Pembelian</x-layouts.sidebar-two-level-link>
+
+
+                            </x-layouts.sidebar-two-level-link-parent>
+
                             <x-layouts.sidebar-two-level-link-parent title="Menu Entitas" icon="fas-users-cog"
                                 :active="request()->routeIs('suppliers*') || request()->routeIs('customers*') || request()->routeIs('pihak3s*') || request()->routeIs('karyawans*')">
 
