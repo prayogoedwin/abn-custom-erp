@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('produks', function (Blueprint $table) {
+        Schema::create('pembelians', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kategori_produk_id')->constrained()->cascadeOnDelete();
-            $table->string('nama_produk');
-            $table->string('satuan');
-            $table->decimal('harga_basis_pembelian', 15, 2);
-            $table->float('stok_akhir');
-            $table->boolean('isactive')->default(true);
+            $table->string('no_transaksi');
 
+            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
+            $table->string('nopol')->nullable();
+            $table->string('tipe_transaksi_pembelian')->default('Titip'); // titip or jual
+            $table->integer('total_nominal_pembelian')->default(0);
+            $table->integer('total_nominal_terbayar')->default(0);
+            $table->integer('kekurangan')->nullable();
+            $table->string('status_pembayaran')->default('Lunas'); // lunas or belum lunas
+            $table->boolean('isactive')->nullable()->default(true);
             $table->timestamps();
             $table->string('deleted_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
@@ -33,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('produks');
+        Schema::dropIfExists('pembelians');
     }
 };

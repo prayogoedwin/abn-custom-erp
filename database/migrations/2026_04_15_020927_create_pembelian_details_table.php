@@ -11,15 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('produks', function (Blueprint $table) {
+        Schema::create('pembelian_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kategori_produk_id')->constrained()->cascadeOnDelete();
-            $table->string('nama_produk');
+            $table->foreignId('pembelian_id')->constrained('pembelians')->onDelete('cascade');
+            $table->foreignId('produk_id')->constrained('produks')->onDelete('cascade');
+            $table->float('netto')->nullable();
             $table->string('satuan');
-            $table->decimal('harga_basis_pembelian', 15, 2);
-            $table->float('stok_akhir');
-            $table->boolean('isactive')->default(true);
-
+            $table->float('rendeman');
+            $table->integer('bobot')->default(0);
+            $table->integer('harga')->default(0);
+            $table->integer('harga_basis')->nullable();
+            $table->integer('harga_basis_pembelian')->nullable();
+            $table->integer('harga_netto')->nullable();
+            
+            $table->boolean('isactive')->nullable()->default(true);
             $table->timestamps();
             $table->string('deleted_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
@@ -33,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('produks');
+        Schema::dropIfExists('pembelian_details');
     }
 };

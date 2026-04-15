@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('tipe_stok'); // masuk / keluar
             $table->string('satuan');
 
-            $table->integer('stok')->default(0);
+            $table->float('stok')->default(0);
 
             $table->timestamps();
         });

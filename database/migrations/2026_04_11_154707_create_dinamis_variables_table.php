@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_variable');
             $table->string('jenis');
-            $table->integer('variable_value');
+            $table->float('variable_value');
             $table->text('keterangan');
             $table->boolean('isactive')->nullable()->default(true);
             $table->timestamps();
