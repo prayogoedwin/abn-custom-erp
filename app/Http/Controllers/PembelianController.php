@@ -176,7 +176,7 @@ class PembelianController extends Controller
             return to_route('pembeliandetails.createtitip', $pembelian->id);
         }
 
-        return to_route('pembeliandetails.create', $pembelian->id);
+        return to_route('pembeliandetails.createjual', $pembelian->id);
     }
 
     public function show(Pembelian $karyawan): View

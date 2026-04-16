@@ -29,8 +29,8 @@
                     <div class="produk-row border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Produk</label>
-                                <select name="produk_id[]" class="produk-select block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Produk</label>
+                                <select name="produk_id[]" class="produk-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                                     <option value="">Pilih Produk</option>
                                     @foreach($produks as $produk)
                                     <option value="{{ $produk->id }}" data-satuan="{{ $produk->satuan }}">
@@ -38,6 +38,12 @@
                                     </option>
                                     @endforeach
                                 </select>
+                            </div>
+
+                            <div class="container-satuan hidden">
+                                <input
+                                    class="input-satuan"
+                                    name="satuan[]" />
                             </div>
 
                             <div class="container-netto hidden">
@@ -64,6 +70,7 @@
             </form>
         </div>
     </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('produk-container');
@@ -75,6 +82,7 @@
                 const nettoDiv = row.querySelector('.container-netto');
                 const rendemanDiv = row.querySelector('.container-rendeman');
                 const appendSatuan = row.querySelector('.text-gray-900'); // Sesuai temuan Anda
+                const hiddenInputSatuan = row.querySelector('.input-satuan');
 
                 select.addEventListener('change', function() {
                     const selectedOption = select.options[select.selectedIndex];
@@ -88,6 +96,11 @@
                     if (val !== "") {
                         nettoDiv.classList.remove('hidden');
                         if (appendSatuan) appendSatuan.textContent = satuan || '-';
+
+                        // 2. Isi value ke input satuan[] yang tersembunyi
+                        if (hiddenInputSatuan) {
+                            hiddenInputSatuan.value = satuan || '';
+                        }
 
                         // Logika Rendeman
                         if (val === "1" || val === "2") {

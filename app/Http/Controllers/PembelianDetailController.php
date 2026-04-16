@@ -106,9 +106,6 @@ class PembelianDetailController extends Controller
     }
 
 
-
-
-
     public function export()
     {
         return Excel::download(new PembelianDetailExport, 'pembeliandetails-' . date('Y-m-d') . '.xlsx');
@@ -136,6 +133,19 @@ class PembelianDetailController extends Controller
     }
 
 
+    public function createjual($pembelian_id): View
+    {
+        $produks = Produk::where('isActive', true)->get();
+
+
+
+        $pagedata = $this->getPagedata();
+        $pagedata['pembelian_id'] = $pembelian_id;
+
+        return view('pembeliandetails.createjual', compact('produks'), $pagedata);
+    }
+
+
     public function titipstore(Request $request): RedirectResponse
     {
         $store_data = [
@@ -153,24 +163,20 @@ class PembelianDetailController extends Controller
             'created_by' => auth()->id(),
         ];
 
-        //      'pembelian_id',
-        //     'produk_id',
-        //     'netto',
-        //     'satuan',
-        //     'rendeman',
-        //     'bobot',
-        //     'harga',
-        //     'harga_basis',
-        //     'harga_basis_pembelian',
-        //     'harga_netto',
 
+        foreach ($request->produk_id as $index => $produk_id) {
+            if (!empty($produk_id)) {
+                // Simpan setiap item ke database
+                PembelianDetail::create([
+                    'pembelian_id' => $request->pembelian_id,
+                    'produk_id'    => $produk_id,
+                    'netto'        => $request->netto[$index] ?? 0,
+                    'satuan'       => $request->satuan[$index] ?? "satuan",
+                    'rendeman'     => $request->rendeman[$index] ?? null,
+                ]);
+            }
+        }
 
-        $store_data['satuan'] = Produk::where('id', $request->produk_id)->value('satuan');
-        // dd($store_data);
-
-
-
-        $pembelian = PembelianDetail::create($store_data);
 
 
         return to_route('pembelians.index')->with('status', 'Pembelian updated successfully.');
@@ -215,7 +221,7 @@ class PembelianDetailController extends Controller
             'stok' => $store_data['netto'],
         ]);
 
-        
+
         $pembelian = PembelianDetail::create($store_data);
 
 
