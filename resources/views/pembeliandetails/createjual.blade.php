@@ -27,7 +27,7 @@
 
                 <div id="produk-container">
                     <div class="produk-row border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Produk</label>
 
@@ -56,6 +56,10 @@
                             <div class="container-rendeman hidden">
                                 <x-forms.input append="%" label="Rendeman" name="rendeman[]" type="number" />
                             </div>
+
+                            <div class="container-bobot hidden">
+                                <x-forms.input prepend="Rp." append=".00" label="Bobot" name="bobot[]" type="number" />
+                            </div>
                         </div>
                         <div class="container-hargas hidden grid grid-cols-1 md:grid-cols-3 gap-4">
 
@@ -73,7 +77,12 @@
 
                         <button type="button" class="btn-remove hidden text-red-500 text-sm mt-2">Hapus Produk</button>
 
-                        <button type="button" class="btn btn-yellow ">Hitung</button>
+
+                        <div class="container-button-hitung hidden">
+                            <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold p-1 rounded">
+                                Hitung
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -100,14 +109,17 @@
                 const nettoDiv = row.querySelector('.container-netto');
                 const hargasDiv = row.querySelector('.container-hargas');
                 const rendemanDiv = row.querySelector('.container-rendeman');
+                const bobotDiv = row.querySelector('.container-bobot');
                 const appendSatuan = row.querySelector('.text-gray-900'); // Sesuai temuan Anda
                 const hiddenInputSatuan = row.querySelector('.input-satuan');
-                const btnHitung = row.querySelector('.btn-yellow'); // Tombol Hitung
+                const btnHitungDiv = row.querySelector('.container-button-hitung');
+                const btnHitung = row.querySelector('.bg-yellow-500'); // Tombol Hitung
 
 
                 // Field Harga-Harga
                 const inputRendeman = row.querySelector('input[name="rendeman[]"]');
                 const inputNetto = row.querySelector('input[name="netto[]"]');
+                const inputBobot = row.querySelector('input[name="bobot[]"]');
 
                 const inputHargaMaster = row.querySelector('input[name="harga[]"]');
                 const inputHargaBasisUser = row.querySelector('input[name="harga_basis[]"]');
@@ -120,12 +132,16 @@
                     const satuan = selectedOption.getAttribute('data-satuan');
                     const harga_basis = selectedOption.getAttribute('data-harga-basis');
 
+                    console.log("kesini");
+
                     // Reset
                     nettoDiv.classList.add('hidden');
                     rendemanDiv.classList.add('hidden');
+                    bobotDiv.classList.add('hidden');
                     hargasDiv.classList.add('hidden');
+                    btnHitungDiv.classList.add('hidden');
 
-                    console.log(harga_basis);
+
 
                     if (val !== "") {
                         nettoDiv.classList.remove('hidden');
@@ -139,7 +155,14 @@
 
                         hargasDiv.classList.remove('hidden');
                         containerHargas.classList.remove('hidden');
-                        hitungSemua();
+                        btnHitungDiv.classList.remove('hidden');
+
+                        inputHargaBasisUser.value = harga_basis;
+
+                        // Logika Rendeman
+                        if (val === "2") {
+                            bobotDiv.classList.remove('hidden');
+                        }
 
 
                         // Logika Rendeman
@@ -151,32 +174,77 @@
 
                 function eksekusiKalkulasi() {
                     const selectedOption = select.options[select.selectedIndex];
+                    const hargaMaster = parseFloat(selectedOption.getAttribute('data-harga-basis')) || 0;
+                    const val = selectedOption.value;
 
-                    // Pastikan produk sudah dipilih
-                    if (!selectedOption || select.value === "") {
-                        alert("Silakan pilih produk terlebih dahulu.");
-                        return;
+                    console.log(val);
+
+                    if (val === '1') {
+                        //ini kopi
+                        //harga               = (harga_basis (dari master) * rendeman) => Rupiah
+                        //harga_basis_pembelian = secara otomatis terisi sesuai {harga} => tapi editable => Rupiah
+                        //harga_netto           = (harga_basis_pembelian * netto) => Rupiah
+
+
+                        const rendeman = parseFloat(inputRendeman.value) || 0;
+                        const netto = parseFloat(inputNetto.value) || 0;
+
+                        // 1. Hitung Harga (Master * Rendeman)
+                        const hasilHarga = hargaMaster * (rendeman / 100);
+                        inputHargaMaster.value = Math.round(hasilHarga);
+
+                        console.log(hasilHarga);
+
+
+                        const hargaBasisTerbaru = parseFloat(inputHargaBasisUser.value) || 0;
+                        const hasilNetto = hargaBasisTerbaru * netto;
+                        inputHargaNetto.value = Math.round(hasilNetto);
+
+                        console.log("Kalkulasi selesai untuk produk Kopi:", selectedOption.text);
+
+                    } else if (val === '2') {
+                        // ini Lada 
+                        // harga = (harga_basis + (harga_basis * rendeman)) => Rupiah
+                        //   Input bobot => Rupiah (bisa + / -) Misal : -5000
+                        //   harga_basis_pembelian = (harga_basis +/- bobot) => + atau - tergantung isi bobot => editable => rupiah
+                        //   harga_netto = (harga_basis_pembelian * netto) => Rupiah
+
+                        const rendeman = parseFloat(inputRendeman.value) || 0;
+                        const netto = parseFloat(inputNetto.value) || 0;
+                        const bobot = parseFloat(inputBobot.value) || 0;
+
+                        // 1. Hitung Harga (Master * Rendeman)
+                        const hasilHarga = hargaMaster + (hargaMaster * (rendeman / 100));
+                        inputHargaMaster.value = Math.round(hasilHarga);
+
+                        const hasilHargaBasis = parseFloat(inputHargaBasisUser.value + bobot) || 0;
+                        inputHargaBasisUser.value = hasilHargaBasis
+
+                        const hasilNetto = hasilHargaBasis * netto;
+                        inputHargaNetto.value = Math.round(hasilNetto);
+
+                        console.log("Kalkulasi selesai untuk produk Lada:", selectedOption.text);
+                    } else {
+                        // ini Lada 
+                        // harga = harga_basis
+                        //    harga_basis_pembelian = secara otomatis terisi susuai {harga} => tapi editable => rupiah
+                        //    harga_netto = harga_basis * netto => Rupiah
+
+
+                        const netto = parseFloat(inputNetto.value) || 0;
+
+                        // 1. Hitung Harga (Master * Rendeman)
+                        const hasilHarga = hargaMaster;
+                        inputHargaMaster.value = hasilHarga;
+
+
+                        inputHargaBasisUser.value = hasilHargaBasis
+
+                        const hasilNetto = hasilHargaBasis * netto;
+                        inputHargaNetto.value = Math.round(hasilNetto);
+
+                        console.log("Kalkulasi selesai untuk produk lainya:", selectedOption.text);
                     }
-
-                    const hargaMaster = parseFloat(selectedOption.getAttribute('data-harga')) || 0;
-                    const rendeman = parseFloat(inputRendeman.value) || 0;
-                    const netto = parseFloat(inputNetto.value) || 0;
-
-                    // 1. Hitung Harga (Master * Rendeman)
-                    const hasilHarga = hargaMaster * (rendeman / 100);
-                    inputHargaMaster.value = Math.round(hasilHarga);
-
-                    // 2. Isi Harga Basis Pembelian (Hanya jika masih kosong atau ingin di-reset)
-                    // Jika ingin selalu update saat klik hitung:
-                    inputHargaBasisUser.value = Math.round(hasilHarga);
-
-                    // 3. Hitung Harga Netto (Harga Basis Pembelian * Netto)
-                    // Kita ambil value terbaru dari inputHargaBasisUser karena user mungkin sudah edit
-                    const hargaBasisTerbaru = parseFloat(inputHargaBasisUser.value) || 0;
-                    const hasilNetto = hargaBasisTerbaru * netto;
-                    inputHargaNetto.value = Math.round(hasilNetto);
-
-                    console.log("Kalkulasi selesai untuk produk:", selectedOption.text);
                 }
 
 
