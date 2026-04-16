@@ -23,85 +23,104 @@
         <div class="p-5">
             <form action="{{ route($tablename . '.titipstore') }}" method="POST" id="pembelianForm">
                 @csrf
-                @method('POST')
+                <input type="hidden" name="pembelian_id" value="{{ $pembelian_id }}">
 
-                <div id="container-pembelian_id" class="mb-4 hidden">
-                    <x-forms.input append="%" label="-" name="pembelian_id" type="number" value="{{ $pembelian_id }}" />
-                </div>
+                <div id="produk-container">
+                    <div class="produk-row border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Produk</label>
+                                <select name="produk_id[]" class="produk-select block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="">Pilih Produk</option>
+                                    @foreach($produks as $produk)
+                                    <option value="{{ $produk->id }}" data-satuan="{{ $produk->satuan }}">
+                                        {{$produk->nama_produk}}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Produk</label>
-                    <select
-                        name="produk_id"
-                        id="produk_select"
-                        class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                        <option value="">Pilih Produk</option>
+                            <div class="container-netto hidden">
+                                <x-forms.input append="satuan" label="Netto" name="netto[]" type="number" />
+                            </div>
 
-                        @foreach($produks as $produk)
-                        <option value="{{ $produk->id }}"
-                            data-satuan="{{ $produk->satuan }}">
-                            {{$produk->nama_produk}}
+                            <div class="container-rendeman hidden">
+                                <x-forms.input append="%" label="Rendeman" name="rendeman[]" type="number" />
+                            </div>
+                        </div>
 
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div id="container-netto" class="mb-4 hidden">
-                    <div class="relative">
-                        <x-forms.input append="satuan" label="Netto" name="netto" type="number" value="{{ old('netto') }}" />
-
+                        <button type="button" class="btn-remove hidden text-red-500 text-sm mt-2">Hapus Produk</button>
                     </div>
                 </div>
 
-                <div id="container-rendeman" class="mb-4 hidden">
-                    <x-forms.input append="%" label="Rendeman" name="rendeman" type="number" value="{{ old('rendeman') }}" />
-                </div>
+                <button type="button" id="add-produk" class="mb-4 bg-green-500 text-white px-4 py-2 rounded shadow">
+                    + Tambah Produk Lain
+                </button>
 
-
-                <div class="flex gap-3 mt-3">
-                    <x-button type="primary">{{ __('Save') }}</x-button>
-                    <a href="{{ route('pembelians.index') }}">
-                        <x-button type="secondary">{{ __('Cancel') }}</x-button>
-                    </a>
+                <div class="flex gap-3 mt-3 border-t pt-4">
+                    <x-button type="primary">Simpan Semua</x-button>
+                    <a href="{{ route('pembelians.index') }}"><x-button type="secondary">Batal</x-button></a>
                 </div>
             </form>
         </div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const produkSelect = document.getElementById('produk_select');
-            const containerNetto = document.getElementById('container-netto');
-            const containerRendeman = document.getElementById('container-rendeman');
+            const container = document.getElementById('produk-container');
+            const addButton = document.getElementById('add-produk');
 
-            function updateVisibility() {
-                const selectedOption = produkSelect.options[produkSelect.selectedIndex];
-                if (!selectedOption) return;
+            // 1. Fungsi Update Visibility untuk baris tertentu
+            function handleRowLogic(row) {
+                const select = row.querySelector('.produk-select');
+                const nettoDiv = row.querySelector('.container-netto');
+                const rendemanDiv = row.querySelector('.container-rendeman');
+                const appendSatuan = row.querySelector('.text-gray-900'); // Sesuai temuan Anda
 
-                const val = selectedOption.value;
-                const satuan = selectedOption.getAttribute('data-satuan');
+                select.addEventListener('change', function() {
+                    const selectedOption = select.options[select.selectedIndex];
+                    const val = selectedOption.value;
+                    const satuan = selectedOption.getAttribute('data-satuan');
 
-                containerNetto.classList.add('hidden');
-                containerRendeman.classList.add('hidden');
+                    // Reset
+                    nettoDiv.classList.add('hidden');
+                    rendemanDiv.classList.add('hidden');
 
-                if (val !== "") {
-                    containerNetto.classList.remove('hidden');
+                    if (val !== "") {
+                        nettoDiv.classList.remove('hidden');
+                        if (appendSatuan) appendSatuan.textContent = satuan || '-';
 
-                    // Mencari elemen berdasarkan ID atau class penanda
-                    const appendSatuan = document.getElementById('display_satuan') || containerNetto.querySelector('.text-gray-900');
-
-                    if (appendSatuan) {
-                        appendSatuan.textContent = satuan;
+                        // Logika Rendeman
+                        if (val === "1" || val === "2") {
+                            rendemanDiv.classList.remove('hidden');
+                        }
                     }
-
-                    if (val === "1" || val === "2") {
-                        containerRendeman.classList.remove('hidden');
-                    }
-                }
+                });
             }
 
-            produkSelect.addEventListener('change', updateVisibility);
-            updateVisibility(); // Handle initial state/old input
+            // 2. Inisialisasi baris pertama
+            handleRowLogic(container.querySelector('.produk-row'));
+
+            // 3. Logika Tambah Baris (Clone)
+            addButton.addEventListener('click', function() {
+                const rows = container.querySelectorAll('.produk-row');
+                const newRow = rows[0].cloneNode(true); // Clone baris pertama
+
+                // Reset nilai di baris baru
+                newRow.querySelectorAll('input').forEach(input => input.value = '');
+                newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+                newRow.querySelector('.container-netto').classList.add('hidden');
+                newRow.querySelector('.container-rendeman').classList.add('hidden');
+
+                // Tampilkan tombol hapus di baris baru
+                const removeBtn = newRow.querySelector('.btn-remove');
+                removeBtn.classList.remove('hidden');
+                removeBtn.addEventListener('click', () => newRow.remove());
+
+                // Jalankan logic untuk baris baru
+                handleRowLogic(newRow);
+
+                container.appendChild(newRow);
+            });
         });
     </script>
 
