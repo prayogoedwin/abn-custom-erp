@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\PembelianDetailExport;
 use App\Models\PembelianDetail;
 use App\Models\Produk;
+use App\Models\Stok;
 use Illuminate\Http\Request;
 
 use Illuminate\Http\RedirectResponse;
@@ -28,26 +29,30 @@ class PembelianDetailController extends Controller
         //     'harga_basis_pembelian',
         //     'harga_netto',
 
-        $produks = Produk::where('isActive')->get();
+        $produks = Produk::where('isActive', true)->get();
 
         $pagedata = [
             'title' => 'PembelianDetail',
             'tablename' => 'pembeliandetails',
             'tableaction' => true,
             'columns' => [
-                ['name' => 'pembelian_id', 'value' => 'pembelian_id',  'title' => 'pembelian_id', 'type' => 'text', 'inform' => false, 'intable' => false],
-                ['name' => 'produk_id', 'value' => 'produk', 'title' => 'Produk', 'type' => 'select', 'inform' => true, 'intable' => true, 'options' => [
+                ['name' => 'pembelian_id', 'value' => 'pembelian_id',  'title' => 'pembelian_id', 'type' => 'text', 'inform' => false, 'inshow' => true, 'intable' => false],
+                ['name' => 'produk_id', 'value' => 'produk', 'title' => 'Produk', 'type' => 'select', 'inform' => true, 'inshow' => true, 'intable' => true, 'options' => [
                     // Ambil data kategori dari database
-                    
+
                     ...$produks->map(function ($produk) {
                         return ['value' => $produk->id, 'label' => $produk->nama_produk];
                     })->toArray(),
-                    ]],
-                ['name' => 'rendeman', 'value' => 'rendeman', 'title' => 'Rendeman', 'type' => 'number', 'inform' => true, 'intable' => true],
-                ['name' => 'bobot', 'value' => 'bobot', 'title' => 'bobot', 'type' => 'number', 'inform' => true, 'intable' => true],
+                ]],
+                ['name' => 'rendeman', 'value' => 'rendeman', 'title' => 'Rendeman', 'type' => 'number', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'bobot', 'value' => 'bobot', 'title' => 'bobot', 'type' => 'number', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'netto', 'value' => 'netto', 'title' => 'Netto', 'type' => 'number', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'satuan', 'value' => 'satuan', 'title' => 'satuan', 'type' => 'string', 'inform' => true, 'inshow' => true, 'intable' => true],
 
             ],
         ];
+
+        // dd($pagedata);
 
         return $pagedata;
     }
@@ -111,12 +116,113 @@ class PembelianDetailController extends Controller
 
     public function create(): View
     {
-        $produks = Produk::where('isActive')->get();
+        $produks = Produk::where('isActive', true)->get();
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.create', compact('produks'), $pagedata);
+        return view('pembeliandetails.create', compact('produks'), $pagedata);
     }
+
+    public function createtitip($pembelian_id): View
+    {
+        $produks = Produk::where('isActive', true)->get();
+
+
+
+        $pagedata = $this->getPagedata();
+        $pagedata['pembelian_id'] = $pembelian_id;
+
+        return view('pembeliandetails.createtitip', compact('produks'), $pagedata);
+    }
+
+
+    public function titipstore(Request $request): RedirectResponse
+    {
+        $store_data = [
+            'pembelian_id' => $request->input('pembelian_id'),
+            'produk_id' => $request->input('produk_id'),
+            'netto' => $request->input('netto'),
+            'satuan' => $request->input('satuan'),
+            'rendeman' => $request->input('rendeman'),
+            'bobot' => $request->input('bobot'),
+            'harga' => $request->input('harga'),
+            'harga_basis' => $request->input('harga_basis'),
+            'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
+            'harga_netto' => $request->input('harga_netto'),
+
+            'created_by' => auth()->id(),
+        ];
+
+        //      'pembelian_id',
+        //     'produk_id',
+        //     'netto',
+        //     'satuan',
+        //     'rendeman',
+        //     'bobot',
+        //     'harga',
+        //     'harga_basis',
+        //     'harga_basis_pembelian',
+        //     'harga_netto',
+
+
+        $store_data['satuan'] = Produk::where('id', $request->produk_id)->value('satuan');
+        // dd($store_data);
+
+
+
+        $pembelian = PembelianDetail::create($store_data);
+
+
+        return to_route('pembelians.index')->with('status', 'Pembelian updated successfully.');
+    }
+    public function jualstore(Request $request): RedirectResponse
+    {
+        $store_data = [
+            'pembelian_id' => $request->input('pembelian_id'),
+            'produk_id' => $request->input('produk_id'),
+            'netto' => $request->input('netto'),
+            'satuan' => $request->input('satuan'),
+            'rendeman' => $request->input('rendeman'),
+            'bobot' => $request->input('bobot'),
+            'harga' => $request->input('harga'),
+            'harga_basis' => $request->input('harga_basis'),
+            'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
+            'harga_netto' => $request->input('harga_netto'),
+
+            'created_by' => auth()->id(),
+        ];
+
+        //      'pembelian_id',
+        //     'produk_id',
+        //     'netto',
+        //     'satuan',
+        //     'rendeman',
+        //     'bobot',
+        //     'harga',
+        //     'harga_basis',
+        //     'harga_basis_pembelian',
+        //     'harga_netto',
+
+
+        $store_data['satuan'] = Produk::where('id', $request->produk_id)->value('satuan');
+        // dd($store_data);
+
+
+        Stok::create([
+            'produk_id' => $store_data['produk_id'],
+            'tipe_stok' => 'Masuk',
+            'satuan' => $store_data['satuan'],
+            'stok' => $store_data['netto'],
+        ]);
+
+        
+        $pembelian = PembelianDetail::create($store_data);
+
+
+        return to_route('pembelians.index')->with('status', 'Pembelian updated successfully.');
+    }
+
+
 
     public function store(Request $request): RedirectResponse
     {

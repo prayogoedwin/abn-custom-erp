@@ -170,7 +170,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pembeliandetails', [PembelianDetailController::class, 'index'])->name('pembeliandetails.index')->middleware('permission:view-pembeliandetails');
     Route::get('pembeliandetails/export', [PembelianDetailController::class, 'export'])->name('pembeliandetails.export')->middleware('permission:download-pembeliandetails');
     Route::get('pembeliandetails/create', [PembelianDetailController::class, 'create'])->name('pembeliandetails.create')->middleware('permission:create-pembeliandetails');
+    Route::get('pembeliandetails/createtitip/{pembelian}', [PembelianDetailController::class, 'createtitip'])->name('pembeliandetails.createtitip')->middleware('permission:create-pembeliandetails');
     Route::post('pembeliandetails', [PembelianDetailController::class, 'store'])->name('pembeliandetails.store')->middleware('permission:create-pembeliandetails'); 
+    Route::post('pembeliandetails', [PembelianDetailController::class, 'titipstore'])->name('pembeliandetails.titipstore')->middleware('permission:create-pembeliandetails'); 
     Route::get('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'show'])->name('pembeliandetails.show')->middleware('permission:show-pembeliandetails');
     Route::get('pembeliandetails/{pembeliandetail}/edit', [PembelianDetailController::class, 'edit'])->name('pembeliandetails.edit')->middleware('permission:edit-pembeliandetails');
     Route::put('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'update'])->name('pembeliandetails.update')->middleware('permission:edit-pembeliandetails');

@@ -17,9 +17,9 @@ return new class extends Migration
             $table->foreignId('produk_id')->constrained('produks')->onDelete('cascade');
             $table->float('netto')->nullable();
             $table->string('satuan');
-            $table->float('rendeman');
-            $table->integer('bobot')->default(0);
-            $table->integer('harga')->default(0);
+            $table->float('rendeman')->nullable();
+            $table->integer('bobot')->nullable();
+            $table->integer('harga')->nullable();
             $table->integer('harga_basis')->nullable();
             $table->integer('harga_basis_pembelian')->nullable();
             $table->integer('harga_netto')->nullable();

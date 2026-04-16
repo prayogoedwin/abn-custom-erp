@@ -21,9 +21,13 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-5">
-            <form action="{{ route($tablename . '.store') }}" method="POST" id="pembelianForm">
+            <form action="{{ route($tablename . '.titipstore') }}" method="POST" id="pembelianForm">
                 @csrf
                 @method('POST')
+
+                <div id="container-pembelian_id" class="mb-4 hidden">
+                    <x-forms.input append="%" label="-" name="pembelian_id" type="number" value="{{ $pembelian_id }}" />
+                </div>
 
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Produk</label>
@@ -54,11 +58,6 @@
                     <x-forms.input append="%" label="Rendeman" name="rendeman" type="number" value="{{ old('rendeman') }}" />
                 </div>
 
-                <div id="container-bobot" class="mb-4 hidden">
-                    <x-forms.input prepend="Rp." append=".00" label="Bobot" name="bobot" type="number" value="{{ old('bobot') }}" />
-                </div>
-
-                
 
                 <div class="flex gap-3 mt-3">
                     <x-button type="primary">{{ __('Save') }}</x-button>
@@ -74,37 +73,27 @@
             const produkSelect = document.getElementById('produk_select');
             const containerNetto = document.getElementById('container-netto');
             const containerRendeman = document.getElementById('container-rendeman');
-            const containerBobot = document.getElementById('container-bobot');
-            
-
-            // Cari elemen tempat teks satuan muncul (sesuaikan selector dengan output komponen Anda)
-            // Asumsi: komponen x-forms.input merender append di dalam elemen dengan class/id tertentu
-            const appendSatuan = document.querySelector('#container-netto .text-gray-500');
 
             function updateVisibility() {
                 const selectedOption = produkSelect.options[produkSelect.selectedIndex];
+                if (!selectedOption) return;
+
                 const val = selectedOption.value;
                 const satuan = selectedOption.getAttribute('data-satuan');
 
-
-                // Reset visibility
                 containerNetto.classList.add('hidden');
                 containerRendeman.classList.add('hidden');
-                containerBobot.classList.add('hidden');
 
                 if (val !== "") {
                     containerNetto.classList.remove('hidden');
+
+                    // Mencari elemen berdasarkan ID atau class penanda
+                    const appendSatuan = document.getElementById('display_satuan') || containerNetto.querySelector('.text-gray-900');
 
                     if (appendSatuan) {
                         appendSatuan.textContent = satuan;
                     }
 
-                    // Logika Bobot (ID 1)
-                    if (val === "1") {
-                        containerBobot.classList.remove('hidden');
-                    }
-
-                    // Logika Rendeman (ID 1 & 2)
                     if (val === "1" || val === "2") {
                         containerRendeman.classList.remove('hidden');
                     }
@@ -112,11 +101,11 @@
             }
 
             produkSelect.addEventListener('change', updateVisibility);
-            updateVisibility(); // Jalankan saat reload untuk handle old input
+            updateVisibility(); // Handle initial state/old input
         });
     </script>
 
-    
+
 
     <style>
         /* Tambahkan jika Tailwind .hidden belum terdefinisi atau butuh fallback */

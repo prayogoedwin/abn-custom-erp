@@ -118,15 +118,8 @@ class KaryawanController extends Controller
 
         // 2. Add the extra data after validation
         $validated['created_by'] = auth()->id();
-        $validated['password'] = Hash::make($request->password); 
-        // 3. Create the record
-        $user = User::create([
-            'name' => $validated['nama'],
-            'email' =>$validated['email'],
-            'password' =>$validated['password'],
-        ]);
+        
 
-        $validated['user_id'] = $user->id;
 
 
 

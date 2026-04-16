@@ -40,7 +40,7 @@ class PembelianController extends Controller
                 ['name' => 'no_transaksi', 'value' => 'no_transaksi',  'title' => 'No Transaksi', 'type' => 'text', 'inform' => false, 'inshow' => true, 'intable' => true],
                 ['name' => 'supplier_id', 'value' => 'supplier',  'title' => 'Supplier', 'type' => 'select', 'inform' => true, 'intable' => true, 'options' => [
                     // Ambil data kategori dari database
-                    
+
                     ...$suppliers->map(function ($supplier) {
                         return ['value' => $supplier->id, 'label' => $supplier->nama];
                     })->toArray(),
@@ -50,8 +50,8 @@ class PembelianController extends Controller
                     ['value' => 'Titip', 'label' => 'Titip'],
                     ['value' => 'Jual', 'label' => 'Jual'],
                 ]],
-                ['name' => 'total_nominal_pembelian', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Pembelian', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => true],
-                ['name' => 'total_nominal_terbayar', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Terbayar', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'total_nominal_pembelian', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Pembelian', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => false],
+                ['name' => 'total_nominal_terbayar', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Terbayar', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => false],
                 ['name' => 'kekurangan', 'value' => 'kekurangan',  'title' => 'Kekurangan', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => true],
                 ['name' => 'status_pembayaran', 'value' => 'status_pembayaran',  'title' => 'Status Pembayaran', 'type' => 'select', 'inform' => false, 'inshow' => true, 'intable' => true, 'options' => [
                     ['value' => 'Lunas', 'label' => 'Lunas'],
@@ -69,7 +69,7 @@ class PembelianController extends Controller
         // dd($request->headers->all());
         // $pembelians = Pembelian::join('suppliers', 'pembelians.supplier_id', '=', 'suppliers.id')
         //     // Select everything from karyawan, and specific fields from users
-        //     ->select('pembelians.*', 'suppliers.nama as supplier_name')
+        //     ->select('pembelians.*', 'suppliers.nama as supplier')
         //     ->where('pembelians.isactive', true)
         //     ->get();
         // dd($pembelians);
@@ -77,7 +77,7 @@ class PembelianController extends Controller
             // dd('masuk ajax');
             $pembelians = Pembelian::join('suppliers', 'pembelians.supplier_id', '=', 'suppliers.id')
                 // Select everything from karyawan, and specific fields from users
-                ->select('pembelians.*', 'suppliers.nama as supplier_name')
+                ->select('pembelians.*', 'suppliers.nama as supplier')
                 ->where('pembelians.isactive', true)
                 ->get();
             // dd($pembelians);
@@ -136,7 +136,7 @@ class PembelianController extends Controller
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.create',compact('suppliers'), $pagedata);
+        return view('dynamiccrud.create', compact('suppliers'), $pagedata);
     }
 
     public function store(Request $request): RedirectResponse
@@ -150,14 +150,14 @@ class PembelianController extends Controller
             'created_by' => auth()->id(),
         ];
 
-        
+
 
 
         $validate = Validator::make($store_data, [
             'nopol' => ['required', 'string', 'max:255'],
             'supplier_id' => ['required', 'integer', 'max:255'],
             'tipe_transaksi_pembelian' => ['required', 'string'],
-            
+
             'created_by' => ['required', 'integer']
         ]);
 
@@ -170,24 +170,13 @@ class PembelianController extends Controller
         // dd($store_data);
 
 
-        Pembelian::create($store_data);
-        // // log stok change
-        // Stok::create([
-        //     'karyawan_id' => $karyawan->id,
-        //     'tipe_stok' => 'masuk',
-        //     'satuan' => $validated['satuan'],
-        //     'stok' => $validated['stok_akhir'],
-        // ]);
+        $pembelian = Pembelian::create($store_data);
 
-        // // log historyharga
-        // HistoryHargaBasis::create([
-        //     'karyawan_id' => $karyawan->id,
-        //     'satuan' => $validated['satuan'],
-        //     'harga_basis' => $validated['harga_basis_pembelian'],
-        //     'tanggal' => now(),
-        // ]);
+        if ($store_data['tipe_transaksi_pembelian'] === 'Titip') {
+            return to_route('pembeliandetails.createtitip', $pembelian->id);
+        }
 
-        return to_route('pembeliandetails.create');
+        return to_route('pembeliandetails.create', $pembelian->id);
     }
 
     public function show(Pembelian $karyawan): View

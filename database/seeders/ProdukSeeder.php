@@ -24,46 +24,6 @@ class ProdukSeeder extends Seeder
     {
         $data = [
             [
-                'kategori_produk_id' => 1,
-                'nama_produk' => 'Laptop',
-                'satuan' => 'unit',
-                'harga_basis_pembelian' => 10000000,
-                'stok_akhir' => 50,
-                'isactive' => true,
-            ],
-            [
-                'kategori_produk_id' => 2,
-                'nama_produk' => 'Kaos Polos',
-                'satuan' => 'pcs',
-                'harga_basis_pembelian' => 50000,
-                'stok_akhir' => 200,
-                'isactive' => true,
-            ],
-            [
-                'kategori_produk_id' => 3,
-                'nama_produk' => 'Cokelat Batangan',
-                'satuan' => 'pcs',
-                'harga_basis_pembelian' => 20000,
-                'stok_akhir' => 150,
-                'isactive' => true,
-            ],
-            [
-                'kategori_produk_id' => 4,
-                'nama_produk' => 'Air Mineral',
-                'satuan' => 'botol',
-                'harga_basis_pembelian' => 5000,
-                'stok_akhir' => 300,
-                'isactive' => true,
-            ],
-            [
-                'kategori_produk_id' => 5,
-                'nama_produk' => 'Panci Stainless Steel',
-                'satuan' => 'unit',
-                'harga_basis_pembelian' => 150000,
-                'stok_akhir' => 80,
-                'isactive' => true,
-            ],
-            [
                 'kategori_produk_id' => 6,
                 'nama_produk' => 'Kopi',
                 'satuan' => 'gram',
@@ -79,6 +39,23 @@ class ProdukSeeder extends Seeder
                 'stok_akhir' => 100,
                 'isactive' => true,
             ],
+            [
+                'kategori_produk_id' => 1,
+                'nama_produk' => 'Laptop',
+                'satuan' => 'unit',
+                'harga_basis_pembelian' => 10000000,
+                'stok_akhir' => 50,
+                'isactive' => true,
+            ],
+            [
+                'kategori_produk_id' => 3,
+                'nama_produk' => 'Cokelat Batangan',
+                'satuan' => 'pcs',
+                'harga_basis_pembelian' => 20000,
+                'stok_akhir' => 150,
+                'isactive' => true,
+            ],
+            
 
         ];
 
