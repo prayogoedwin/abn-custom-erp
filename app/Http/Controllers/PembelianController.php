@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\PembelianExport;
 use App\Models\Pembelian;
+use App\Models\SimpanPinjamSupplier;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -46,6 +47,7 @@ class PembelianController extends Controller
                     })->toArray(),
                 ]],
                 ['name' => 'nopol', 'value' => 'nopol',  'title' => 'Nopol', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'nominal', 'value' => 'nominal',  'title' => 'Nominal', 'type' => 'number', 'inform' => true, 'inshow' => false, 'intable' => false],
                 ['name' => 'tipe_transaksi_pembelian', 'value' => 'tipe_transaksi_pembelian',  'title' => 'Tipe Transaksi Pembelian', 'type' => 'select', 'inform' => true, 'inshow' => true, 'intable' => true, 'options' => [
                     ['value' => 'Titip', 'label' => 'Titip'],
                     ['value' => 'Jual', 'label' => 'Jual'],
@@ -121,10 +123,6 @@ class PembelianController extends Controller
         return view('dynamiccrud.index', $pagedata);
     }
 
-
-
-
-
     public function export()
     {
         return Excel::download(new PembelianExport, 'pembelians-' . date('Y-m-d') . '.xlsx');
@@ -139,6 +137,17 @@ class PembelianController extends Controller
         return view('dynamiccrud.create', compact('suppliers'), $pagedata);
     }
 
+    public function createlanjut(Pembelian $pembelian): View
+    {
+        $supplier = Supplier::find($pembelian->supplier_id);
+
+        $simpanpinjamsupplier = SimpanPinjamSupplier::where("supplier_id", $supplier->id)->first();
+
+        $pagedata = $this->getPagedata();
+
+        return view('pembelians.createlanjut', compact('supplier', 'simpanpinjamsupplier'), $pagedata);
+    }
+
     public function store(Request $request): RedirectResponse
     {
 
@@ -149,8 +158,6 @@ class PembelianController extends Controller
 
             'created_by' => auth()->id(),
         ];
-
-
 
 
         $validate = Validator::make($store_data, [
@@ -167,10 +174,15 @@ class PembelianController extends Controller
         }
 
 
-        // dd($store_data);
-
-
         $pembelian = Pembelian::create($store_data);
+
+        $simpanpinjamsupplier = SimpanPinjamSupplier::create([
+            'supplier_id' => $store_data['supplier_id'],
+            'pembelian_id' => $pembelian->id,
+            'nominal' => $request->nominal,
+            'keterangan' => 'ini keterangan'
+
+        ]);
 
         if ($store_data['tipe_transaksi_pembelian'] === 'Titip') {
             return to_route('pembeliandetails.createtitip', $pembelian->id);

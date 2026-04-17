@@ -231,6 +231,7 @@
                         //    harga_netto = harga_basis * netto => Rupiah
 
 
+
                         const netto = parseFloat(inputNetto.value) || 0;
 
                         // 1. Hitung Harga (Master * Rendeman)
@@ -238,9 +239,9 @@
                         inputHargaMaster.value = hasilHarga;
 
 
-                        inputHargaBasisUser.value = hasilHargaBasis
+                        inputHargaBasisUser.value = hasilHarga
 
-                        const hasilNetto = hasilHargaBasis * netto;
+                        const hasilNetto = hasilHarga * netto;
                         inputHargaNetto.value = Math.round(hasilNetto);
 
                         console.log("Kalkulasi selesai untuk produk lainya:", selectedOption.text);

@@ -179,7 +179,7 @@ class PembelianDetailController extends Controller
 
 
 
-        return to_route('pembelians.index')->with('status', 'Pembelian updated successfully.');
+        return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
     }
     public function jualstore(Request $request): RedirectResponse
     {
@@ -210,22 +210,31 @@ class PembelianDetailController extends Controller
         //     'harga_netto',
 
 
-        $store_data['satuan'] = Produk::where('id', $request->produk_id)->value('satuan');
-        // dd($store_data);
+        foreach ($request->produk_id as $index => $produk_id) {
+            if ($produk_id) {
+
+                Stok::create([
+                    'produk_id' => $produk_id,
+                    'tipe_stok' => 'Masuk',
+                    'satuan' => $request->satuan[$index],
+                    'stok' => $request->netto[$index],
+                ]);
 
 
-        Stok::create([
-            'produk_id' => $store_data['produk_id'],
-            'tipe_stok' => 'Masuk',
-            'satuan' => $store_data['satuan'],
-            'stok' => $store_data['netto'],
-        ]);
+                PembelianDetail::create([
+                    'pembelian_id' => $request->pembelian_id,
+                    'produk_id'    => $produk_id,
+                    'netto'        => $request->netto[$index],
+                    'satuan'       => $request->satuan[$index], // Nilai ini datang dari input hidden tadi
+                    'rendeman'     => $request->rendeman[$index] ?? null,
+                ]);
+            }
+        }
+
+        
 
 
-        $pembelian = PembelianDetail::create($store_data);
-
-
-        return to_route('pembelians.index')->with('status', 'Pembelian updated successfully.');
+        return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
     }
 
 
@@ -257,21 +266,7 @@ class PembelianDetailController extends Controller
 
 
         $pihak3 = PembelianDetail::create($store_data);
-        // // log stok change
-        // Stok::create([
-        //     'pihak3_id' => $pihak3->id,
-        //     'tipe_stok' => 'masuk',
-        //     'satuan' => $validated['satuan'],
-        //     'stok' => $validated['stok_akhir'],
-        // ]);
 
-        // // log historyharga
-        // HistoryHargaBasis::create([
-        //     'pihak3_id' => $pihak3->id,
-        //     'satuan' => $validated['satuan'],
-        //     'harga_basis' => $validated['harga_basis_pembelian'],
-        //     'tanggal' => now(),
-        // ]);
 
         return to_route('pembeliandetails.index')->with('status', 'PembelianDetail updated successfully.');
     }
