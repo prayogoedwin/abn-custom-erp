@@ -125,6 +125,16 @@ class RolePermissionSeeder extends Seeder
             'download-pembeliandetails',
             'delete-pembeliandetails',
 
+
+            //pembeliansdetails
+            'view-absensis',
+            'show-absensis',
+            'create-absensis',
+            'edit-absensis',
+            'update-absensis',
+            'download-absensis',
+            'delete-absensis',
+
         ];
 
         foreach ($permissions as $permissionName) {

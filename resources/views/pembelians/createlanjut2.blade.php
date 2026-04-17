@@ -65,17 +65,21 @@
                     @enderror
                 </div>
 
-                
-                <div class="mb-4">
-                    <x-forms.input label="Nama Supplier" name="supplier_nama" type="text" value="{{$supplier->nama}}" required />
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Nama Supplier
+                    </label>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        {{$supplier->nama}}
+                    </div>
                 </div>
-
-                <div class="mb-4">
-                    <x-forms.input label="Nominal" name="nominal" type="number" value="{{$simpanpinjamsupplier->nominal}}" required />
-                </div>
-
-                <div class="mb-4">
-                    <x-forms.input label="Keterangan" name="keterangan" type="string" value="{{$simpanpinjamsupplier->keterangan}}" required />
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Nominal
+                    </label>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        {{$simpanpinjamsupplier->nominal}}
+                    </div>
                 </div>
 
                 <div class="mb-6">
@@ -87,7 +91,14 @@
                     </div>
                 </div>
 
-
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Keterangan
+                    </label>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        {{$simpanpinjamsupplier->keterangan}}
+                    </div>
+                </div>
 
 
 

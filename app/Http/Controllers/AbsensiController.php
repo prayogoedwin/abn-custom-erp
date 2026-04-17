@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\AbsensiExport;
 use App\Models\Absensi;
+use App\Models\Karyawan;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -25,12 +26,13 @@ class AbsensiController extends Controller
             'tablename' => 'absensis',
             'tableaction' => true,
             'columns' => [
-                ['name' => 'nama', 'value' => 'nama',  'title' => 'Nama Absensi', 'type' => 'text', 'inform' => true, 'intable' => true],
-                ['name' => 'email', 'value' => 'email',  'title' => 'Email', 'type' => 'email', 'inform' => true, 'intable' => true],
-                ['name' => 'password', 'value' => 'password',  'title' => 'Password', 'type' => 'password', 'inform' => true, 'intable' => false],
-                ['name' => 'noPegawai', 'value' => 'noPegawai',  'title' => 'No Pegawai', 'type' => 'text', 'inform' => false, 'intable' => true],
-                ['name' => 'kontak', 'value' => 'kontak', 'title' => 'Kontak', 'type' => 'text', 'inform' => true, 'intable' => true],
-                ['name' => 'alamat', 'value' => 'alamat', 'title' => 'Alamat', 'type' => 'text', 'inform' => true, 'intable' => true],
+                ['name' => 'user_name', 'value' => 'user_name',  'title' => 'Nama Absensi', 'type' => 'text', 'inform' => false, 'inshow' => true,  'intable' => true],
+                ['name' => 'bulan', 'value' => 'bulan',  'title' => 'Bulan', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => false],
+                ['name' => 'tahun', 'value' => 'tahun',  'title' => 'Tahun', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => false],
+                ['name' => 'jumlah_masuk', 'value' => 'jumlah_masuk',  'title' => 'Jumlah Masuk', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'jumlah_absen', 'value' => 'jumlah_absen',  'title' => 'Jumlah Izin', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'jumlah_izin', 'value' => 'jumlah_izin',  'title' => 'Jumlah Izin', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
+
             ],
         ];
 
@@ -40,9 +42,11 @@ class AbsensiController extends Controller
     public function index(Request $request)
     {
         // dd($request->headers->all());
+        
+
         if ($request->ajax()) {
             // dd('masuk ajax');
-            $absensis = Absensi::join('users', 'absensis.user_id', '=', 'users.id')
+            $absensis = Absensi::join('karyawans', 'absensis.karyawan_id', '=', 'karyawans.id')->join('users', 'karyawans.id', '=', 'users.id')
                 // Select everything from absensi, and specific fields from users
                 ->select('absensis.*', 'users.name as user_name', 'users.email')
                 ->where('absensis.isactive', true)
@@ -83,9 +87,28 @@ class AbsensiController extends Controller
                 ->make(true);
         }
 
+        $absensisBulanIni = Absensi::where('bulan', 'April')->get();
+
+        if(count($absensisBulanIni) == 0){
+            $this->BuatAbsensiBulan('April');
+        }
+
         $pagedata = $this->getPagedata();
 
         return view('dynamiccrud.index', $pagedata);
+    }
+
+    private function BuatAbsensiBulan($bulan): void {
+
+        $karyawans = Karyawan::where('isActive', true)->get();
+
+        foreach ($karyawans as $karyawan) {
+            Absensi::create([
+                'karyawan_id' => $karyawan->id,
+                'bulan' => $bulan,
+            ]);
+        }
+        
     }
 
 
@@ -118,7 +141,7 @@ class AbsensiController extends Controller
 
         // 2. Add the extra data after validation
         $validated['created_by'] = auth()->id();
-        
+
 
 
 

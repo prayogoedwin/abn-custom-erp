@@ -69,6 +69,15 @@
 
                             </x-layouts.sidebar-two-level-link-parent>
 
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Absensi" icon="fas-cog"
+                                :active="request()->routeIs('absensis*')">
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('absensis.index') }}" icon='fas-cogs'
+                                    :active="request()->routeIs('absensis*')">Menu Absensi</x-layouts.sidebar-two-level-link>
+
+
+                            </x-layouts.sidebar-two-level-link-parent>
+
                             <x-layouts.sidebar-two-level-link-parent title="Example two level" icon="fas-house"
                                 :active="request()->routeIs('two-level*')">
                                 <x-layouts.sidebar-two-level-link href="#" icon='fas-house'
