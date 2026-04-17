@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\PembelianDetailExport;
+use App\Models\Pembelian;
 use App\Models\PembelianDetail;
 use App\Models\Produk;
 use App\Models\Stok;
@@ -231,11 +232,13 @@ class PembelianDetailController extends Controller
             }
         }
 
-        
+
 
 
         return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
     }
+
+
 
 
 
@@ -286,6 +289,7 @@ class PembelianDetailController extends Controller
         return view('dynamiccrud.show', compact('data'), $pagedata);
     }
 
+
     public function edit(PembelianDetail $pihak3): View
     {
 
@@ -293,6 +297,20 @@ class PembelianDetailController extends Controller
         $data = $pihak3;
 
 
+
+        $pagedata = $this->getPagedata();
+
+        return view('dynamiccrud.edit', compact('data'), $pagedata);
+    }
+
+    public function edittitip(Pembelian $pembelian): View
+    {
+        $pembeliandetails = PembelianDetail::where('pembelian_id', $pembelian->id);
+        $produks = Produk::all();
+        return view('pembelian.edit', compact('pembeliandetails', 'produks'));
+
+
+        $data = $pihak3;
 
         $pagedata = $this->getPagedata();
 

@@ -183,8 +183,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('pembeliandetails', [PembelianDetailController::class, 'jualstore'])->name('pembeliandetails.jualstore')->middleware('permission:create-pembeliandetails'); 
     Route::get('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'show'])->name('pembeliandetails.show')->middleware('permission:show-pembeliandetails');
 
-    Route::get('pembeliandetails/{pembeliandetail}/titipupdate', [PembelianDetailController::class, 'editupdate'])->name('pembeliandetails.titipupdate')->middleware('permission:edit-pembeliandetails');
-    Route::get('pembeliandetails/{pembeliandetail}/titipjual', [PembelianDetailController::class, 'editjual'])->name('pembeliandetails.titipjual')->middleware('permission:edit-pembeliandetails');
+    Route::get('pembeliandetails/{pembeliandetail}/titipupdate', [PembelianDetailController::class, 'edittitip'])->name('pembeliandetails.edittitip')->middleware('permission:edit-pembeliandetails');
+    Route::get('pembeliandetails/{pembeliandetail}/titipjual', [PembelianDetailController::class, 'editjual'])->name('pembeliandetails.editjual')->middleware('permission:edit-pembeliandetails');
 
     Route::put('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'update'])->name('pembeliandetails.titipupdate')->middleware('permission:edit-pembeliandetails');
     Route::put('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'update'])->name('pembeliandetails.jualupdate')->middleware('permission:edit-pembeliandetails');

@@ -26,6 +26,7 @@
                 <input type="hidden" name="pembelian_id" value="{{ $pembelian_id }}">
 
                 <div id="produk-container">
+                    @foreach($pembelian->details as $index => $detail)
                     <div class="produk-row border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
@@ -49,28 +50,28 @@
                                     name="satuan[]" />
                             </div>
 
-                            <div class="container-netto hidden">
-                                <x-forms.input append="satuan" label="Netto" name="netto[]" type="number" />
+                            <div class="container-netto {{ $detail->netto ? '' : 'hidden' }}">
+                                <x-forms.input append="satuan" label="Netto" name="netto[]" type="number" value="{{ $detail->netto }}"/>
                             </div>
 
-                            <div class="container-rendeman hidden">
-                                <x-forms.input append="%" label="Rendeman" name="rendeman[]" type="number" />
+                            <div class="container-rendeman {{ $detail->rendeman ? '' : 'hidden' }}">
+                                <x-forms.input append="%" label="Rendeman" name="rendeman[]" type="number" value="{{ $detail->rendeman }}" />
                             </div>
 
                             <div class="container-bobot hidden">
                                 <x-forms.input prepend="Rp." append=".00" label="Bobot" name="bobot[]" type="number" />
                             </div>
                         </div>
-                        <div class="container-hargas hidden grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="container-hargas {{ $detail->produk_id ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-3 gap-4">
 
                             <div class="container-harga">
-                                <x-forms.input disabled="true" prepend="Rp." append=".00" label="Harga" name="harga[]" type="number" />
+                                <x-forms.input disabled="true" prepend="Rp." append=".00" label="Harga" name="harga[]" type="number" value="{{ $detail->harga }}" />
                             </div>
                             <div class="container-harga-basis">
-                                <x-forms.input prepend="Rp." append=".00" label="Harga Basis" name="harga_basis[]" type="number" />
+                                <x-forms.input prepend="Rp." append=".00" label="Harga Basis" name="harga_basis[]" type="number" value="{{ $detail->harga_basis }}"/>
                             </div>
                             <div class="container-harga-netto">
-                                <x-forms.input disabled="true" prepend="Rp." append=".00" label="Harga Netto" name="harga_netto[]" type="number" />
+                                <x-forms.input disabled="true" prepend="Rp." append=".00" label="Harga Netto" name="harga_netto[]" type="number" value="{{ $detail->harga_netto }}"/>
                             </div>
 
                         </div>
