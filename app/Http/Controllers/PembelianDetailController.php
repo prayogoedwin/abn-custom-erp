@@ -200,6 +200,8 @@ class PembelianDetailController extends Controller
             'created_by' => auth()->id(),
         ];
 
+        
+
         //      'pembelian_id',
         //     'produk_id',
         //     'netto',
@@ -322,6 +324,20 @@ class PembelianDetailController extends Controller
         return view('pembeliandetails.edittitip', compact('pembeliandetails', 'produks', 'data'), $pagedata);
     }
 
+    public function editjual(Pembelian $pembelian): View
+    {
+        $pembeliandetails = PembelianDetail::where('pembelian_id', $pembelian->id)->get();
+        $produks = Produk::all();
+        $data = $pembelian;
+
+        $pagedata = $this->getPagedata();
+        $pagedata['pembelian_id'] = $pembelian->id;
+
+        // dd($pembeliandetails);
+
+        return view('pembeliandetails.editjual', compact('pembeliandetails', 'produks', 'data'), $pagedata);
+    }
+
     public function titipupdate(Request $request): RedirectResponse 
     {
 
@@ -355,6 +371,54 @@ class PembelianDetailController extends Controller
                     'netto'        => $request->netto[$index] ?? 0,
                     'satuan'       => $request->satuan[$index] ?? "satuan",
                     'rendeman'     => $request->rendeman[$index] ?? null,
+
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+        }
+
+
+        return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
+
+    }
+
+    public function jualupdate(Request $request): RedirectResponse 
+    {
+
+        $store_data = [
+            'pembelian_id' => $request->input('pembelian_id'),
+            'produk_id' => $request->input('produk_id'),
+            'netto' => $request->input('netto'),
+            'satuan' => $request->input('satuan'),
+            'rendeman' => $request->input('rendeman'),
+            'bobot' => $request->input('bobot'),
+            'harga' => $request->input('harga'),
+            'harga_basis' => $request->input('harga_basis'),
+            'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
+            'harga_netto' => $request->input('harga_netto'),
+
+            'created_by' => auth()->id(),
+        ];
+
+        // dd($request->all());
+
+        // Hapus semua dulu
+        PembelianDetail::where('pembelian_id', $request->pembelian_id)->delete();
+
+
+        foreach ($request->produk_id as $index => $produk_id) {
+            if (!empty($produk_id)) {
+                // Simpan ulang setiap item ke database
+                PembelianDetail::create([
+                    'pembelian_id' => $request->pembelian_id,
+                    'produk_id'    => $produk_id,
+                    'netto'        => $request->netto[$index] ?? 0,
+                    'satuan'       => $request->satuan[$index] ?? "satuan",
+                    'rendeman'     => $request->rendeman[$index] ?? null,
+                    'harga'     => $request->harga[$index] ?? null,
+                    'harga_basis'     => $request->harga_basis[$index] ?? null,
+                    'harga_basis_pembelian'     => $request->harga_basis_pembelian[$index] ?? null,
+                    'harga_netto'     => $request->harga_netto[$index] ?? null,
 
                     'updated_by' => auth()->id(),
                 ]);

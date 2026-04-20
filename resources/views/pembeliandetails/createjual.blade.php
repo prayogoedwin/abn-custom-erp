@@ -64,13 +64,13 @@
                         <div class="container-hargas hidden grid grid-cols-1 md:grid-cols-3 gap-4">
 
                             <div class="container-harga">
-                                <x-forms.input disabled="true" prepend="Rp." append=".00" label="Harga" name="harga[]" type="number" />
+                                <x-forms.input readonly="true" prepend="Rp." append=".00" label="Harga" name="harga[]" type="number" />
                             </div>
                             <div class="container-harga-basis">
                                 <x-forms.input prepend="Rp." append=".00" label="Harga Basis" name="harga_basis[]" type="number" />
                             </div>
                             <div class="container-harga-netto">
-                                <x-forms.input disabled="true" prepend="Rp." append=".00" label="Harga Netto" name="harga_netto[]" type="number" />
+                                <x-forms.input readonly="true" prepend="Rp." append=".00" label="Harga Netto" name="harga_netto[]" type="number" />
                             </div>
 
                         </div>
@@ -174,7 +174,7 @@
 
                 function eksekusiKalkulasi() {
                     const selectedOption = select.options[select.selectedIndex];
-                    const hargaMaster = parseFloat(selectedOption.getAttribute('data-harga-basis')) || 0;
+                    const hargaMaster = inputHargaBasisUser.value; // Ambil harga basis dari input yang sudah diisi (bisa dari data attribute atau hasil edit user)
                     const val = selectedOption.value;
 
                     console.log(val);
@@ -225,7 +225,7 @@
 
                         console.log("Kalkulasi selesai untuk produk Lada:", selectedOption.text);
                     } else {
-                        // ini Lada 
+                        // ini produk lainya (misal gula, kemiri, dll) 
                         // harga = harga_basis
                         //    harga_basis_pembelian = secara otomatis terisi susuai {harga} => tapi editable => rupiah
                         //    harga_netto = harga_basis * netto => Rupiah

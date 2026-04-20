@@ -11,11 +11,11 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">{{ $title ?? __('Create') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">{{ $title ?? __('Edit') }}</span>
     </div>
 
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Create {{ $title }}</h1>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit {{ $title }}</h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Fill in the details below2') }}</p>
     </div>
 
@@ -25,59 +25,50 @@
                 @csrf
                 <input type="hidden" name="pembelian_id" value="{{ $pembelian_id }}">
 
-                <div id="produk-container">
-                    @foreach($pembelian->details as $index => $detail)
-                    <div class="produk-row border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Produk</label>
 
+
+                <div id="produk-container">
+                </div>
+
+                <template id="row-template">
+                    <div class="produk-row border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Produk</label>
                                 <select name="produk_id[]" class="produk-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                                     <option value="">Pilih Produk</option>
-                                    @foreach($produks as $produk)
-                                    <option value="{{ $produk->id }}"
-                                        data-satuan="{{ $produk->satuan }}"
-                                        data-harga-basis="{{ $produk->harga_basis_pembelian }}">
-                                        {{$produk->nama_produk}}
+                                    @foreach($produks as $p)
+                                    <option value="{{ $p->id }}" data-satuan="{{ $p->satuan }}" data-harga-basis="{{ $p->harga_basis_pembelian }}">
+                                        {{ $p->nama_produk }}
                                     </option>
                                     @endforeach
                                 </select>
                             </div>
-
-                            <div class="container-satuan hidden">
-                                <input
-                                    class="input-satuan"
-                                    name="satuan[]" />
+                            <div class="container-netto hidden">
+                                <x-forms.input append="satuan" label="Netto" name="netto[]" type="number" />
                             </div>
-
-                            <div class="container-netto {{ $detail->netto ? '' : 'hidden' }}">
-                                <x-forms.input append="satuan" label="Netto" name="netto[]" type="number" value="{{ $detail->netto }}"/>
+                            <div class="container-rendeman hidden">
+                                <x-forms.input append="%" label="Rendeman" name="rendeman[]" type="number" />
                             </div>
-
-                            <div class="container-rendeman {{ $detail->rendeman ? '' : 'hidden' }}">
-                                <x-forms.input append="%" label="Rendeman" name="rendeman[]" type="number" value="{{ $detail->rendeman }}" />
-                            </div>
-
                             <div class="container-bobot hidden">
                                 <x-forms.input prepend="Rp." append=".00" label="Bobot" name="bobot[]" type="number" />
                             </div>
                         </div>
-                        <div class="container-hargas {{ $detail->produk_id ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="container-hargas hidden grid grid-cols-1 md:grid-cols-3 gap-4">
 
                             <div class="container-harga">
-                                <x-forms.input disabled="true" prepend="Rp." append=".00" label="Harga" name="harga[]" type="number" value="{{ $detail->harga }}" />
+                                <x-forms.input readonly="true" prepend="Rp." append=".00" label="Harga" name="harga[]" type="number" />
                             </div>
                             <div class="container-harga-basis">
-                                <x-forms.input prepend="Rp." append=".00" label="Harga Basis" name="harga_basis[]" type="number" value="{{ $detail->harga_basis }}"/>
+                                <x-forms.input prepend="Rp." append=".00" label="Harga Basis" name="harga_basis[]" type="number" />
                             </div>
                             <div class="container-harga-netto">
-                                <x-forms.input disabled="true" prepend="Rp." append=".00" label="Harga Netto" name="harga_netto[]" type="number" value="{{ $detail->harga_netto }}"/>
+                                <x-forms.input readonly="true" prepend="Rp." append=".00" label="Harga Netto" name="harga_netto[]" type="number" />
                             </div>
 
                         </div>
 
-                        <button type="button" class="btn-remove hidden text-red-500 text-sm mt-2">Hapus Produk</button>
-
+                        <button type="button" class="btn-remove text-red-500 text-sm mt-2">Hapus Produk</button>
 
                         <div class="container-button-hitung hidden">
                             <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold p-1 rounded">
@@ -85,7 +76,8 @@
                             </button>
                         </div>
                     </div>
-                </div>
+                </template>
+
 
                 <button type="button" id="add-produk" class="mb-4 bg-green-500 text-white px-4 py-2 rounded shadow">
                     + Tambah Produk Lain
@@ -100,13 +92,38 @@
     </div>
 
     <script>
+        $olddata = @json($pembeliandetails);
+
+        console.log('$olddata:', $olddata);
+
+
+
+
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('produk-container');
+            const template = document.getElementById('row-template');
             const addButton = document.getElementById('add-produk');
 
-            // 1. Fungsi Update Visibility untuk baris tertentu
-            function handleRowLogic(row) {
+            // Fungsi utama untuk menambah baris
+            function addRow(data = null) {
+                const clone = template.content.cloneNode(true);
+                const row = clone.querySelector('.produk-row');
+
+                container.appendChild(clone);
+
+                console.log("Row baru ditambahkan" + (data ? " dengan data lama." : " tanpa data."));
+
+                // Inisialisasi logika pada baris baru
+                handleRowLogic(row, data);
+            }
+
+            function handleRowLogic(row, data = null) {
                 const select = row.querySelector('.produk-select');
+                const inNetto = row.querySelector('input[name="netto[]"]');
+                const inRendeman = row.querySelector('input[name="rendeman[]"]');
+
+                const btnHitung = row.querySelector('.bg-yellow-500'); // Tombol Hitung
+
                 const nettoDiv = row.querySelector('.container-netto');
                 const hargasDiv = row.querySelector('.container-hargas');
                 const rendemanDiv = row.querySelector('.container-rendeman');
@@ -114,10 +131,7 @@
                 const appendSatuan = row.querySelector('.text-gray-900'); // Sesuai temuan Anda
                 const hiddenInputSatuan = row.querySelector('.input-satuan');
                 const btnHitungDiv = row.querySelector('.container-button-hitung');
-                const btnHitung = row.querySelector('.bg-yellow-500'); // Tombol Hitung
 
-
-                // Field Harga-Harga
                 const inputRendeman = row.querySelector('input[name="rendeman[]"]');
                 const inputNetto = row.querySelector('input[name="netto[]"]');
                 const inputBobot = row.querySelector('input[name="bobot[]"]');
@@ -127,13 +141,39 @@
                 const inputHargaNetto = row.querySelector('input[name="harga_netto[]"]');
                 const containerHargas = row.querySelector('.container-hargas');
 
-                select.addEventListener('change', function() {
+
+
+                // Jika ada data lama, isi field-nya
+                if (data) {
+
+                    containerHargas.classList.remove('hidden'); // Pastikan container harga muncul jika ada data lama
+
+                    btnHitungDiv.classList.remove('hidden'); // Pastikan tombol hitung muncul jika ada data lama
+
+                    select.value = data.produk_id;
+                    inNetto.value = data.netto;
+                    inRendeman.value = data.rendeman;
+
+                    inputBobot.value = data.bobot;
+                    inputHargaMaster.value = data.harga;
+                    inputHargaBasisUser.value = data.harga_basis;
+                    inputHargaNetto.value = data.harga_netto;
+
+
+                    // Trigger tampilan manual karena value diset lewat JS
+                    row.querySelector('.container-netto').classList.remove('hidden');
+                    if (data.rendeman) row.querySelector('.container-rendeman').classList.remove('hidden');
+
+                }
+
+                // Event Listeners
+                select.addEventListener('change', () => {
                     const selectedOption = select.options[select.selectedIndex];
                     const val = selectedOption.value;
                     const satuan = selectedOption.getAttribute('data-satuan');
                     const harga_basis = selectedOption.getAttribute('data-harga-basis');
 
-                    console.log("kesini");
+                    console.log("harga_basis yang diambil dari data attribute:", harga_basis);
 
                     // Reset
                     nettoDiv.classList.add('hidden');
@@ -175,7 +215,7 @@
 
                 function eksekusiKalkulasi() {
                     const selectedOption = select.options[select.selectedIndex];
-                    const hargaMaster = parseFloat(selectedOption.getAttribute('data-harga-basis')) || 0;
+                    const hargaMaster = parseFloat(inputHargaBasisUser.value) || 0; // Ambil harga basis dari input yang sudah diisi (bisa dari data attribute atau hasil edit user)
                     const val = selectedOption.value;
 
                     console.log(val);
@@ -226,7 +266,7 @@
 
                         console.log("Kalkulasi selesai untuk produk Lada:", selectedOption.text);
                     } else {
-                        // ini Lada 
+                        // ini produk lainya (misal gula, kemiri, dll) 
                         // harga = harga_basis
                         //    harga_basis_pembelian = secara otomatis terisi susuai {harga} => tapi editable => rupiah
                         //    harga_netto = harga_basis * netto => Rupiah
@@ -254,45 +294,26 @@
                     e.preventDefault(); // Mencegah submit form tidak sengaja
                     eksekusiKalkulasi();
                 });
+
+                row.querySelector('.btn-remove').addEventListener('click', () => row.remove());
             }
 
+            // 1. Render data lama jika ada
+            if ($olddata && $olddata.length > 0) {
+                $olddata.forEach(item => addRow(item));
+            } else {
+                // 2. Jika create baru, kasih 1 baris kosong
+                addRow();
+            }
 
-
-
-            // 2. Inisialisasi baris pertama
-            handleRowLogic(container.querySelector('.produk-row'));
-
-            // Listener Tombol Hitung
-
-
-            // 3. Logika Tambah Baris (Clone)
-            addButton.addEventListener('click', function() {
-                const rows = container.querySelectorAll('.produk-row');
-                const newRow = rows[0].cloneNode(true); // Clone baris pertama
-
-                // Reset nilai di baris baru
-                newRow.querySelectorAll('input').forEach(input => input.value = '');
-                newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-                newRow.querySelector('.container-netto').classList.add('hidden');
-                newRow.querySelector('.container-rendeman').classList.add('hidden');
-
-                // Tampilkan tombol hapus di baris baru
-                const removeBtn = newRow.querySelector('.btn-remove');
-                removeBtn.classList.remove('hidden');
-                removeBtn.addEventListener('click', () => newRow.remove());
-
-                // Jalankan logic untuk baris baru
-                handleRowLogic(newRow);
-
-                container.appendChild(newRow);
-            });
+            // 3. Tombol tambah baris manual
+            addButton.addEventListener('click', () => addRow());
         });
     </script>
 
 
 
     <style>
-        /* Tambahkan jika Tailwind .hidden belum terdefinisi atau butuh fallback */
         .hidden {
             display: none;
         }
