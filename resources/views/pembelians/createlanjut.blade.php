@@ -98,9 +98,11 @@
 
                 <div class="flex gap-3">
                     <x-button type="primary">{{ __('Create') }}</x-button>
-                    <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold p-1 rounded">
+
+                    <a href="{{ route('pembelian.cetaknota', $data->id) }}" target="_blank" class="btn btn-secondary">
                         Cetak Nota
-                    </button>
+                    </a>
+
                     <a href="{{ route($tablename . '.index') }}">
                         <x-button type="secondary">{{ __('Cancel') }}</x-button>
                     </a>

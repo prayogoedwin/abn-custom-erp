@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Exports\PembelianExport;
 use App\Models\Pembelian;
+use App\Models\PembelianDetail;
 use App\Models\SimpanPinjamSupplier;
 use App\Models\Supplier;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 use Illuminate\Http\RedirectResponse;
@@ -226,6 +228,25 @@ class PembelianController extends Controller
         return to_route('pembelians.index');
     }
 
+    
+
+    public function cetakNota($id)
+    {
+        $pembelian = Pembelian::find($id);
+        $pembelian->details = PembelianDetail::where('pembelian_id', $id)->get();
+        $pembelian->supplier = Supplier::find($pembelian->supplier_id);
+
+        // dd($pembelian);
+
+        // Opsional: Atur ukuran kertas (khusus nota thermal biasanya 80mm atau 58mm)
+        // Jika kertas A4 gunakan 'a4', jika thermal gunakan array [0, 0, 226.77, 500] (80mm x sesuai panjang)
+        $pdf = Pdf::loadView('exports.nota', compact('pembelian'))
+            ->setPaper('a4', 'portrait');
+
+        // Stream untuk melihat di browser, atau download() untuk langsung unduh
+        return $pdf->download('Nota-' . $pembelian->kode_transaksi . '.pdf');
+    }
+
     public function show(Pembelian $karyawan): View
     {
         $karyawan->email = User::find($karyawan->user_id)->email;
@@ -281,7 +302,7 @@ class PembelianController extends Controller
             return back()->withErrors($validate)->withInput();
         }
 
-        
+
         $pembelian->update($store_data);
 
 
@@ -291,7 +312,6 @@ class PembelianController extends Controller
         }
 
         return to_route('pembeliandetails.editjual', $pembelian->id);
-
     }
 
     //soft delete

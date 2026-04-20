@@ -46,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit')->middleware('permission:edit-roles');
     Route::put('roles/{role}', [RoleController::class, 'update'])->name('roles.update')->middleware('permission:edit-roles');
     Route::delete('roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy')->middleware('permission:delete-roles');
-    
+
     // Permissions Management - dengan permission check
     Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index')->middleware('permission:view-permissions');
     Route::get('permissions/export', [PermissionController::class, 'export'])->name('permissions.export')->middleware('permission:download-permissions');
@@ -56,7 +56,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('permissions/{permission}/edit', [PermissionController::class, 'edit'])->name('permissions.edit')->middleware('permission:edit-permissions');
     Route::put('permissions/{permission}', [PermissionController::class, 'update'])->name('permissions.update')->middleware('permission:edit-permissions');
     Route::delete('permissions/{permission}', [PermissionController::class, 'destroy'])->name('permissions.destroy')->middleware('permission:delete-permissions');
-    
+
     // Users Management - dengan permission check
     Route::get('users', [UserController::class, 'index'])->name('users.index')->middleware('permission:view-users');
     Route::get('users/export', [UserController::class, 'export'])->name('users.export')->middleware('permission:download-users');
@@ -81,7 +81,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('kategoris', [KategoriProdukController::class, 'index'])->name('kategoris.index')->middleware('permission:view-kategoris');
     Route::get('kategoris/export', [KategoriProdukController::class, 'export'])->name('kategoris.export')->middleware('permission:download-kategoris');
     Route::get('kategoris/create', [KategoriProdukController::class, 'create'])->name('kategoris.create')->middleware('permission:create-kategoris');
-    Route::post('kategoris', [KategoriProdukController::class, 'store'])->name('kategoris.store')->middleware('permission:create-kategoris'); 
+    Route::post('kategoris', [KategoriProdukController::class, 'store'])->name('kategoris.store')->middleware('permission:create-kategoris');
     Route::get('kategoris/{kategori}', [KategoriProdukController::class, 'show'])->name('kategoris.show')->middleware('permission:show-kategoris');
     Route::get('kategoris/{kategori}/edit', [KategoriProdukController::class, 'edit'])->name('kategoris.edit')->middleware('permission:edit-kategoris');
     Route::put('kategoris/{kategori}', [KategoriProdukController::class, 'update'])->name('kategoris.update')->middleware('permission:edit-kategoris');
@@ -91,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('stoks', [StokController::class, 'index'])->name('stoks.index')->middleware('permission:view-stoks');
     Route::get('stoks/export', [StokController::class, 'export'])->name('stoks.export')->middleware('permission:download-stoks');
     Route::get('stoks/create', [StokController::class, 'create'])->name('stoks.create')->middleware('permission:create-stoks');
-    Route::post('stoks', [StokController::class, 'store'])->name('stoks.store')->middleware('permission:create-stoks'); 
+    Route::post('stoks', [StokController::class, 'store'])->name('stoks.store')->middleware('permission:create-stoks');
     Route::get('stoks/{stok}', [StokController::class, 'show'])->name('stoks.show')->middleware('permission:show-stoks');
     Route::get('stoks/{stok}/edit', [StokController::class, 'edit'])->name('stoks.edit')->middleware('permission:edit-stoks');
     Route::put('stoks/{stok}', [StokController::class, 'update'])->name('stoks.update')->middleware('permission:edit-stoks');
@@ -101,7 +101,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('history_harga_bases', [HistoryHargaBasisController::class, 'index'])->name('history_harga_bases.index')->middleware('permission:view-history_harga_bases');
     Route::get('history_harga_bases/export', [HistoryHargaBasisController::class, 'export'])->name('history_harga_bases.export')->middleware('permission:download-history_harga_bases');
     Route::get('history_harga_bases/create', [HistoryHargaBasisController::class, 'create'])->name('history_harga_bases.create')->middleware('permission:create-history_harga_bases');
-    Route::post('history_harga_bases', [HistoryHargaBasisController::class, 'store'])->name('history_harga_bases.store')->middleware('permission:create-history_harga_bases'); 
+    Route::post('history_harga_bases', [HistoryHargaBasisController::class, 'store'])->name('history_harga_bases.store')->middleware('permission:create-history_harga_bases');
     Route::get('history_harga_bases/{historyhargabasis}', [HistoryHargaBasisController::class, 'show'])->name('history_harga_bases.show')->middleware('permission:show-history_harga_bases');
     Route::get('history_harga_bases/{historyhargabasis}/edit', [HistoryHargaBasisController::class, 'edit'])->name('history_harga_bases.edit')->middleware('permission:edit-history_harga_bases');
     Route::put('history_harga_bases/{historyhargabasis}', [HistoryHargaBasisController::class, 'update'])->name('history_harga_bases.update')->middleware('permission:edit-history_harga_bases');
@@ -111,7 +111,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('suppliers', [SupplierController::class, 'index'])->name('suppliers.index')->middleware('permission:view-suppliers');
     Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export')->middleware('permission:download-suppliers');
     Route::get('suppliers/create', [SupplierController::class, 'create'])->name('suppliers.create')->middleware('permission:create-suppliers');
-    Route::post('suppliers', [SupplierController::class, 'store'])->name('suppliers.store')->middleware('permission:create-suppliers'); 
+    Route::post('suppliers', [SupplierController::class, 'store'])->name('suppliers.store')->middleware('permission:create-suppliers');
     Route::get('suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show')->middleware('permission:show-suppliers');
     Route::get('suppliers/{supplier}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit')->middleware('permission:edit-suppliers');
     Route::put('suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update')->middleware('permission:edit-suppliers');
@@ -121,7 +121,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('karyawans', [KaryawanController::class, 'index'])->name('karyawans.index')->middleware('permission:view-karyawans');
     Route::get('karyawans/export', [KaryawanController::class, 'export'])->name('karyawans.export')->middleware('permission:download-karyawans');
     Route::get('karyawans/create', [KaryawanController::class, 'create'])->name('karyawans.create')->middleware('permission:create-karyawans');
-    Route::post('karyawans', [KaryawanController::class, 'store'])->name('karyawans.store')->middleware('permission:create-karyawans'); 
+    Route::post('karyawans', [KaryawanController::class, 'store'])->name('karyawans.store')->middleware('permission:create-karyawans');
     Route::get('karyawans/{karyawan}', [KaryawanController::class, 'show'])->name('karyawans.show')->middleware('permission:show-karyawans');
     Route::get('karyawans/{karyawan}/edit', [KaryawanController::class, 'edit'])->name('karyawans.edit')->middleware('permission:edit-karyawans');
     Route::put('karyawans/{karyawan}', [KaryawanController::class, 'update'])->name('karyawans.update')->middleware('permission:edit-karyawans');
@@ -131,7 +131,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pihak3s', [Pihak3Controller::class, 'index'])->name('pihak3s.index')->middleware('permission:view-pihak3s');
     Route::get('pihak3s/export', [Pihak3Controller::class, 'export'])->name('pihak3s.export')->middleware('permission:download-pihak3s');
     Route::get('pihak3s/create', [Pihak3Controller::class, 'create'])->name('pihak3s.create')->middleware('permission:create-pihak3s');
-    Route::post('pihak3s', [Pihak3Controller::class, 'store'])->name('pihak3s.store')->middleware('permission:create-pihak3s'); 
+    Route::post('pihak3s', [Pihak3Controller::class, 'store'])->name('pihak3s.store')->middleware('permission:create-pihak3s');
     Route::get('pihak3s/{pihak3}', [Pihak3Controller::class, 'show'])->name('pihak3s.show')->middleware('permission:show-pihak3s');
     Route::get('pihak3s/{pihak3}/edit', [Pihak3Controller::class, 'edit'])->name('pihak3s.edit')->middleware('permission:edit-pihak3s');
     Route::put('pihak3s/{pihak3}', [Pihak3Controller::class, 'update'])->name('pihak3s.update')->middleware('permission:edit-pihak3s');
@@ -141,7 +141,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index')->middleware('permission:view-customers');
     Route::get('customers/export', [CustomerController::class, 'export'])->name('customers.export')->middleware('permission:download-customers');
     Route::get('customers/create', [CustomerController::class, 'create'])->name('customers.create')->middleware('permission:create-customers');
-    Route::post('customers', [CustomerController::class, 'store'])->name('customers.store')->middleware('permission:create-customers'); 
+    Route::post('customers', [CustomerController::class, 'store'])->name('customers.store')->middleware('permission:create-customers');
     Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show')->middleware('permission:show-customers');
     Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit')->middleware('permission:edit-customers');
     Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update')->middleware('permission:edit-customers');
@@ -151,7 +151,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('dinamisvariables', [DinamisVariableController::class, 'index'])->name('dinamisvariables.index')->middleware('permission:view-dinamisvariables');
     Route::get('dinamisvariables/export', [DinamisVariableController::class, 'export'])->name('dinamisvariables.export')->middleware('permission:download-dinamisvariables');
     Route::get('dinamisvariables/create', [DinamisVariableController::class, 'create'])->name('dinamisvariables.create')->middleware('permission:create-dinamisvariables');
-    Route::post('dinamisvariables', [DinamisVariableController::class, 'store'])->name('dinamisvariables.store')->middleware('permission:create-dinamisvariables'); 
+    Route::post('dinamisvariables', [DinamisVariableController::class, 'store'])->name('dinamisvariables.store')->middleware('permission:create-dinamisvariables');
     Route::get('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'show'])->name('dinamisvariables.show')->middleware('permission:show-dinamisvariables');
     Route::get('dinamisvariables/{dinamisvariable}/edit', [DinamisVariableController::class, 'edit'])->name('dinamisvariables.edit')->middleware('permission:edit-dinamisvariables');
     Route::put('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'update'])->name('dinamisvariables.update')->middleware('permission:edit-dinamisvariables');
@@ -164,16 +164,19 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('pembelians/createlanjut/{pembelian}', [PembelianController::class, 'createlanjut'])->name('pembelians.createlanjut')->middleware('permission:create-pembelians');
 
-    Route::post('pembelians', [PembelianController::class, 'store'])->name('pembelians.store')->middleware('permission:create-pembelians'); 
+    Route::post('pembelians', [PembelianController::class, 'store'])->name('pembelians.store')->middleware('permission:create-pembelians');
 
     //storelanjut
-    Route::post('pembelians/storelanjut/{pembelian}', [PembelianController::class, 'storelanjut'])->name('pembelians.storelanjut')->middleware('permission:create-pembelians'); 
+    Route::post('pembelians/storelanjut/{pembelian}', [PembelianController::class, 'storelanjut'])->name('pembelians.storelanjut')->middleware('permission:create-pembelians');
 
 
     Route::get('pembelians/{pembelian}', [PembelianController::class, 'show'])->name('pembelians.show')->middleware('permission:show-pembelians');
     Route::get('pembelians/{pembelian}/edit', [PembelianController::class, 'edit'])->name('pembelians.edit')->middleware('permission:edit-pembelians');
     Route::put('pembelians/{pembelian}', [PembelianController::class, 'update'])->name('pembelians.update')->middleware('permission:edit-pembelians');
     Route::delete('pembelians/{pembelian}', [PembelianController::class, 'destroy'])->name('pembelians.destroy')->middleware('permission:delete-pembelians');
+
+    Route::get('pembelian/{pembelian}/cetaknota', [PembelianController::class, 'cetakNota'])->name('pembelian.cetaknota')->middleware('permission:show-pembelians');
+
 
     // PembeliansDetails Management - dengan permission check
     Route::get('pembeliandetails', [PembelianDetailController::class, 'index'])->name('pembeliandetails.index')->middleware('permission:view-pembeliandetails');
@@ -182,10 +185,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pembeliandetails/createtitip/{pembelian}', [PembelianDetailController::class, 'createtitip'])->name('pembeliandetails.createtitip')->middleware('permission:create-pembeliandetails');
 
     Route::get('pembeliandetails/createjual/{pembelian}', [PembelianDetailController::class, 'createjual'])->name('pembeliandetails.createjual')->middleware('permission:create-pembeliandetails');
-    
-    Route::post('pembeliandetails', [PembelianDetailController::class, 'store'])->name('pembeliandetails.store')->middleware('permission:create-pembeliandetails'); 
-    Route::post('pembeliandetails/titipstore', [PembelianDetailController::class, 'titipstore'])->name('pembeliandetails.titipstore')->middleware('permission:create-pembeliandetails'); 
-    Route::post('pembeliandetails/jualstore', [PembelianDetailController::class, 'jualstore'])->name('pembeliandetails.jualstore')->middleware('permission:create-pembeliandetails'); 
+
+    Route::post('pembeliandetails', [PembelianDetailController::class, 'store'])->name('pembeliandetails.store')->middleware('permission:create-pembeliandetails');
+    Route::post('pembeliandetails/titipstore', [PembelianDetailController::class, 'titipstore'])->name('pembeliandetails.titipstore')->middleware('permission:create-pembeliandetails');
+    Route::post('pembeliandetails/jualstore', [PembelianDetailController::class, 'jualstore'])->name('pembeliandetails.jualstore')->middleware('permission:create-pembeliandetails');
 
 
     Route::get('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'show'])->name('pembeliandetails.show')->middleware('permission:show-pembeliandetails');
@@ -194,21 +197,23 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pembeliandetails/{pembelian}/editjual', [PembelianDetailController::class, 'editjual'])->name('pembeliandetails.editjual')->middleware('permission:edit-pembeliandetails');
 
     Route::post('pembeliandetails/{pembelian}/titipupdate', [PembelianDetailController::class, 'titipupdate'])->name('pembeliandetails.titipupdate');
-    Route::put('pembeliandetails/{pembelian}/jualupdate', [PembelianDetailController::class, 'jualupdate'])->name('pembeliandetails.jualupdate')->middleware('permission:edit-pembeliandetails');
+    Route::post('pembeliandetails/{pembelian}/jualupdate', [PembelianDetailController::class, 'jualupdate'])->name('pembeliandetails.jualupdate')->middleware('permission:edit-pembeliandetails');
 
 
     Route::delete('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'destroy'])->name('pembeliandetails.destroy')->middleware('permission:delete-pembeliandetails');
+
+
 
 
     // absensi Management - dengan permission check
     Route::get('absensis', [AbsensiController::class, 'index'])->name('absensis.index')->middleware('permission:view-absensis');
     Route::get('absensis/export', [AbsensiController::class, 'export'])->name('absensis.export')->middleware('permission:download-absensis');
     Route::get('absensis/create', [AbsensiController::class, 'create'])->name('absensis.create')->middleware('permission:create-absensis');
-    Route::post('absensis', [AbsensiController::class, 'store'])->name('absensis.store')->middleware('permission:create-absensis'); 
+    Route::post('absensis', [AbsensiController::class, 'store'])->name('absensis.store')->middleware('permission:create-absensis');
     Route::get('absensis/{absensi}', [AbsensiController::class, 'show'])->name('absensis.show')->middleware('permission:show-absensis');
     Route::get('absensis/{absensi}/edit', [AbsensiController::class, 'edit'])->name('absensis.edit')->middleware('permission:edit-absensis');
     Route::put('absensis/{absensi}', [AbsensiController::class, 'update'])->name('absensis.update')->middleware('permission:edit-absensis');
     Route::delete('absensis/{absensi}', [AbsensiController::class, 'destroy'])->name('absensis.destroy')->middleware('permission:delete-absensis');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
