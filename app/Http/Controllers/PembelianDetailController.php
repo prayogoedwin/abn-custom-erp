@@ -174,6 +174,7 @@ class PembelianDetailController extends Controller
                     'netto'        => $request->netto[$index] ?? 0,
                     'satuan'       => $request->satuan[$index] ?? "satuan",
                     'rendeman'     => $request->rendeman[$index] ?? null,
+                    'created_by' => auth()->id(),
                 ]);
             }
         }
@@ -314,14 +315,54 @@ class PembelianDetailController extends Controller
         $data = $pembelian;
 
         $pagedata = $this->getPagedata();
+        $pagedata['pembelian_id'] = $pembelian->id;
 
+        // dd($pembeliandetails);
 
         return view('pembeliandetails.edittitip', compact('pembeliandetails', 'produks', 'data'), $pagedata);
     }
 
-    public function titipupdate(Pembelian $pembelian): RedirectResponse 
+    public function titipupdate(Request $request): RedirectResponse 
     {
-        return to_route('pembeliandetails.index')->with('status', 'PembelianDetail updated successfully.');
+
+        $store_data = [
+            'pembelian_id' => $request->input('pembelian_id'),
+            'produk_id' => $request->input('produk_id'),
+            'netto' => $request->input('netto'),
+            'satuan' => $request->input('satuan'),
+            'rendeman' => $request->input('rendeman'),
+            'bobot' => $request->input('bobot'),
+            'harga' => $request->input('harga'),
+            'harga_basis' => $request->input('harga_basis'),
+            'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
+            'harga_netto' => $request->input('harga_netto'),
+
+            'created_by' => auth()->id(),
+        ];
+
+        // dd($request->all());
+
+        // Hapus semua dulu
+        PembelianDetail::where('pembelian_id', $request->pembelian_id)->delete();
+
+
+        foreach ($request->produk_id as $index => $produk_id) {
+            if (!empty($produk_id)) {
+                // Simpan ulang setiap item ke database
+                PembelianDetail::create([
+                    'pembelian_id' => $request->pembelian_id,
+                    'produk_id'    => $produk_id,
+                    'netto'        => $request->netto[$index] ?? 0,
+                    'satuan'       => $request->satuan[$index] ?? "satuan",
+                    'rendeman'     => $request->rendeman[$index] ?? null,
+
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+        }
+
+
+        return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
 
     }
 

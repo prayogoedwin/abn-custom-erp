@@ -16,7 +16,7 @@
 
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit {{ $title }}</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Fill in the details below') }}</p>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Fill in the details below2') }}</p>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -25,39 +25,37 @@
                 @csrf
                 <input type="hidden" name="pembelian_id" value="{{ $pembelian_id }}">
 
+
+
                 <div id="produk-container">
+                </div>
+
+                <template id="row-template">
                     <div class="produk-row border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Produk</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Produk</label>
                                 <select name="produk_id[]" class="produk-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                                     <option value="">Pilih Produk</option>
-                                    @foreach($produks as $produk)
-                                    <option value="{{ $produk->id }}" data-satuan="{{ $produk->satuan }}">
-                                        {{$produk->nama_produk}}
+                                    @foreach($produks as $p)
+                                    <option value="{{ $p->id }}" data-satuan="{{ $p->satuan }}" data-harga="{{ $p->harga_basis }}">
+                                        {{ $p->nama_produk }}
                                     </option>
                                     @endforeach
                                 </select>
                             </div>
-
-                            <div class="container-satuan hidden">
-                                <input
-                                    class="input-satuan"
-                                    name="satuan[]" />
-                            </div>
-
                             <div class="container-netto hidden">
                                 <x-forms.input append="satuan" label="Netto" name="netto[]" type="number" />
                             </div>
-
                             <div class="container-rendeman hidden">
                                 <x-forms.input append="%" label="Rendeman" name="rendeman[]" type="number" />
                             </div>
                         </div>
 
-                        <button type="button" class="btn-remove hidden text-red-500 text-sm mt-2">Hapus Produk</button>
+                        <button type="button" class="btn-remove text-red-500 text-sm mt-2">Hapus Produk</button>
                     </div>
-                </div>
+                </template>
+
 
                 <button type="button" id="add-produk" class="mb-4 bg-green-500 text-white px-4 py-2 rounded shadow">
                     + Tambah Produk Lain
@@ -70,70 +68,68 @@
             </form>
         </div>
     </div>
-    
+
     <script>
+        $olddata = @json($pembeliandetails);
+
+        console.log('$olddata:', $olddata);
+
+
+
+
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('produk-container');
+            const template = document.getElementById('row-template');
             const addButton = document.getElementById('add-produk');
 
-            // 1. Fungsi Update Visibility untuk baris tertentu
-            function handleRowLogic(row) {
-                const select = row.querySelector('.produk-select');
-                const nettoDiv = row.querySelector('.container-netto');
-                const rendemanDiv = row.querySelector('.container-rendeman');
-                const appendSatuan = row.querySelector('.text-gray-900'); // Sesuai temuan Anda
-                const hiddenInputSatuan = row.querySelector('.input-satuan');
+            // Fungsi utama untuk menambah baris
+            function addRow(data = null) {
+                const clone = template.content.cloneNode(true);
+                const row = clone.querySelector('.produk-row');
 
-                select.addEventListener('change', function() {
-                    const selectedOption = select.options[select.selectedIndex];
-                    const val = selectedOption.value;
-                    const satuan = selectedOption.getAttribute('data-satuan');
+                container.appendChild(clone);
 
-                    // Reset
-                    nettoDiv.classList.add('hidden');
-                    rendemanDiv.classList.add('hidden');
-
-                    if (val !== "") {
-                        nettoDiv.classList.remove('hidden');
-                        if (appendSatuan) appendSatuan.textContent = satuan || '-';
-
-                        // 2. Isi value ke input satuan[] yang tersembunyi
-                        if (hiddenInputSatuan) {
-                            hiddenInputSatuan.value = satuan || '';
-                        }
-
-                        // Logika Rendeman
-                        if (val === "1" || val === "2") {
-                            rendemanDiv.classList.remove('hidden');
-                        }
-                    }
-                });
+                // Inisialisasi logika pada baris baru
+                handleRowLogic(row, data);
             }
 
-            // 2. Inisialisasi baris pertama
-            handleRowLogic(container.querySelector('.produk-row'));
+            function handleRowLogic(row, data = null) {
+                const select = row.querySelector('.produk-select');
+                const inNetto = row.querySelector('input[name="netto[]"]');
+                const inRendeman = row.querySelector('input[name="rendeman[]"]');
 
-            // 3. Logika Tambah Baris (Clone)
-            addButton.addEventListener('click', function() {
-                const rows = container.querySelectorAll('.produk-row');
-                const newRow = rows[0].cloneNode(true); // Clone baris pertama
 
-                // Reset nilai di baris baru
-                newRow.querySelectorAll('input').forEach(input => input.value = '');
-                newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-                newRow.querySelector('.container-netto').classList.add('hidden');
-                newRow.querySelector('.container-rendeman').classList.add('hidden');
+                // Jika ada data lama, isi field-nya
+                if (data) {
+                    select.value = data.produk_id;
+                    inNetto.value = data.netto;
+                    inRendeman.value = data.rendeman;
 
-                // Tampilkan tombol hapus di baris baru
-                const removeBtn = newRow.querySelector('.btn-remove');
-                removeBtn.classList.remove('hidden');
-                removeBtn.addEventListener('click', () => newRow.remove());
 
-                // Jalankan logic untuk baris baru
-                handleRowLogic(newRow);
+                    // Trigger tampilan manual karena value diset lewat JS
+                    row.querySelector('.container-netto').classList.remove('hidden');
+                    if (data.rendeman) row.querySelector('.container-rendeman').classList.remove('hidden');
 
-                container.appendChild(newRow);
-            });
+                }
+
+                // Event Listeners
+                select.addEventListener('change', () => {
+                    // ... logika show/hide yang sebelumnya ...
+                });
+
+                row.querySelector('.btn-remove').addEventListener('click', () => row.remove());
+            }
+
+            // 1. Render data lama jika ada
+            if ($olddata && $olddata.length > 0) {
+                $olddata.forEach(item => addRow(item));
+            } else {
+                // 2. Jika create baru, kasih 1 baris kosong
+                addRow();
+            }
+
+            // 3. Tombol tambah baris manual
+            addButton.addEventListener('click', () => addRow());
         });
     </script>
 
