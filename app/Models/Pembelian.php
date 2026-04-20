@@ -38,6 +38,8 @@ class Pembelian extends Model
         'total_nominal_terbayar',
         'kekurangan',
         'status_pembayaran',
+        'metode_pembayaran',
+        'tipe_pembayaran',
         'isactive',
         'created_by',
         'updated_by',

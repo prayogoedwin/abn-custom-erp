@@ -145,7 +145,9 @@ class PembelianController extends Controller
 
         $pagedata = $this->getPagedata();
 
-        return view('pembelians.createlanjut', compact('supplier', 'simpanpinjamsupplier'), $pagedata);
+        $data = $pembelian;
+
+        return view('pembelians.createlanjut', compact('supplier', 'simpanpinjamsupplier', 'data'), $pagedata,);
     }
 
     public function store(Request $request): RedirectResponse
@@ -191,6 +193,39 @@ class PembelianController extends Controller
         return to_route('pembeliandetails.createjual', $pembelian->id);
     }
 
+    public function storelanjut(Pembelian $pembelian, Request $request): RedirectResponse
+    {
+
+        $store_data = [
+            'metode_pembayaran' => $request->input('metode_pembayaran'),
+            'tipe_pembayaran' => $request->input('tipe_pembayaran'),
+            'nominal' => $request->input('nominal'),
+            'keterangan' => $request->input('keterangan'),
+
+            'created_by' => auth()->id(),
+        ];
+
+
+
+        $p = Pembelian::find($pembelian->id);
+        $p->update([
+            'metode_pembayaran' => $store_data['metode_pembayaran'],
+            'tipe_pembayaran' => $store_data['tipe_pembayaran'],
+        ]);
+
+
+
+
+        $simpanpinjamsupplier = SimpanPinjamSupplier::find($pembelian->id)->update([
+            'nominal' => $store_data['nominal'],
+            'keterangan' => $store_data['keterangan']
+
+        ]);
+
+
+        return to_route('pembelians.index');
+    }
+
     public function show(Pembelian $karyawan): View
     {
         $karyawan->email = User::find($karyawan->user_id)->email;
@@ -207,11 +242,10 @@ class PembelianController extends Controller
         return view('dynamiccrud.show', compact('data'), $pagedata);
     }
 
-    public function edit(Pembelian $karyawan): View
+    public function edit(Pembelian $pembelian): View
     {
-        $karyawan->email = User::find($karyawan->user_id)->email;
 
-        $data = $karyawan;
+        $data = $pembelian;
 
 
         $pagedata = $this->getPagedata();
@@ -219,31 +253,27 @@ class PembelianController extends Controller
         return view('dynamiccrud.edit', compact('data'), $pagedata);
     }
 
-    public function update(Request $request, Pembelian $karyawan): RedirectResponse
+    public function update(Request $request, Pembelian $pembelian): RedirectResponse
     {
         // dd($request->all());
 
 
         // dd("current user id: " . $current_user_id);
         $store_data = [
-            'nama' => $request->input('nama'),
-            'email' => $request->input('email'),
-            'password' => $request->input('password'),
-            'kontak' => $request->input('kontak'),
-            'alamat' => $request->input('alamat'),
+            'nopol' => $request->input('nopol'),
+            'supplier_id' => $request->input('supplier_id'),
+            'tipe_transaksi_pembelian' => $request->input('tipe_transaksi_pembelian'),
 
-            'updated_by' => auth()->id(),
+            'created_by' => auth()->id(),
         ];
 
 
         $validate = Validator::make($store_data, [
-            'nama' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['nullable', 'confirmed', Password::default()],
-            'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
+            'nopol' => ['required', 'string', 'max:255'],
+            'supplier_id' => ['required', 'integer', 'max:255'],
+            'tipe_transaksi_pembelian' => ['required', 'string'],
 
-            'updated_by' => ['required', 'integer']
+            'created_by' => ['required', 'integer']
         ]);
 
 
@@ -251,30 +281,17 @@ class PembelianController extends Controller
             return back()->withErrors($validate)->withInput();
         }
 
-        $user = User::find($karyawan->user_id);
+        
+        $pembelian->update($store_data);
 
-        $user->update(
-            [
-                'name' => $store_data['nama'],
-                'email' => $store_data['email'],
-            ]
-        );
 
-        if (! empty($store_data['password'])) {
-            $user->update([
-                'password' => Hash::make($store_data['password']),
-            ]);
+
+        if ($store_data['tipe_transaksi_pembelian'] === 'Titip') {
+            return to_route('pembeliandetails.edittitip', $pembelian->id);
         }
 
-        $karyawan->update($store_data);
+        return to_route('pembeliandetails.editjual', $pembelian->id);
 
-
-
-        // dd("karyawan updated: " . json_encode($karyawan));
-
-
-
-        return to_route('pembelians.index')->with('status', 'Pembelian updated successfully.');
     }
 
     //soft delete

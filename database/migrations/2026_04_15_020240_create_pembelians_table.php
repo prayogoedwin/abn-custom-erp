@@ -22,6 +22,9 @@ return new class extends Migration
             $table->integer('total_nominal_terbayar')->default(0);
             $table->integer('kekurangan')->nullable();
             $table->string('status_pembayaran')->default('Lunas'); // lunas or belum lunas
+            $table->string('metode_pembayaran')->nullable(); // transfer / cash
+            $table->string('tipe_pembayaran')->nullable(); // potong / full / titip
+
             $table->boolean('isactive')->nullable()->default(true);
             $table->timestamps();
             $table->string('deleted_at')->nullable();

@@ -165,6 +165,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pembelians/createlanjut/{pembelian}', [PembelianController::class, 'createlanjut'])->name('pembelians.createlanjut')->middleware('permission:create-pembelians');
 
     Route::post('pembelians', [PembelianController::class, 'store'])->name('pembelians.store')->middleware('permission:create-pembelians'); 
+
+    //storelanjut
+    Route::post('pembelians/storelanjut/{pembelian}', [PembelianController::class, 'storelanjut'])->name('pembelians.storelanjut')->middleware('permission:create-pembelians'); 
+
+
     Route::get('pembelians/{pembelian}', [PembelianController::class, 'show'])->name('pembelians.show')->middleware('permission:show-pembelians');
     Route::get('pembelians/{pembelian}/edit', [PembelianController::class, 'edit'])->name('pembelians.edit')->middleware('permission:edit-pembelians');
     Route::put('pembelians/{pembelian}', [PembelianController::class, 'update'])->name('pembelians.update')->middleware('permission:edit-pembelians');
@@ -179,19 +184,23 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pembeliandetails/createjual/{pembelian}', [PembelianDetailController::class, 'createjual'])->name('pembeliandetails.createjual')->middleware('permission:create-pembeliandetails');
     
     Route::post('pembeliandetails', [PembelianDetailController::class, 'store'])->name('pembeliandetails.store')->middleware('permission:create-pembeliandetails'); 
-    Route::post('pembeliandetails', [PembelianDetailController::class, 'titipstore'])->name('pembeliandetails.titipstore')->middleware('permission:create-pembeliandetails'); 
-    Route::post('pembeliandetails', [PembelianDetailController::class, 'jualstore'])->name('pembeliandetails.jualstore')->middleware('permission:create-pembeliandetails'); 
+    Route::post('pembeliandetails/titipstore', [PembelianDetailController::class, 'titipstore'])->name('pembeliandetails.titipstore')->middleware('permission:create-pembeliandetails'); 
+    Route::post('pembeliandetails/jualstore', [PembelianDetailController::class, 'jualstore'])->name('pembeliandetails.jualstore')->middleware('permission:create-pembeliandetails'); 
+
+
     Route::get('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'show'])->name('pembeliandetails.show')->middleware('permission:show-pembeliandetails');
 
-    Route::get('pembeliandetails/{pembeliandetail}/titipupdate', [PembelianDetailController::class, 'edittitip'])->name('pembeliandetails.edittitip')->middleware('permission:edit-pembeliandetails');
-    Route::get('pembeliandetails/{pembeliandetail}/titipjual', [PembelianDetailController::class, 'editjual'])->name('pembeliandetails.editjual')->middleware('permission:edit-pembeliandetails');
+    Route::get('pembeliandetails/{pembelian}/edittitip', [PembelianDetailController::class, 'edittitip'])->name('pembeliandetails.edittitip')->middleware('permission:edit-pembeliandetails');
+    Route::get('pembeliandetails/{pembelian}/editjual', [PembelianDetailController::class, 'editjual'])->name('pembeliandetails.editjual')->middleware('permission:edit-pembeliandetails');
 
-    Route::put('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'update'])->name('pembeliandetails.titipupdate')->middleware('permission:edit-pembeliandetails');
-    Route::put('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'update'])->name('pembeliandetails.jualupdate')->middleware('permission:edit-pembeliandetails');
+    Route::put('pembeliandetails/{pembelian}/titipupdate', [PembelianDetailController::class, 'titipupdate'])->name('pembeliandetails.titipupdate')->middleware('permission:edit-pembeliandetails');
+    Route::put('pembeliandetails/{pembelian}/jualupdate', [PembelianDetailController::class, 'jualupdate'])->name('pembeliandetails.jualupdate')->middleware('permission:edit-pembeliandetails');
+
+
     Route::delete('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'destroy'])->name('pembeliandetails.destroy')->middleware('permission:delete-pembeliandetails');
 
 
-    // DinamisVariable Produk Management - dengan permission check
+    // absensi Management - dengan permission check
     Route::get('absensis', [AbsensiController::class, 'index'])->name('absensis.index')->middleware('permission:view-absensis');
     Route::get('absensis/export', [AbsensiController::class, 'export'])->name('absensis.export')->middleware('permission:download-absensis');
     Route::get('absensis/create', [AbsensiController::class, 'create'])->name('absensis.create')->middleware('permission:create-absensis');

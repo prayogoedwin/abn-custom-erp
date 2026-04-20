@@ -20,7 +20,7 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-6">
-            <form action="{{ route($tablename . '.store') }}" method="POST" class="max-w-2xl">
+            <form action="{{ route($tablename . '.storelanjut', $data) }}" method="POST" class="max-w-2xl">
                 @csrf
                 @method('POST')
 
@@ -65,10 +65,15 @@
                     @enderror
                 </div>
 
-                
-                <div class="mb-4">
-                    <x-forms.input label="Nama Supplier" name="supplier_nama" type="text" value="{{$supplier->nama}}" required />
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Supplier
+                    </label>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        {{$supplier->nama}}
+                    </div>
                 </div>
+
 
                 <div class="mb-4">
                     <x-forms.input label="Nominal" name="nominal" type="number" value="{{$simpanpinjamsupplier->nominal}}" required />

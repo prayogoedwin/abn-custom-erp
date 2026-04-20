@@ -228,6 +228,10 @@ class PembelianDetailController extends Controller
                     'netto'        => $request->netto[$index],
                     'satuan'       => $request->satuan[$index], // Nilai ini datang dari input hidden tadi
                     'rendeman'     => $request->rendeman[$index] ?? null,
+                    'harga'     => $request->harga[$index] ?? null,
+                    'harga_basis'     => $request->harga_basis[$index] ?? null,
+                    'harga_basis_pembelian'     => $request->harga_basis_pembelian[$index] ?? null,
+                    'harga_netto'     => $request->harga_netto[$index] ?? null,
                 ]);
             }
         }
@@ -305,17 +309,22 @@ class PembelianDetailController extends Controller
 
     public function edittitip(Pembelian $pembelian): View
     {
-        $pembeliandetails = PembelianDetail::where('pembelian_id', $pembelian->id);
+        $pembeliandetails = PembelianDetail::where('pembelian_id', $pembelian->id)->get();
         $produks = Produk::all();
-        return view('pembelian.edit', compact('pembeliandetails', 'produks'));
-
-
-        $data = $pihak3;
+        $data = $pembelian;
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.edit', compact('data'), $pagedata);
+
+        return view('pembeliandetails.edittitip', compact('pembeliandetails', 'produks', 'data'), $pagedata);
     }
+
+    public function titipupdate(Pembelian $pembelian): RedirectResponse 
+    {
+        return to_route('pembeliandetails.index')->with('status', 'PembelianDetail updated successfully.');
+
+    }
+
 
     public function update(Request $request, PembelianDetail $pihak3): RedirectResponse
     {

@@ -140,7 +140,6 @@
 
 
     <style>
-        /* Tambahkan jika Tailwind .hidden belum terdefinisi atau butuh fallback */
         .hidden {
             display: none;
         }
