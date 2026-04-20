@@ -247,20 +247,17 @@ class PembelianController extends Controller
         return $pdf->download('Nota-' . $pembelian->kode_transaksi . '.pdf');
     }
 
-    public function show(Pembelian $karyawan): View
+    public function show($id): View
     {
-        $karyawan->email = User::find($karyawan->user_id)->email;
-
-        $data = $karyawan;
-
+        $pembelian = Pembelian::find($id);
+        $pembelian->details = PembelianDetail::where('pembelian_id', $id)->get();
+        $pembelian->supplier = Supplier::find($pembelian->supplier_id);
 
         $pagedata = $this->getPagedata();
 
-        //TO DO: asdfasdfwe
+        
 
-        // dd($data);
-
-        return view('dynamiccrud.show', compact('data'), $pagedata);
+        return view('pembelians.show', compact('pembelian'), $pagedata);
     }
 
     public function edit(Pembelian $pembelian): View
