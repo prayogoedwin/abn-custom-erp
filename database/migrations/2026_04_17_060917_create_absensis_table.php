@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('karyawan_id')->constrained('karyawans')->onDelete('cascade');
             $table->string('nama')->default('');
-            $table->string('bulan')->default('');
-            $table->string('tahun')->default('');
+            $table->integer('bulan');
+            $table->integer('tahun');
             $table->integer('jumlah_masuk')->default(0);
             $table->integer('jumlah_absen')->default(0);
             $table->integer('jumlah_izin')->default(0);

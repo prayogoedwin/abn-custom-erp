@@ -207,6 +207,10 @@ Route::middleware(['auth'])->group(function () {
 
     // absensi Management - dengan permission check
     Route::get('absensis', [AbsensiController::class, 'index'])->name('absensis.index')->middleware('permission:view-absensis');
+
+    Route::get('absensis/absensi', [AbsensiController::class, 'absensi'])->name('absensis.absensi')->middleware('permission:view-absensis');
+    Route::post('absensis/generate', [AbsensiController::class, 'generate'])->name('absensis.generate')->middleware('permission:view-absensis');
+
     Route::get('absensis/export', [AbsensiController::class, 'export'])->name('absensis.export')->middleware('permission:download-absensis');
     Route::get('absensis/create', [AbsensiController::class, 'create'])->name('absensis.create')->middleware('permission:create-absensis');
     Route::post('absensis', [AbsensiController::class, 'store'])->name('absensis.store')->middleware('permission:create-absensis');

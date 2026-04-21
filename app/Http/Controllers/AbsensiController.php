@@ -39,27 +39,43 @@ class AbsensiController extends Controller
         return $pagedata;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        // dd($request->headers->all());
+        $pagedata = $this->getPagedata();
+
+        return view('absensis.index', $pagedata);
+    }
+
+    public function absensi(Request $request)
+    {
+        // dd($request->all());
+
         
+        $month = $request->month;
+        $year = $request->year;
+
+        $absensis = Absensi::join('karyawans', 'absensis.karyawan_id', '=', 'karyawans.id')->join('users', 'karyawans.user_id', '=', 'users.id')
+            // Select everything from absensi, and specific fields from users
+            ->select('absensis.*', 'users.name as user_name', 'users.email')
+            
+            
+            ->get();
+        // dd($absensis);
+
 
         if ($request->ajax()) {
+
             // dd('masuk ajax');
-            $absensis = Absensi::join('karyawans', 'absensis.karyawan_id', '=', 'karyawans.id')->join('users', 'karyawans.id', '=', 'users.id')
+            $absensis = Absensi::join('karyawans', 'absensis.karyawan_id', '=', 'karyawans.id')->join('users', 'karyawans.user_id', '=', 'users.id')
                 // Select everything from absensi, and specific fields from users
                 ->select('absensis.*', 'users.name as user_name', 'users.email')
                 ->where('absensis.isactive', true)
+                
                 ->get();
             // dd($absensis);
 
             return DataTables::of($absensis)
-                // ->filterColumn('name', function ($query, $keyword) {
-                //     $query->where('absensis.nama_absensi', 'like', "%{$keyword}%");
-                // })
-                // ->filterColumn('kategori', function ($query, $keyword) {
-                //     $query->where('kategori_absensis.nama', 'like', "%{$keyword}%");
-                // })
+               
 
 
 
@@ -87,28 +103,46 @@ class AbsensiController extends Controller
                 ->make(true);
         }
 
-        $absensisBulanIni = Absensi::where('bulan', 'April')->get();
 
-        if(count($absensisBulanIni) == 0){
-            $this->BuatAbsensiBulan('April');
-        }
+
+        $rekapData = Absensi::where('bulan', $month)
+            ->where('tahun', $year)
+            ->get();
+
+        $isExist = $rekapData->isNotEmpty();
+
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.index', $pagedata);
+        return view('absensis.absensi', compact('isExist', 'month', 'year'), $pagedata);
     }
 
-    private function BuatAbsensiBulan($bulan): void {
+    public function generate(Request $request): RedirectResponse
+    {
 
-        $karyawans = Karyawan::where('isActive', true)->get();
+        $month = $request->month;
+        $year = $request->year;
+
+        $karyawans = Karyawan::where('isactive', true)->get();
 
         foreach ($karyawans as $karyawan) {
+
+
+            // 3. Simpan ke table rekap
             Absensi::create([
-                'karyawan_id' => $karyawan->id,
-                'bulan' => $bulan,
+                'karyawan_id'  => $karyawan->id,
+                'nama'         => $karyawan->nama,
+                'bulan'        => $month,
+                'tahun'        => $year,
+                'jumlah_masuk' => 0,
+                'jumlah_absen' => 0,
+                'jumlah_izin'  => 0,
+                'isactive'     => 1,
+                'created_by'   => auth()->id(),
             ]);
         }
-        
+
+        return redirect()->back()->with('success', 'Rekap bulan ini berhasil digenerate!');
     }
 
 
@@ -186,9 +220,7 @@ class AbsensiController extends Controller
 
     public function edit(Absensi $absensi): View
     {
-        $absensi->email = User::find($absensi->user_id)->email;
-
-        $data = $absensi;
+        
 
 
         $pagedata = $this->getPagedata();
