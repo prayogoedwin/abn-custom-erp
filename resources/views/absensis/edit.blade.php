@@ -26,76 +26,37 @@
                 @csrf
                 @method('PUT')
 
-                @foreach($columns as $column)
-                @if(!$column['inform'] )
-                @continue
-                @endif
-
-                @if($column['type'] === 'text')
-                <div class="mb-4">
-                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="text" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
-                </div>
-
-                
-                @elseif($column['type'] === 'email')
-                
-                <div class="mb-4">
-                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="email" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
-                </div>
-
-
-                @elseif($column['type'] === 'password')
-
-                <div class="mb-4">
-                    <x-forms.input label="Password" name="password" type="password" />
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('Leave blank to keep current password') }}</p>
-                </div>
-
-                <div class="mb-6">
-                    <x-forms.input label="Confirm Password" name="password_confirmation" type="password" />
-                </div>
-
-
-                @elseif($column['type'] === 'number')
-
-                <div class="mb-4">
-                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="0.01" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
-                </div>
-
-                
-
-
-                @elseif($column['type'] === 'select')
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ $column['title'] }}
+                        Nama Karyawan
                     </label>
-
-                    <select
-                        name="{{ $column['name'] }}"
-                        class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-
-                        
-                        @foreach($column['options'] as $option)
-                        @if(old($column['value'], $data->{$column['name']}) == $option['value'])
-                            <option value="{{ $option['value'] }}" selected>
-                            {{ $option['label'] }}
-                            </option>
-                        @else
-                            <option value="{{ $option['value'] }}">
-                            {{ $option['label'] }}
-                            </option>
-                        @endif
-                        
-                        @endforeach
-                    </select>
-
-                    @error($column['name'])
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
+                    <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        {{ $data->nama }}
+                    </div>
                 </div>
-                @endif
-                @endforeach
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Bulan - Tahun
+                    </label>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        {{ \Carbon\Carbon::create()->month($data->bulan)->format('F') }} - {{ $data->tahun }}
+                    </div>
+                </div>
+
+
+                <div class="mb-4">
+                    <x-forms.input label="Jumlah Masuk" name="jumlah_masuk" type="number" value="{{ old('jumlah_masuk', $data->jumlah_masuk) }}" required />
+                </div>
+
+                <div class="mb-4">
+                    <x-forms.input label="Jumlah Absen" name="jumlah_absen" type="number" value="{{ old('jumlah_absen', $data->jumlah_absen) }}" required />
+                </div>
+
+                <div class="mb-4">
+                    <x-forms.input label="Jumlah Izin" name="jumlah_izin" type="number" value="{{ old('jumlah_izin', $data->jumlah_izin) }}" required />
+                </div>
+
 
 
                 <div class="flex gap-3">

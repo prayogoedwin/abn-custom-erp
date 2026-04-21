@@ -19,6 +19,17 @@
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        @if ($errors->any())
+        <div class="bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-300 p-4">
+            <ul class="list-disc pl-5 space-y-1">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+
         <div class="p-6">
             <form action="{{ route($tablename . '.store') }}" method="POST" class="max-w-2xl">
                 @csrf
@@ -63,7 +74,7 @@
 
                     <select
                         name="{{ $column['name'] }}"
-                        class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                        class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm p-2">
 
                         <option value="">{{ __('Select ' . $column['title']) }}</option>
                         @foreach($column['options'] as $option)

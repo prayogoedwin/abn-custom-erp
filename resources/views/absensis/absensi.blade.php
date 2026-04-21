@@ -41,24 +41,36 @@
                 @csrf
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bulan</label>
-                    <select name="month" id="filter-month" class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm" required>
+                    <select name="month" id="filter-month" class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 mb-2" required>
                         <option value="">Semua Bulan</option>
                         @foreach(range(1, 12) as $m)
+                        @if($m == $month)
+                        <option selected value="{{ $m }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                        @else
                         <option value="{{ $m }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                        @endif
                         @endforeach
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tahun</label>
-                    <select name="year" id="filter-year" class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm" required>
+                    <select name="year" id="filter-year" class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 mb-2" required>
                         <option value="">Semua Tahun</option>
                         @for($y = date('Y') + 3; $y >= 2020; $y--)
+                        @if($y == $year)
+                        <option selected value="{{ $y }}">{{ $y }}</option>
+                        @else
                         <option value="{{ $y }}">{{ $y }}</option>
+                        @endif
                         @endfor
                     </select>
                 </div>
                 <x-button type="primary" class="h-9">GO</x-button>
             </form>
+
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ date('F', mktime(0, 0, 0, $month, 1)) }} {{ $year }}</h1>
+
+
         </div>
         @if(!$isExist)
         {{-- Jika data kosong --}}
@@ -133,13 +145,24 @@
 
         ];
 
+        // Ambil parameter dari URL browser
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterMonth = urlParams.get('month');
+        const filterYear = urlParams.get('year');
+
         console.log('$columnsdata:', $columnsdata);
 
         $(document).ready(function() {
             $('#dynamic-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route(strtolower($tablename) . ".absensi") }}',
+                ajax: {
+                    'url': '{{ route(strtolower($tablename) . ".absensi") }}',
+                    'data': function(d) {
+                        d.month = filterMonth;
+                        d.year = filterYear;
+                    }
+                },
                 columns: $columnsdata,
                 order: [
                     [0, 'desc']

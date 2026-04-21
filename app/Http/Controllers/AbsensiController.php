@@ -20,17 +20,37 @@ class AbsensiController extends Controller
 {
     private function getPagedata()
     {
+        $karyawans = Karyawan::where('isactive', true)->get();
 
         $pagedata = [
             'title' => 'Absensi',
             'tablename' => 'absensis',
             'tableaction' => true,
             'columns' => [
-                ['name' => 'user_name', 'value' => 'user_name',  'title' => 'Nama Absensi', 'type' => 'text', 'inform' => false, 'inshow' => true,  'intable' => true],
-                ['name' => 'bulan', 'value' => 'bulan',  'title' => 'Bulan', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => false],
-                ['name' => 'tahun', 'value' => 'tahun',  'title' => 'Tahun', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => false],
+                ['name' => 'karyawan_id', 'value' => 'user_name',  'title' => 'Nama Karyawan', 'type' => 'select', 'inform' => true, 'intable' => true, 'options' => [
+                    // Ambil data kategori dari database
+
+                    ...$karyawans->map(function ($karyawan) {
+                        return ['value' => $karyawan->id, 'label' => $karyawan->nama];
+                    })->toArray(),
+                ]],
+                ['name' => 'bulan', 'value' => 'bulan',  'title' => 'Bulan', 'type' => 'select', 'inform' => true, 'intable' => false, 'options' => [
+                    ['value' => '1', 'label' => 'Januari'],
+                    ['value' => '2', 'label' => 'Februari'],
+                    ['value' => '3', 'label' => 'Maret'],
+                    ['value' => '4', 'label' => 'April'],
+                    ['value' => '5', 'label' => 'Mei'],
+                    ['value' => '6', 'label' => 'Juni'],
+                    ['value' => '7', 'label' => 'Juli'],
+                    ['value' => '8', 'label' => 'Agustus'],
+                    ['value' => '9', 'label' => 'September'],
+                    ['value' => '10', 'label' => 'Oktober'],
+                    ['value' => '11', 'label' => 'November'],
+                    ['value' => '12', 'label' => 'Desember'],
+                ]],
+                ['name' => 'tahun', 'value' => 'tahun',  'title' => 'Tahun', 'type' => 'number', 'inform' => true, 'inshow' => true, 'intable' => false],
                 ['name' => 'jumlah_masuk', 'value' => 'jumlah_masuk',  'title' => 'Jumlah Masuk', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
-                ['name' => 'jumlah_absen', 'value' => 'jumlah_absen',  'title' => 'Jumlah Izin', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'jumlah_absen', 'value' => 'jumlah_absen',  'title' => 'Jumlah Absen', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
                 ['name' => 'jumlah_izin', 'value' => 'jumlah_izin',  'title' => 'Jumlah Izin', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
 
             ],
@@ -50,41 +70,48 @@ class AbsensiController extends Controller
     {
         // dd($request->all());
 
-        
+
         $month = $request->month;
         $year = $request->year;
 
-        $absensis = Absensi::join('karyawans', 'absensis.karyawan_id', '=', 'karyawans.id')->join('users', 'karyawans.user_id', '=', 'users.id')
-            // Select everything from absensi, and specific fields from users
-            ->select('absensis.*', 'users.name as user_name', 'users.email')
-            
-            
-            ->get();
+        // $absensis = Absensi::join('karyawans', 'absensis.karyawan_id', '=', 'karyawans.id')->join('users', 'karyawans.user_id', '=', 'users.id')
+        //     // Select everything from absensi, and specific fields from users
+        //     ->select('absensis.*', 'users.name as user_name', 'users.email')
+        //     ->where('absensis.isactive', true)
+        //     ->where('absensis.bulan', $month)
+        //     ->where('absensis.tahun', $year)
+        //     ->get();
         // dd($absensis);
 
 
         if ($request->ajax()) {
 
             // dd('masuk ajax');
-            $absensis = Absensi::join('karyawans', 'absensis.karyawan_id', '=', 'karyawans.id')->join('users', 'karyawans.user_id', '=', 'users.id')
+            $query = Absensi::join('karyawans', 'absensis.karyawan_id', '=', 'karyawans.id')->join('users', 'karyawans.user_id', '=', 'users.id')
                 // Select everything from absensi, and specific fields from users
                 ->select('absensis.*', 'users.name as user_name', 'users.email')
-                ->where('absensis.isactive', true)
-                
-                ->get();
+                ->where('absensis.isactive', true);
             // dd($absensis);
 
+            // Tambahkan kondisi hanya jika filter ada
+            if ($month) {
+                $query->where('absensis.bulan', $month);
+            }
+            if ($year) {
+                $query->where('absensis.tahun', $year);
+            }
+
+            $absensis = $query->get();
+
             return DataTables::of($absensis)
-               
+
 
 
 
                 ->addColumn('actions', function ($absensi) {
                     $actions = '';
 
-                    if (auth()->user()->hasPermission('show-absensis')) {
-                        $actions .= '<a href="' . route('absensis.show', $absensi) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
-                    }
+
 
                     if (auth()->user()->hasPermission('edit-absensis')) {
                         $actions .= '<a href="' . route('absensis.edit', $absensi) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
@@ -113,6 +140,8 @@ class AbsensiController extends Controller
 
 
         $pagedata = $this->getPagedata();
+        $pagedata['month'] = $month;
+        $pagedata['year'] = $year;
 
         return view('absensis.absensi', compact('isExist', 'month', 'year'), $pagedata);
     }
@@ -166,21 +195,26 @@ class AbsensiController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'nama' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['required', 'confirmed', Password::defaults()],
-            'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
+            'karyawan_id' => ['required', 'integer'],
+            'bulan' => ['required', 'integer', 'between:1,12'],
+            'tahun' => ['required', 'integer', 'min:2000'],
+            'jumlah_masuk' => ['required', 'numeric'],
+            'jumlah_absen' => ['required', 'numeric'],
+            'jumlah_izin' => ['required', 'numeric'],
         ]);
 
         // 2. Add the extra data after validation
         $validated['created_by'] = auth()->id();
 
-
-
-
-
-
+        //pastikan tidak ada data absensi untuk karyawan, bulan, dan tahun yang sama
+        $existingAbsensi = Absensi::where('karyawan_id', $validated['karyawan_id'])
+            ->where('bulan', $validated['bulan'])
+            ->where('tahun', $validated['tahun'])
+            ->where('isactive', true)
+            ->first();
+        if ($existingAbsensi) {
+            return back()->withErrors(['karyawan_id' => 'Absensi untuk karyawan ini pada bulan dan tahun yang sama sudah ada.'])->withInput();
+        }
 
         $absensi = Absensi::create($validated);
         // // log stok change
@@ -211,7 +245,7 @@ class AbsensiController extends Controller
 
         $pagedata = $this->getPagedata();
 
-        //TO DO: asdfasdfwe
+
 
         // dd($data);
 
@@ -220,12 +254,17 @@ class AbsensiController extends Controller
 
     public function edit(Absensi $absensi): View
     {
-        
+        $absensi->email = User::find($absensi->karyawan->user_id)->email;
+        // $absensi->nama = Karyawan::find($absensi->karyawan_id)->nama;
+
+        // dd($absensi);
+
+        $data = $absensi;
 
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.edit', compact('data'), $pagedata);
+        return view('absensis.edit', compact('data'), $pagedata);
     }
 
     public function update(Request $request, Absensi $absensi): RedirectResponse
@@ -235,22 +274,18 @@ class AbsensiController extends Controller
 
         // dd("current user id: " . $current_user_id);
         $store_data = [
-            'nama' => $request->input('nama'),
-            'email' => $request->input('email'),
-            'password' => $request->input('password'),
-            'kontak' => $request->input('kontak'),
-            'alamat' => $request->input('alamat'),
+            'jumlah_masuk' => $request->jumlah_masuk,
+            'jumlah_absen' => $request->jumlah_absen,
+            'jumlah_izin' => $request->jumlah_izin,
 
             'updated_by' => auth()->id(),
         ];
 
 
         $validate = Validator::make($store_data, [
-            'nama' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['nullable', 'confirmed', Password::default()],
-            'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
+            'jumlah_masuk' => ['required', 'numeric'],
+            'jumlah_absen' => ['required', 'numeric'],
+            'jumlah_izin' => ['required', 'numeric'],
 
             'updated_by' => ['required', 'integer']
         ]);
@@ -260,20 +295,7 @@ class AbsensiController extends Controller
             return back()->withErrors($validate)->withInput();
         }
 
-        $user = User::find($absensi->user_id);
 
-        $user->update(
-            [
-                'name' => $store_data['nama'],
-                'email' => $store_data['email'],
-            ]
-        );
-
-        if (! empty($store_data['password'])) {
-            $user->update([
-                'password' => Hash::make($store_data['password']),
-            ]);
-        }
 
         $absensi->update($store_data);
 
