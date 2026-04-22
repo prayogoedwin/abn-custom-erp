@@ -174,7 +174,8 @@
 
                 function eksekusiKalkulasi() {
                     const selectedOption = select.options[select.selectedIndex];
-                    const hargaMaster = inputHargaBasisUser.value; // Ambil harga basis dari input yang sudah diisi (bisa dari data attribute atau hasil edit user)
+                    const hargaMaster = parseFloat(selectedOption.getAttribute('data-harga-basis')) || 0;
+                    const hargaBasis = parseFloat(inputHargaBasisUser.value) || 0;
                     const val = selectedOption.value;
 
                     console.log(val);
@@ -190,7 +191,7 @@
                         const netto = parseFloat(inputNetto.value) || 0;
 
                         // 1. Hitung Harga (Master * Rendeman)
-                        const hasilHarga = hargaMaster * (rendeman / 100);
+                        const hasilHarga = Number(hargaBasis) + (Number(hargaBasis) * (rendeman / 100));
                         inputHargaMaster.value = Math.round(hasilHarga);
 
                         console.log(hasilHarga);
@@ -214,11 +215,17 @@
                         const bobot = parseFloat(inputBobot.value) || 0;
 
                         // 1. Hitung Harga (Master * Rendeman)
-                        const hasilHarga = hargaMaster + (hargaMaster * (rendeman / 100));
+                        const hasilHarga = Number(hargaBasis) + (Number(hargaBasis) * (rendeman / 100));
                         inputHargaMaster.value = Math.round(hasilHarga);
 
-                        const hasilHargaBasis = parseFloat(inputHargaBasisUser.value + bobot) || 0;
-                        inputHargaBasisUser.value = hasilHargaBasis
+                        const hasilHargaBasis = inputHargaBasisUser.value;
+                        
+
+                        if (bobot !== 0) {
+                            const hasilHargaBasis = Number(hargaMaster) + Number(bobot);
+                            inputHargaBasisUser.value = Math.round(hasilHargaBasis);
+                        }
+
 
                         const hasilNetto = hasilHargaBasis * netto;
                         inputHargaNetto.value = Math.round(hasilNetto);
@@ -234,12 +241,12 @@
 
                         const netto = parseFloat(inputNetto.value) || 0;
 
-                        // 1. Hitung Harga (Master * Rendeman)
-                        const hasilHarga = hargaMaster;
-                        inputHargaMaster.value = hasilHarga;
+
+                        const hasilHarga = hargaBasis;
+                        inputHargaMaster.value = hargaBasis;
 
 
-                        inputHargaBasisUser.value = hasilHarga
+
 
                         const hasilNetto = hasilHarga * netto;
                         inputHargaNetto.value = Math.round(hasilNetto);

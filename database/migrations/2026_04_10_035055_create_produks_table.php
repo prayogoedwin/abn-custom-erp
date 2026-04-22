@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('kategori_produk_id')->constrained()->cascadeOnDelete();
             $table->string('nama_produk');
             $table->string('satuan');
-            $table->decimal('harga_basis_pembelian', 15, 2);
+            $table->integer('harga_basis_pembelian');
             $table->float('stok_akhir');
             $table->boolean('isactive')->default(true);
 

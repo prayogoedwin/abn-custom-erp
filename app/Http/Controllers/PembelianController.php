@@ -72,7 +72,7 @@ class PembelianController extends Controller
     {
         // dd($request->headers->all());
         // $pembelians = Pembelian::join('suppliers', 'pembelians.supplier_id', '=', 'suppliers.id')
-        //     // Select everything from karyawan, and specific fields from users
+        //     // Select everything from pembelian, and specific fields from users
         //     ->select('pembelians.*', 'suppliers.nama as supplier')
         //     ->where('pembelians.isactive', true)
         //     ->get();
@@ -80,35 +80,30 @@ class PembelianController extends Controller
         if ($request->ajax()) {
             // dd('masuk ajax');
             $pembelians = Pembelian::join('suppliers', 'pembelians.supplier_id', '=', 'suppliers.id')
-                // Select everything from karyawan, and specific fields from users
+                // Select everything from pembelian, and specific fields from users
                 ->select('pembelians.*', 'suppliers.nama as supplier')
                 ->where('pembelians.isactive', true)
                 ->get();
             // dd($pembelians);
 
             return DataTables::of($pembelians)
-                // ->filterColumn('name', function ($query, $keyword) {
-                //     $query->where('pembelians.nama_karyawan', 'like', "%{$keyword}%");
-                // })
-                // ->filterColumn('kategori', function ($query, $keyword) {
-                //     $query->where('kategori_pembelians.nama', 'like', "%{$keyword}%");
-                // })
+                
 
 
 
-                ->addColumn('actions', function ($karyawan) {
+                ->addColumn('actions', function ($pembelian) {
                     $actions = '';
 
                     if (auth()->user()->hasPermission('show-pembelians')) {
-                        $actions .= '<a href="' . route('pembelians.show', $karyawan) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
+                        $actions .= '<a href="' . route('pembelians.show', $pembelian) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
                     }
 
                     if (auth()->user()->hasPermission('edit-pembelians')) {
-                        $actions .= '<a href="' . route('pembelians.edit', $karyawan) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
+                        $actions .= '<a href="' . route('pembelians.edit', $pembelian) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
                     }
 
                     if (auth()->user()->hasPermission('delete-pembelians')) {
-                        $actions .= '<form action="' . route('pembelians.destroy', $karyawan) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
+                        $actions .= '<form action="' . route('pembelians.destroy', $pembelian) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
                             ' . csrf_field() . method_field('DELETE') . '
                             <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
                         </form>';
@@ -136,7 +131,7 @@ class PembelianController extends Controller
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.create', compact('suppliers'), $pagedata);
+        return view('pembelians.create', compact('suppliers'), $pagedata);
     }
 
     public function createlanjut(Pembelian $pembelian): View
@@ -183,8 +178,8 @@ class PembelianController extends Controller
         $simpanpinjamsupplier = SimpanPinjamSupplier::create([
             'supplier_id' => $store_data['supplier_id'],
             'pembelian_id' => $pembelian->id,
-            'nominal' => $request->nominal,
-            'keterangan' => 'ini keterangan'
+            'nominal' => $request->nominal ?? 0,
+            'keterangan' => 'isi keterangan',
 
         ]);
 
@@ -312,9 +307,9 @@ class PembelianController extends Controller
     }
 
     //soft delete
-    public function destroy(Pembelian $karyawan): RedirectResponse
+    public function destroy(Pembelian $pembelian): RedirectResponse
     {
-        $karyawan->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
+        $pembelian->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
 
 
         return to_route('pembelians.index')->with('status', 'Pembelian deleted successfully.');

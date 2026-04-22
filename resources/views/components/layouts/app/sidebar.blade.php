@@ -39,7 +39,7 @@
                                 :active="request()->routeIs('pembelians*')">
 
                                 <x-layouts.sidebar-two-level-link href="{{ route('pembelians.index') }}" icon='fas-cart-arrow-down'
-                                    :active="request()->routeIs('pembelians*')">Menu Pembelian</x-layouts.sidebar-two-level-link>
+                                    :active="request()->routeIs('pembelians*')">Pembelian</x-layouts.sidebar-two-level-link>
 
                             </x-layouts.sidebar-two-level-link-parent>
 

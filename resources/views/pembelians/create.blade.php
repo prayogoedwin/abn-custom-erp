@@ -53,7 +53,7 @@
                 @elseif($column['type'] === 'number')
 
                 <div class="mb-4">
-                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="0.01" value="{{ old($column['name']) }}" required />
+                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="0.01" value="{{ old($column['name']) }}"  />
                 </div>
                 @elseif($column['type'] === 'select')
                 <div class="mb-6">

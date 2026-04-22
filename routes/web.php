@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\BackupRestoreController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DinamisVariableController;
 use App\Http\Controllers\HistoryHargaBasisController;
@@ -218,6 +219,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('absensis/{absensi}/edit', [AbsensiController::class, 'edit'])->name('absensis.edit')->middleware('permission:edit-absensis');
     Route::put('absensis/{absensi}', [AbsensiController::class, 'update'])->name('absensis.update')->middleware('permission:edit-absensis');
     Route::delete('absensis/{absensi}', [AbsensiController::class, 'destroy'])->name('absensis.destroy')->middleware('permission:delete-absensis');
+
+
+    Route::get('backup', [BackupRestoreController::class, 'backup'])->name('backup.backup')->middleware('permission:delete-users'); // TODO: Ganti permission 
+    Route::post('restore', [BackupRestoreController::class, 'restore'])->name('backup.restore')->middleware('permission:delete-users');
 });
 
 require __DIR__ . '/auth.php';

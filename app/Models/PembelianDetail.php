@@ -43,6 +43,43 @@ class PembelianDetail extends Model
         'deleted_by',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($pembelianDetail) {
+
+            Stok::create([
+                'produk_id' => $pembelianDetail->produk_id,
+                'tipe_stok' =>  'Masuk',
+                'satuan' => $pembelianDetail->satuan,
+                'stok' => $pembelianDetail->netto,
+            ]);
+
+        });
+
+
+
+        // Terjadi update di database
+        static::updated(function ($pembelianDetail) {
+            if (auth()->check()) {
+                $pembelianDetail->updated_by = auth()->id();
+            }
+            // Cek apakah kolom 'netto' yang berubah
+            if ($pembelianDetail->isDirty('netto')) {
+                $nettoLama = $pembelianDetail->getOriginal('netto');
+                $nettoBaru = $pembelianDetail->netto;
+                $selisih = $nettoBaru - $nettoLama;
+
+                // Simpan riwayat ke tabel mutasi
+                Stok::create([
+                    'produk_id' => $pembelianDetail->produk->id,
+                    'tipe_stok' => $selisih > 0 ? 'Masuk' : 'Keluar',
+                    'satuan' => $pembelianDetail->produk->satuan,
+                    'stok' => abs($selisih),
+                ]);
+            }
+        });
+    }
+
     public function pembelian()
     {
         return $this->belongsTo(Pembelian::class);

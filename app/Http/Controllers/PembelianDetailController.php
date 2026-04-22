@@ -69,7 +69,7 @@ class PembelianDetailController extends Controller
 
             return DataTables::of($pembeliandetails)
                 // ->filterColumn('name', function ($query, $keyword) {
-                //     $query->where('pembeliandetails.nama_pihak3', 'like', "%{$keyword}%");
+                //     $query->where('pembeliandetails.nama_pembelian', 'like', "%{$keyword}%");
                 // })
                 // ->filterColumn('kategori', function ($query, $keyword) {
                 //     $query->where('kategori_pembeliandetails.nama', 'like', "%{$keyword}%");
@@ -77,19 +77,19 @@ class PembelianDetailController extends Controller
 
 
 
-                ->addColumn('actions', function ($pihak3) {
+                ->addColumn('actions', function ($pembelian) {
                     $actions = '';
 
                     if (auth()->user()->hasPermission('show-pembeliandetails')) {
-                        $actions .= '<a href="' . route('pembeliandetails.show', $pihak3) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
+                        $actions .= '<a href="' . route('pembeliandetails.show', $pembelian) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
                     }
 
                     if (auth()->user()->hasPermission('edit-pembeliandetails')) {
-                        $actions .= '<a href="' . route('pembeliandetails.edit', $pihak3) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
+                        $actions .= '<a href="' . route('pembeliandetails.edit', $pembelian) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
                     }
 
                     if (auth()->user()->hasPermission('delete-pembeliandetails')) {
-                        $actions .= '<form action="' . route('pembeliandetails.destroy', $pihak3) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
+                        $actions .= '<form action="' . route('pembeliandetails.destroy', $pembelian) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
                             ' . csrf_field() . method_field('DELETE') . '
                             <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
                         </form>';
@@ -112,14 +112,6 @@ class PembelianDetailController extends Controller
         return Excel::download(new PembelianDetailExport, 'pembeliandetails-' . date('Y-m-d') . '.xlsx');
     }
 
-    public function create(): View
-    {
-        $produks = Produk::where('isActive', true)->get();
-
-        $pagedata = $this->getPagedata();
-
-        return view('pembeliandetails.create', compact('produks'), $pagedata);
-    }
 
     public function createtitip($pembelian_id): View
     {
@@ -217,14 +209,7 @@ class PembelianDetailController extends Controller
         foreach ($request->produk_id as $index => $produk_id) {
             if ($produk_id) {
 
-                Stok::create([
-                    'produk_id' => $produk_id,
-                    'tipe_stok' => 'Masuk',
-                    'satuan' => $request->satuan[$index],
-                    'stok' => $request->netto[$index],
-                ]);
-
-
+                
                 PembelianDetail::create([
                     'pembelian_id' => $request->pembelian_id,
                     'produk_id'    => $produk_id,
@@ -248,66 +233,17 @@ class PembelianDetailController extends Controller
 
 
 
-
-    public function store(Request $request): RedirectResponse
-    {
-        $store_data = [
-            'nama' => $request->input('nama'),
-            'kontak' => $request->input('kontak'),
-            'alamat' => $request->input('alamat'),
-
-            'created_by' => auth()->id(),
-        ];
-
-
-        $validate = Validator::make($store_data, [
-            'nama' => ['required', 'string', 'max:255'],
-            'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
-
-            'created_by' => ['required', 'integer']
-        ]);
-
-
-        if ($validate->fails()) {
-            return back()->withErrors($validate)->withInput();
-        }
-
-
-
-        $pihak3 = PembelianDetail::create($store_data);
-
-
-        return to_route('pembeliandetails.index')->with('status', 'PembelianDetail updated successfully.');
-    }
-
-    public function show(PembelianDetail $pihak3): View
+    public function show(PembelianDetail $pembelian): View
     {
 
-        $data = $pihak3;
+        $data = $pembelian;
 
 
         $pagedata = $this->getPagedata();
 
-        //TO DO: asdfasdfwe
-
-
+       
 
         return view('dynamiccrud.show', compact('data'), $pagedata);
-    }
-
-
-    public function edit(PembelianDetail $pihak3): View
-    {
-
-
-        $data = $pihak3;
-
-
-
-        $pagedata = $this->getPagedata();
-
-        return view('dynamiccrud.edit', compact('data'), $pagedata);
     }
 
     public function edittitip(Pembelian $pembelian): View
@@ -431,56 +367,11 @@ class PembelianDetailController extends Controller
     }
 
 
-    public function update(Request $request, PembelianDetail $pihak3): RedirectResponse
-    {
-        // dd($request->all());
-
-
-        // dd("current user id: " . $current_user_id);
-        $store_data = [
-            'nama' => $request->input('nama'),
-            'kontak' => $request->input('kontak'),
-            'alamat' => $request->input('alamat'),
-
-            'updated_by' => auth()->id(),
-        ];
-
-
-        $validate = Validator::make($store_data, [
-            'nama' => ['required', 'string', 'max:255'],
-            'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
-
-            'updated_by' => ['required', 'integer']
-        ]);
-
-
-        if ($validate->fails()) {
-            return back()->withErrors($validate)->withInput();
-        }
-
-
-        // dd("validated data: " . json_encode($validate));
-
-
-
-
-        // dd($data);
-
-        $pihak3->update($store_data);
-
-
-        // dd("pihak3 updated: " . json_encode($pihak3));
-
-
-
-        return to_route('pembeliandetails.index')->with('status', 'PembelianDetail updated successfully.');
-    }
 
     //soft delete
-    public function destroy(PembelianDetail $pihak3): RedirectResponse
+    public function destroy(PembelianDetail $pembelian): RedirectResponse
     {
-        $pihak3->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
+        $pembelian->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
 
 
         return to_route('pembeliandetails.index')->with('status', 'PembelianDetail deleted successfully.');

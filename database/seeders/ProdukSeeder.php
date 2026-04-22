@@ -24,37 +24,23 @@ class ProdukSeeder extends Seeder
     {
         $data = [
             [
-                'kategori_produk_id' => 6,
+                'kategori_produk_id' => 1,
                 'nama_produk' => 'Kopi',
-                'satuan' => 'ton',
-                'harga_basis_pembelian' => 1500000,
-                'stok_akhir' => 100,
-                'isactive' => true,
-            ],
-            [
-                'kategori_produk_id' => 6,
-                'nama_produk' => 'Lada',
-                'satuan' => 'ton',
-                'harga_basis_pembelian' => 1200000,
+                'satuan' => 'kg',
+                'harga_basis_pembelian' => 10000,
                 'stok_akhir' => 100,
                 'isactive' => true,
             ],
             [
                 'kategori_produk_id' => 1,
-                'nama_produk' => 'Laptop',
-                'satuan' => 'unit',
-                'harga_basis_pembelian' => 10000000,
-                'stok_akhir' => 50,
+                'nama_produk' => 'Lada',
+                'satuan' => 'kg',
+                'harga_basis_pembelian' => 12000,
+                'stok_akhir' => 100,
                 'isactive' => true,
             ],
-            [
-                'kategori_produk_id' => 3,
-                'nama_produk' => 'Cokelat Batangan',
-                'satuan' => 'pcs',
-                'harga_basis_pembelian' => 20000,
-                'stok_akhir' => 150,
-                'isactive' => true,
-            ],
+            
+            
             
 
         ];

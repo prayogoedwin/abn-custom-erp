@@ -13,16 +13,8 @@ class KategoriProdukSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['nama' => 'Elektronik'],
-            ['nama' => 'Pakaian'],
-            ['nama' => 'Makanan'],
-            ['nama' => 'Minuman'],
-            ['nama' => 'Peralatan Rumah Tangga'],
-            ['nama' => 'Bahan Makanan'],
-            ['nama' => 'Kendaraan'],
-            ['nama' => 'Alat Tulis'],
-            ['nama' => 'Mainan'],
-            ['nama' => 'Peralatan Olahraga'],
+            ['nama' => 'Hasil Bumi'],
+            
         ];
 
         foreach ($data as $item) {
