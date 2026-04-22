@@ -35,12 +35,11 @@
 
                             </x-layouts.sidebar-two-level-link-parent>
 
-                            <x-layouts.sidebar-two-level-link-parent title="Menu Transaksi" icon="fas-boxes-packing"
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Transaksi" icon="fas-receipt"
                                 :active="request()->routeIs('pembelians*')">
 
-                                <x-layouts.sidebar-two-level-link href="{{ route('pembelians.index') }}" icon='fas-cube'
+                                <x-layouts.sidebar-two-level-link href="{{ route('pembelians.index') }}" icon='fas-cart-arrow-down'
                                     :active="request()->routeIs('pembelians*')">Menu Pembelian</x-layouts.sidebar-two-level-link>
-
 
                             </x-layouts.sidebar-two-level-link-parent>
 
@@ -69,12 +68,11 @@
 
                             </x-layouts.sidebar-two-level-link-parent>
 
-                            <x-layouts.sidebar-two-level-link-parent title="Menu Absensi" icon="fas-cog"
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Absensi" icon="fas-calendar-check"
                                 :active="request()->routeIs('absensis*')">
 
-                                <x-layouts.sidebar-two-level-link href="{{ route('absensis.index') }}" icon='fas-cogs'
+                                <x-layouts.sidebar-two-level-link href="{{ route('absensis.index') }}" icon='fas-user-clock'
                                     :active="request()->routeIs('absensis*')">Menu Absensi</x-layouts.sidebar-two-level-link>
-
 
                             </x-layouts.sidebar-two-level-link-parent>
 
