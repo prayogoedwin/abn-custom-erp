@@ -30,7 +30,7 @@ class PermissionsExport implements FromCollection, WithHeadings, WithMapping
             $permission->id,
             $permission->name,
             $permission->roles_count,
-            $permission->created_at->format('Y-m-d H:i:s'),
+            $permission->created_at->format('d-m-Y H:i:s'),
         ];
     }
 }

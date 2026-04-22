@@ -33,8 +33,8 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping
             $user->name,
             $user->email,
             $user->roles->pluck('name')->implode(', '),
-            $user->email_verified_at?->format('Y-m-d H:i:s'),
-            $user->created_at->format('Y-m-d H:i:s'),
+            $user->email_verified_at?->format('d-m-Y H:i:s'),
+            $user->created_at->format('d-m-Y H:i:s'),
         ];
     }
 }

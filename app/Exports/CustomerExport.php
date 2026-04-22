@@ -44,11 +44,11 @@ class CustomerExport implements FromCollection, WithHeadings, WithMapping
             $customer->kontak,
             $customer->alamat,
             $customer->isactive ? 'Active' : 'Inactive',
-            $customer->created_at->format('Y-m-d H:i:s'),
+            $customer->created_at->format('d-m-Y H:i:s'),
             $customer->created_by,
-            $customer->updated_at?->format('Y-m-d H:i:s'),
+            $customer->updated_at?->format('d-m-Y H:i:s'),
             $customer->updated_by,
-            $customer->deleted_at?->format('Y-m-d H:i:s'),
+            $customer->deleted_at?->format('d-m-Y H:i:s'),
             $customer->deleted_by,
         ];
     }

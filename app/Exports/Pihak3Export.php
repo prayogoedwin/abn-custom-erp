@@ -44,11 +44,11 @@ class Pihak3Export implements FromCollection, WithHeadings, WithMapping
             $pihak3->kontak,
             $pihak3->alamat,
             $pihak3->isactive ? 'Active' : 'Inactive',
-            $pihak3->created_at->format('Y-m-d H:i:s'),
+            $pihak3->created_at->format('d-m-Y H:i:s'),
             $pihak3->created_by,
-            $pihak3->updated_at?->format('Y-m-d H:i:s'),
+            $pihak3->updated_at?->format('d-m-Y H:i:s'),
             $pihak3->updated_by,
-            $pihak3->deleted_at?->format('Y-m-d H:i:s'),
+            $pihak3->deleted_at?->format('d-m-Y H:i:s'),
             $pihak3->deleted_by,
         ];
     }

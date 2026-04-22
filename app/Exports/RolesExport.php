@@ -32,7 +32,7 @@ class RolesExport implements FromCollection, WithHeadings, WithMapping
             $role->name,
             $role->users_count,
             $role->permissions_count,
-            $role->created_at->format('Y-m-d H:i:s'),
+            $role->created_at->format('d-m-Y H:i:s'),
         ];
     }
 }

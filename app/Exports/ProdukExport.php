@@ -43,11 +43,11 @@ class ProdukExport implements FromCollection, WithHeadings, WithMapping
             $produk->harga_basis_pembelian,
             $produk->stok_akhir,
             $produk->isactive ? 'Active' : 'Inactive',
-            $produk->created_at->format('Y-m-d H:i:s'),
+            $produk->created_at->format('d-m-Y H:i:s'),
             $produk->created_by,
-            $produk->updated_at?->format('Y-m-d H:i:s'),
+            $produk->updated_at?->format('d-m-Y H:i:s'),
             $produk->updated_by,
-            $produk->deleted_at?->format('Y-m-d H:i:s'),
+            $produk->deleted_at?->format('d-m-Y H:i:s'),
             $produk->deleted_by,
         ];
     }

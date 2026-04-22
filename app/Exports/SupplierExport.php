@@ -44,11 +44,11 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
             $supplier->kontak,
             $supplier->alamat,
             $supplier->isactive ? 'Active' : 'Inactive',
-            $supplier->created_at->format('Y-m-d H:i:s'),
+            $supplier->created_at->format('d-m-Y H:i:s'),
             $supplier->created_by,
-            $supplier->updated_at?->format('Y-m-d H:i:s'),
+            $supplier->updated_at?->format('d-m-Y H:i:s'),
             $supplier->updated_by,
-            $supplier->deleted_at?->format('Y-m-d H:i:s'),
+            $supplier->deleted_at?->format('d-m-Y H:i:s'),
             $supplier->deleted_by,
         ];
     }

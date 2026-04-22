@@ -48,11 +48,11 @@ class KaryawanExport implements FromCollection, WithHeadings, WithMapping
             $karyawan->kontak,
             $karyawan->alamat,
             $karyawan->isactive ? 'Active' : 'Inactive',
-            $karyawan->created_at->format('Y-m-d H:i:s'),
+            $karyawan->created_at->format('d-m-Y H:i:s'),
             $karyawan->created_by,
-            $karyawan->updated_at?->format('Y-m-d H:i:s'),
+            $karyawan->updated_at?->format('d-m-Y H:i:s'),
             $karyawan->updated_by,
-            $karyawan->deleted_at?->format('Y-m-d H:i:s'),
+            $karyawan->deleted_at?->format('d-m-Y H:i:s'),
             $karyawan->deleted_by,
         ];
     }
