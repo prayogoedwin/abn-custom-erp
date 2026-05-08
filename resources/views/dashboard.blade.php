@@ -108,6 +108,7 @@
         </div>
     </div>
 
+        @if($withbackup)
     <!-- System Backup Card -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <form action="{{ route('backup.backup') }}" method="GET">
@@ -158,7 +159,9 @@
                         </div>
                     </div>
             </label>
-        </div>
+        </div> 
+        @endif
     </div>
+    
 
 </x-layouts.app>

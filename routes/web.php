@@ -25,7 +25,7 @@ Route::get('/', function () {
     return redirect('dashboard');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::view('dashboard', 'dashboard', ['withbackup' => false])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
