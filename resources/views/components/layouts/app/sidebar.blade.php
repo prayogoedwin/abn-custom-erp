@@ -36,10 +36,13 @@
                             </x-layouts.sidebar-two-level-link-parent>
 
                             <x-layouts.sidebar-two-level-link-parent title="Menu Transaksi" icon="fas-receipt"
-                                :active="request()->routeIs('pembelians*')">
+                                :active="request()->routeIs('pembelians*') || request()->routeIs('pengirimans*')">
 
                                 <x-layouts.sidebar-two-level-link href="{{ route('pembelians.index') }}" icon='fas-cart-arrow-down'
                                     :active="request()->routeIs('pembelians*')">Pembelian</x-layouts.sidebar-two-level-link>
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('pengirimans.index') }}" icon='fas-cart-arrow-down'
+                                    :active="request()->routeIs('pengirimans*')">Pengiriman</x-layouts.sidebar-two-level-link>
 
                             </x-layouts.sidebar-two-level-link-parent>
 
@@ -76,7 +79,7 @@
 
                             </x-layouts.sidebar-two-level-link-parent>
 
-                            
+
                         </ul>
                     </nav>
                 </div>

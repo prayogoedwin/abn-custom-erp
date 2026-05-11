@@ -1,0 +1,348 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Exports\PengirimanExport;
+use App\Models\Pengiriman;
+use App\Models\PengirimanDetail;
+use App\Models\SimpanPinjamSupplier;
+use App\Models\Supplier;
+use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Yajra\DataTables\Facades\DataTables;
+
+class PengirimanController extends Controller
+{
+    private function toIntMoney($value): int
+    {
+        if (is_null($value) || $value === '') {
+            return 0;
+        }
+
+        if (is_numeric($value)) {
+            return (int) round((float) $value);
+        }
+
+        $cleaned = preg_replace('/[^\d\-]/', '', (string) $value);
+        return $cleaned === '' || $cleaned === '-' ? 0 : (int) $cleaned;
+    }
+
+    private function getPagedata()
+    {
+        // 'no_transaksi',
+        // 'supplier_id',
+        // 'nopol',
+        // 'tipe_transaksi_pembelian',
+        // 'total_nominal_pembelian',
+        // 'total_nominal_terbayar',
+        // 'kekurangan',
+        // 'status_pembayaran',
+
+        $suppliers = Supplier::where('deleted_at', null)->get();
+        // dd($suppliers);
+
+        $pagedata = [
+            'title' => 'Pengiriman',
+            'tablename' => 'pengirimans',
+            'tableaction' => true,
+            'columns' => [
+                ['name' => 'no_transaksi', 'value' => 'no_transaksi',  'title' => 'No Transaksi', 'type' => 'text', 'inform' => false, 'inshow' => true, 'intable' => true],
+                ['name' => 'supplier_id', 'value' => 'supplier',  'title' => 'Supplier', 'type' => 'select', 'inform' => true, 'intable' => true, 'options' => [
+                    // Ambil data kategori dari database
+
+                    ...$suppliers->map(function ($supplier) {
+                        return ['value' => $supplier->id, 'label' => $supplier->nama];
+                    })->toArray(),
+                ]],
+                ['name' => 'nopol', 'value' => 'nopol',  'title' => 'Nopol', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'nominal', 'value' => 'nominal',  'title' => 'Nominal DP', 'type' => 'number', 'inform' => true, 'inshow' => false, 'intable' => false],
+                ['name' => 'tipe_transaksi_pembelian', 'value' => 'tipe_transaksi_pembelian',  'title' => 'Tipe Transaksi Pengiriman', 'type' => 'select', 'inform' => true, 'inshow' => true, 'intable' => true, 'options' => [
+                    ['value' => 'Titip', 'label' => 'Titip'],
+                    ['value' => 'Jual', 'label' => 'Jual'],
+                ]],
+                ['name' => 'total_nominal_pembelian', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Pengiriman', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => false],
+                ['name' => 'total_nominal_terbayar', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Terbayar', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => false],
+                ['name' => 'kekurangan', 'value' => 'kekurangan',  'title' => 'Kekurangan', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => true],
+                ['name' => 'status_pembayaran', 'value' => 'status_pembayaran',  'title' => 'Status Pembayaran', 'type' => 'select', 'inform' => false, 'inshow' => true, 'intable' => true, 'options' => [
+                    ['value' => 'Lunas', 'label' => 'Lunas'],
+                    ['value' => 'Belum Lunas', 'label' => 'Belum Lunas'],
+                ]],
+
+            ],
+        ];
+
+        return $pagedata;
+    }
+
+    public function index(Request $request)
+    {
+        // dd($request->headers->all());
+        // $pengirimans = Pengiriman::join('suppliers', 'pengirimans.supplier_id', '=', 'suppliers.id')
+        //     // Select everything from pembelian, and specific fields from users
+        //     ->select('pengirimans.*', 'suppliers.nama as supplier')
+        //     ->where('pengirimans.isactive', true)
+        //     ->get();
+        // dd($pengirimans);
+        if ($request->ajax()) {
+            // dd('masuk ajax');
+            $pengirimans = Pengiriman::join('suppliers', 'pengirimans.supplier_id', '=', 'suppliers.id')
+                // Select everything from pembelian, and specific fields from users
+                ->select('pengirimans.*', 'suppliers.nama as supplier')
+                ->where('pengirimans.deleted_at', null)
+                ->get();
+            // dd($pengirimans);
+
+            return DataTables::of($pengirimans)
+                
+
+
+
+                ->addColumn('actions', function ($pembelian) {
+                    $actions = '';
+
+                    if (auth()->user()->hasPermission('show-pengirimans')) {
+                        $actions .= '<a href="' . route('pengirimans.show', $pembelian) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
+                    }
+
+                    if (auth()->user()->hasPermission('edit-pengirimans')) {
+                        $actions .= '<a href="' . route('pengirimans.edit', $pembelian) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
+                    }
+
+                    if (auth()->user()->hasPermission('delete-pengirimans')) {
+                        $actions .= '<form action="' . route('pengirimans.destroy', $pembelian) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
+                            ' . csrf_field() . method_field('DELETE') . '
+                            <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
+                        </form>';
+                    }
+
+                    return $actions;
+                })
+                ->rawColumns(['actions'])
+                ->make(true);
+        }
+
+        $pagedata = $this->getPagedata();
+
+        return view('dynamiccrud.index', $pagedata);
+    }
+
+    public function export()
+    {
+        // return Excel::download(new PengirimanExport, 'pengirimans-' . date('Y-m-d') . '.xlsx');
+    }
+
+    public function create(): View
+    {
+        $suppliers = Supplier::where('deleted_at', null)->get();
+
+        $pagedata = $this->getPagedata();
+
+        return view('pengirimans.create', compact('suppliers'), $pagedata);
+    }
+
+    public function createlanjut(Pengiriman $pembelian): View
+    {
+        $supplier = Supplier::find($pembelian->supplier_id);
+
+        $simpanpinjamsupplier = SimpanPinjamSupplier::where("supplier_id", $supplier->id)->first();
+
+        $pagedata = $this->getPagedata();
+
+        $data = $pembelian;
+
+        return view('pengirimans.createlanjut', compact('supplier', 'simpanpinjamsupplier', 'data'), $pagedata,);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+
+        $store_data = [
+            'nopol' => $request->input('nopol'),
+            'supplier_id' => $request->input('supplier_id'),
+            'tipe_transaksi_pembelian' => $request->input('tipe_transaksi_pembelian'),
+
+            'created_by' => auth()->id(),
+        ];
+
+
+        $validate = Validator::make($store_data, [
+            'nopol' => ['required', 'string', 'max:255'],
+            'supplier_id' => ['required', 'integer', 'max:255'],
+            'tipe_transaksi_pembelian' => ['required', 'string'],
+
+            'created_by' => ['required', 'integer']
+        ]);
+
+
+        if ($validate->fails()) {
+            return back()->withErrors($validate)->withInput();
+        }
+
+
+        $pembelian = Pengiriman::create($store_data);
+
+        $simpanpinjamsupplier = SimpanPinjamSupplier::create([
+            'supplier_id' => $store_data['supplier_id'],
+            'pembelian_id' => $pembelian->id,
+            'nominal' => $request->nominal ?? 0,
+            'keterangan' => 'isi keterangan',
+
+        ]);
+
+        if ($store_data['tipe_transaksi_pembelian'] === 'Titip') {
+            return to_route('pembeliandetails.createtitip', $pembelian->id);
+        }
+
+        return to_route('pembeliandetails.createjual', $pembelian->id);
+    }
+
+    public function storelanjut(Pengiriman $pembelian, Request $request): RedirectResponse
+    {
+
+        $store_data = [
+            'metode_pembayaran' => $request->input('metode_pembayaran'),
+            'tipe_pembayaran' => $request->input('tipe_pembayaran'),
+            'nominal' => $this->toIntMoney($request->input('nominal')),
+            'keterangan' => $request->input('keterangan'),
+
+            'created_by' => auth()->id(),
+        ];
+
+
+
+        $p = Pengiriman::find($pembelian->id);
+        $p->update([
+            'metode_pembayaran' => $store_data['metode_pembayaran'],
+            'tipe_pembayaran' => $store_data['tipe_pembayaran'],
+        ]);
+
+
+
+
+        SimpanPinjamSupplier::updateOrCreate(
+            ['pembelian_id' => $pembelian->id],
+            [
+                'supplier_id' => $pembelian->supplier_id,
+                'tipe' => 'IN',
+                'nominal' => $store_data['nominal'] ?? 0,
+                'keterangan' => $store_data['keterangan'],
+                'created_by' => auth()->id(),
+            ]
+        );
+
+        $totalNominalPengiriman = (int) PengirimanDetail::where('pembelian_id', $pembelian->id)->sum('harga_netto');
+        $totalNominalTerbayar = (int) SimpanPinjamSupplier::where('pembelian_id', $pembelian->id)->sum('nominal');
+        $kekurangan = max($totalNominalPengiriman - $totalNominalTerbayar, 0);
+        $statusPembayaran = $kekurangan <= 0 ? 'Lunas' : 'Belum Lunas';
+
+        $p->update([
+            'total_nominal_pembelian' => $totalNominalPengiriman,
+            'total_nominal_terbayar' => $totalNominalTerbayar,
+            'kekurangan' => $kekurangan,
+            'status_pembayaran' => $statusPembayaran,
+        ]);
+
+
+        return to_route('pengirimans.index');
+    }
+
+    
+
+    public function cetakNota($id)
+    {
+        $pembelian = Pengiriman::find($id);
+        $pembelian->details = PengirimanDetail::where('pembelian_id', $id)->get();
+        $pembelian->supplier = Supplier::find($pembelian->supplier_id);
+
+        // dd($pembelian);
+
+        // Opsional: Atur ukuran kertas (khusus nota thermal biasanya 80mm atau 58mm)
+        // Jika kertas A4 gunakan 'a4', jika thermal gunakan array [0, 0, 226.77, 500] (80mm x sesuai panjang)
+        $pdf = Pdf::loadView('exports.nota', compact('pembelian'))
+            ->setPaper('a4', 'portrait');
+
+        // Stream untuk melihat di browser, atau download() untuk langsung unduh
+        return $pdf->download('Nota-' . $pembelian->kode_transaksi . '.pdf');
+    }
+
+    public function show($id): View
+    {
+        $pembelian = Pengiriman::find($id);
+        $pembelian->details = PengirimanDetail::where('pembelian_id', $id)->get();
+        $pembelian->supplier = Supplier::find($pembelian->supplier_id);
+
+        $pagedata = $this->getPagedata();
+
+        
+
+        return view('pengirimans.show', compact('pembelian'), $pagedata);
+    }
+
+    public function edit(Pengiriman $pembelian): View
+    {
+
+        $data = $pembelian;
+
+
+        $pagedata = $this->getPagedata();
+
+        return view('dynamiccrud.edit', compact('data'), $pagedata);
+    }
+
+    public function update(Request $request, Pengiriman $pembelian): RedirectResponse
+    {
+        // dd($request->all());
+
+
+        // dd("current user id: " . $current_user_id);
+        $store_data = [
+            'nopol' => $request->input('nopol'),
+            'supplier_id' => $request->input('supplier_id'),
+            'tipe_transaksi_pembelian' => $request->input('tipe_transaksi_pembelian'),
+
+            'created_by' => auth()->id(),
+        ];
+
+
+        $validate = Validator::make($store_data, [
+            'nopol' => ['required', 'string', 'max:255'],
+            'supplier_id' => ['required', 'integer', 'max:255'],
+            'tipe_transaksi_pembelian' => ['required', 'string'],
+
+            'created_by' => ['required', 'integer']
+        ]);
+
+
+        if ($validate->fails()) {
+            return back()->withErrors($validate)->withInput();
+        }
+
+
+        $pembelian->update($store_data);
+
+
+
+        if ($store_data['tipe_transaksi_pembelian'] === 'Titip') {
+            return to_route('pembeliandetails.edittitip', $pembelian->id);
+        }
+
+        return to_route('pembeliandetails.editjual', $pembelian->id);
+    }
+
+    //soft delete
+    public function destroy(Pengiriman $pembelian): RedirectResponse
+    {
+        $pembelian->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
+
+
+        return to_route('pengirimans.index')->with('status', 'Pengiriman deleted successfully.');
+    }
+}

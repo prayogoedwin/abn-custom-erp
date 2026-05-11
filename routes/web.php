@@ -176,7 +176,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('pembelians/{pembelian}', [PembelianController::class, 'update'])->name('pembelians.update')->middleware('permission:edit-pembelians');
     Route::delete('pembelians/{pembelian}', [PembelianController::class, 'destroy'])->name('pembelians.destroy')->middleware('permission:delete-pembelians');
 
-    Route::get('pembelian/{pembelian}/cetaknota', [PembelianController::class, 'cetakNota'])->name('pembelian.cetaknota')->middleware('permission:show-pembelians');
+    Route::get('pembelians/{pembelian}/cetaknota', [PembelianController::class, 'cetakNota'])->name('pembelians.cetaknota')->middleware('permission:show-pembelians');
 
 
     // PembeliansDetails Management - dengan permission check
@@ -219,6 +219,26 @@ Route::middleware(['auth'])->group(function () {
     Route::get('absensis/{absensi}/edit', [AbsensiController::class, 'edit'])->name('absensis.edit')->middleware('permission:edit-absensis');
     Route::put('absensis/{absensi}', [AbsensiController::class, 'update'])->name('absensis.update')->middleware('permission:edit-absensis');
     Route::delete('absensis/{absensi}', [AbsensiController::class, 'destroy'])->name('absensis.destroy')->middleware('permission:delete-absensis');
+
+    // Pembelians Management - dengan permission check
+    Route::get('pengirimans', [PembelianController::class, 'index'])->name('pengirimans.index')->middleware('permission:view-pengirimans');
+    Route::get('pengirimans/export', [PembelianController::class, 'export'])->name('pengirimans.export')->middleware('permission:download-pengirimans');
+    Route::get('pengirimans/create', [PembelianController::class, 'create'])->name('pengirimans.create')->middleware('permission:create-pengirimans');
+
+    Route::get('pengirimans/createlanjut/{pengiriman}', [PembelianController::class, 'createlanjut'])->name('pengirimans.createlanjut')->middleware('permission:create-pengirimans');
+
+    Route::post('pengirimans', [PembelianController::class, 'store'])->name('pengirimans.store')->middleware('permission:create-pengirimans');
+
+    //storelanjut
+    Route::post('pengirimans/storelanjut/{pengiriman}', [PembelianController::class, 'storelanjut'])->name('pengirimans.storelanjut')->middleware('permission:create-pengirimans');
+
+
+    Route::get('pengirimans/{pengiriman}', [PembelianController::class, 'show'])->name('pengirimans.show')->middleware('permission:show-pengirimans');
+    Route::get('pengirimans/{pengiriman}/edit', [PembelianController::class, 'edit'])->name('pengirimans.edit')->middleware('permission:edit-pengirimans');
+    Route::put('pengirimans/{pengiriman}', [PembelianController::class, 'update'])->name('pengirimans.update')->middleware('permission:edit-pengirimans');
+    Route::delete('pengirimans/{pengiriman}', [PembelianController::class, 'destroy'])->name('pengirimans.destroy')->middleware('permission:delete-pengirimans');
+
+    Route::get('pengirimans/{pengiriman}/cetaknota', [PembelianController::class, 'cetakNota'])->name('pengirimans.cetaknota')->middleware('permission:show-pengirimans');
 
 
     Route::get('backup', [BackupRestoreController::class, 'backup'])->name('backup.backup')->middleware('permission:delete-users'); // TODO: Ganti permission 

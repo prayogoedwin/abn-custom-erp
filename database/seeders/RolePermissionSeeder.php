@@ -125,8 +125,26 @@ class RolePermissionSeeder extends Seeder
             'download-pembeliandetails',
             'delete-pembeliandetails',
 
+            //pengiriman
+            'view-pengirimans',
+            'show-pengirimans',
+            'create-pengirimans',
+            'edit-pengirimans',
+            'update-pengirimans',
+            'download-pengirimans',
+            'delete-pengirimans',
 
-            //pembeliansdetails
+            //pengirimansdetails
+            'view-pengirimandetails',
+            'show-pengirimandetails',
+            'create-pengirimandetails',
+            'edit-pengirimandetails',
+            'update-pengirimandetails',
+            'download-pengirimandetails',
+            'delete-pengirimandetails',
+
+
+            //absensis
             'view-absensis',
             'show-absensis',
             'create-absensis',

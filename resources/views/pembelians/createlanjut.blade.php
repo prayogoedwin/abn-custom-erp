@@ -93,7 +93,7 @@
 
                 <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
                     <x-button type="primary">Simpan</x-button>
-                    <a href="{{ route('pembelian.cetaknota', $data->id) }}" target="_blank">
+                    <a href="{{ route('pembelians.cetaknota', $data->id) }}" target="_blank">
                         <x-button type="secondary">Cetak Nota</x-button>
                     </a>
                     <a href="{{ route($tablename . '.index') }}">
