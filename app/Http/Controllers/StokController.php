@@ -12,16 +12,18 @@ use Yajra\DataTables\Facades\DataTables;
 
 class StokController extends Controller
 {
-    private function getPagedata(){
+    private function getPagedata()
+    {
         $pagedata = [
             'title' => 'Stok',
             'tablename' => 'stoks',
-            'tableaction' => false,
+            'tableaction' => true,
+            'canCreate' => false,
             'columns' => [
                 ['name' => 'nama_produk', 'value' => 'nama_produk', 'title' => 'Produk', 'type' => 'text', 'inform' => true, 'intable' => true],
-                ['name' => 'tipe_stok', 'value' => 'tipe_stok', 'title' => 'Tipe Stok', 'type' => 'text', 'inform' => false, 'intable' => true],
-                ['name' => 'satuan', 'value' => 'satuan', 'title' => 'Satuan', 'type' => 'text', 'inform' => false, 'intable' => true],
-                ['name' => 'stok', 'value' => 'stok', 'title' => 'Stok', 'type' => 'number', 'inform' => false, 'intable' => true],
+                ['name' => 'tipe_stok', 'value' => 'tipe_stok', 'title' => 'Tipe Stok', 'type' => 'text', 'inform' => true, 'intable' => true],
+                ['name' => 'satuan', 'value' => 'satuan', 'title' => 'Satuan', 'type' => 'text', 'inform' => true, 'intable' => true],
+                ['name' => 'stok', 'value' => 'stok', 'title' => 'Stok', 'type' => 'number', 'inform' => true, 'intable' => true],
             ],
         ];
 
@@ -38,7 +40,19 @@ class StokController extends Controller
 
 
             return DataTables::of($stoks)
-                
+                ->addColumn('actions', function ($stok) {
+                    $actions = '';
+
+                    if (auth()->user()->hasPermission('show-produks')) {
+                        $actions .= '<a href="' . route('stoks.show', $stok) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">Detail</a>';
+                    }
+
+                    
+
+                    return $actions;
+                })
+                ->rawColumns(['actions'])
+
                 ->make(true);
         }
 
@@ -70,38 +84,42 @@ class StokController extends Controller
         return to_route('stoks.index')->with('status', 'Stok created successfully.');
     }
 
-    public function show(Stok $kategori): View
+    public function show(Stok $stok): View
     {
         $pagedata = $this->getPagedata();
 
-        return view('stoks.show', compact('kategori'), $pagedata);
+        $data = $stok;
+        $data->nama_produk = $stok->produk->nama_produk;
+
+        // dd($data);
+
+
+        return view('dynamiccrud.show', compact('data'), $pagedata);
     }
 
-    public function edit(Stok $kategori): View
+    public function edit(Stok $stok): View
     {
         $pagedata = $this->getPagedata();
 
-        $data = $kategori;
+        $data = $stok;
 
         return view('dynamiccrud.edit', compact('data'), $pagedata);
-
-        
     }
 
-    public function update(Request $request, Stok $kategori): RedirectResponse
+    public function update(Request $request, Stok $stok): RedirectResponse
     {
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
         ]);
 
-        $kategori->update($validated);
+        $stok->update($validated);
 
         return to_route('stoks.index')->with('status', 'Stok updated successfully.');
     }
 
-    public function destroy(Stok $kategori): RedirectResponse
+    public function destroy(Stok $stok): RedirectResponse
     {
-        $kategori->delete();
+        $stok->delete();
 
         return to_route('stoks.index')->with('status', 'Stok deleted successfully.');
     }

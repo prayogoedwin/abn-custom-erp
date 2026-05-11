@@ -23,7 +23,7 @@
         <div class="flex gap-2">
             @if(auth()->user()->hasPermission('edit-' . $tablename))
             <a href="{{ route($tablename . '.edit', $data) }}">
-                <x-button type="primary">{{ __('Edit Produk') }}</x-button>
+                <x-button type="primary">{{ __('Edit' . $tablename) }}</x-button>
             </a>
             @endif
             <a href="{{ route($tablename . '.index') }}">
