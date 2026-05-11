@@ -21,6 +21,20 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PembelianController extends Controller
 {
+    private function toIntMoney($value): int
+    {
+        if (is_null($value) || $value === '') {
+            return 0;
+        }
+
+        if (is_numeric($value)) {
+            return (int) round((float) $value);
+        }
+
+        $cleaned = preg_replace('/[^\d\-]/', '', (string) $value);
+        return $cleaned === '' || $cleaned === '-' ? 0 : (int) $cleaned;
+    }
+
     private function getPagedata()
     {
         // 'no_transaksi',
@@ -49,7 +63,7 @@ class PembelianController extends Controller
                     })->toArray(),
                 ]],
                 ['name' => 'nopol', 'value' => 'nopol',  'title' => 'Nopol', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
-                ['name' => 'nominal', 'value' => 'nominal',  'title' => 'Nominal', 'type' => 'number', 'inform' => true, 'inshow' => false, 'intable' => false],
+                ['name' => 'nominal', 'value' => 'nominal',  'title' => 'Nominal DP', 'type' => 'number', 'inform' => true, 'inshow' => false, 'intable' => false],
                 ['name' => 'tipe_transaksi_pembelian', 'value' => 'tipe_transaksi_pembelian',  'title' => 'Tipe Transaksi Pembelian', 'type' => 'select', 'inform' => true, 'inshow' => true, 'intable' => true, 'options' => [
                     ['value' => 'Titip', 'label' => 'Titip'],
                     ['value' => 'Jual', 'label' => 'Jual'],
@@ -196,7 +210,7 @@ class PembelianController extends Controller
         $store_data = [
             'metode_pembayaran' => $request->input('metode_pembayaran'),
             'tipe_pembayaran' => $request->input('tipe_pembayaran'),
-            'nominal' => $request->input('nominal'),
+            'nominal' => $this->toIntMoney($request->input('nominal')),
             'keterangan' => $request->input('keterangan'),
 
             'created_by' => auth()->id(),
@@ -213,10 +227,27 @@ class PembelianController extends Controller
 
 
 
-        $simpanpinjamsupplier = SimpanPinjamSupplier::find($pembelian->id)->update([
-            'nominal' => $store_data['nominal'],
-            'keterangan' => $store_data['keterangan']
+        SimpanPinjamSupplier::updateOrCreate(
+            ['pembelian_id' => $pembelian->id],
+            [
+                'supplier_id' => $pembelian->supplier_id,
+                'tipe' => 'IN',
+                'nominal' => $store_data['nominal'] ?? 0,
+                'keterangan' => $store_data['keterangan'],
+                'created_by' => auth()->id(),
+            ]
+        );
 
+        $totalNominalPembelian = (int) PembelianDetail::where('pembelian_id', $pembelian->id)->sum('harga_netto');
+        $totalNominalTerbayar = (int) SimpanPinjamSupplier::where('pembelian_id', $pembelian->id)->sum('nominal');
+        $kekurangan = max($totalNominalPembelian - $totalNominalTerbayar, 0);
+        $statusPembayaran = $kekurangan <= 0 ? 'Lunas' : 'Belum Lunas';
+
+        $p->update([
+            'total_nominal_pembelian' => $totalNominalPembelian,
+            'total_nominal_terbayar' => $totalNominalTerbayar,
+            'kekurangan' => $kekurangan,
+            'status_pembayaran' => $statusPembayaran,
         ]);
 
 

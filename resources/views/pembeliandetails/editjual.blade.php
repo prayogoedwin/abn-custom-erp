@@ -1,14 +1,11 @@
 <x-layouts.app>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <div class="mb-6 flex items-center text-sm">
         <a href="{{ route('dashboard') }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ __('Dashboard') }}</a>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
         <a href="{{ route('produks.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $title ?? __('Produks') }}</a>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
         <span class="text-gray-500 dark:text-gray-400">{{ $title ?? __('Edit') }}</span>
@@ -25,25 +22,27 @@
                 @csrf
                 <input type="hidden" name="pembelian_id" value="{{ $pembelian_id }}">
 
-
-
-                <div id="produk-container">
-                </div>
+                <div id="produk-container"></div>
 
                 <template id="row-template">
-                    <div class="produk-row border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="produk-row rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-900/30 p-4 mb-5">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Produk</label>
                                 <select name="produk_id[]" class="produk-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                                     <option value="">Pilih Produk</option>
                                     @foreach($produks as $p)
-                                    <option value="{{ $p->id }}" data-satuan="{{ $p->satuan }}" data-harga-basis="{{ $p->harga_basis_pembelian }}">
+                                    <option value="{{ $p->id }}" data-satuan="{{ $p->satuan }}" data-harga-basis="{{ $p->harga_basis_pembelian }}" data-produk-tipe="{{ strtolower($p->nama_produk) === 'kopi' ? 'kopi' : (strtolower($p->nama_produk) === 'lada' ? 'lada' : 'standar') }}">
                                         {{ $p->nama_produk }}
                                     </option>
                                     @endforeach
                                 </select>
                             </div>
+
+                            <div class="container-satuan hidden">
+                                <input class="input-satuan" name="satuan[]" />
+                            </div>
+
                             <div class="container-netto hidden">
                                 <x-forms.input append="satuan" label="Netto" name="netto[]" type="number" />
                             </div>
@@ -51,33 +50,35 @@
                                 <x-forms.input append="%" label="Rendeman" name="rendeman[]" type="number" />
                             </div>
                             <div class="container-bobot hidden">
-                                <x-forms.input prepend="Rp." append=".00" label="Bobot" name="bobot[]" type="number" />
+                                <x-forms.input prepend="Rp." label="Bobot" name="bobot[]" type="number" />
                             </div>
                         </div>
-                        <div class="container-hargas hidden grid grid-cols-1 md:grid-cols-3 gap-4">
 
-                            <div class="container-harga">
-                                <x-forms.input readonly="true" prepend="Rp." append=".00" label="Harga" name="harga[]" type="number" />
-                            </div>
+                        <div class="container-hargas hidden grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div class="container-harga-basis">
-                                <x-forms.input prepend="Rp." append=".00" label="Harga Basis" name="harga_basis[]" type="number" />
+                                <x-forms.input readonly="true" prepend="Rp." label="Harga Basis Master" name="harga_basis[]" type="number" />
+                            </div>
+                            <div class="container-harga">
+                                <x-forms.input readonly="true" prepend="Rp." label="Harga" name="harga[]" type="number" />
+                            </div>
+                            <div class="container-harga-basis-pembelian">
+                                <x-forms.input prepend="Rp." label="Harga Beli" name="harga_basis_pembelian[]" type="number" />
                             </div>
                             <div class="container-harga-netto">
-                                <x-forms.input readonly="true" prepend="Rp." append=".00" label="Harga Netto" name="harga_netto[]" type="number" />
+                                <x-forms.input readonly="true" prepend="Rp." label="Harga Netto" name="harga_netto[]" type="number" />
                             </div>
-
                         </div>
 
-                        <button type="button" class="btn-remove text-red-500 text-sm mt-2">Hapus Produk</button>
-
-                        <div class="container-button-hitung hidden">
-                            <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold p-1 rounded">
-                                Hitung
+                        <div class="container-button-hitung hidden mt-3 flex items-center justify-between gap-3">
+                            <button type="button" class="btn-hitung inline-flex items-center rounded-md bg-amber-500 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-600">
+                                Hitung Harga
+                            </button>
+                            <button type="button" class="btn-remove inline-flex items-center rounded-md border border-red-400 px-3 py-2 text-sm font-medium text-red-300 hover:bg-red-900/20">
+                                Hapus Produk
                             </button>
                         </div>
                     </div>
                 </template>
-
 
                 <button type="button" id="add-produk" class="mb-4 bg-green-500 text-white px-4 py-2 rounded shadow">
                     + Tambah Produk Lain
@@ -92,231 +93,142 @@
     </div>
 
     <script>
-        $olddata = @json($pembeliandetails);
-
-        console.log('$olddata:', $olddata);
-
-
-
+        const oldData = @json($pembeliandetails);
 
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('produk-container');
             const template = document.getElementById('row-template');
             const addButton = document.getElementById('add-produk');
 
-            // Fungsi utama untuk menambah baris
             function addRow(data = null) {
                 const clone = template.content.cloneNode(true);
                 const row = clone.querySelector('.produk-row');
-
                 container.appendChild(clone);
-
-                console.log("Row baru ditambahkan" + (data ? " dengan data lama." : " tanpa data."));
-
-                // Inisialisasi logika pada baris baru
                 handleRowLogic(row, data);
             }
 
             function handleRowLogic(row, data = null) {
                 const select = row.querySelector('.produk-select');
-                const inNetto = row.querySelector('input[name="netto[]"]');
-                const inRendeman = row.querySelector('input[name="rendeman[]"]');
-
-                const btnHitung = row.querySelector('.bg-yellow-500'); // Tombol Hitung
-
                 const nettoDiv = row.querySelector('.container-netto');
                 const hargasDiv = row.querySelector('.container-hargas');
                 const rendemanDiv = row.querySelector('.container-rendeman');
                 const bobotDiv = row.querySelector('.container-bobot');
-                const appendSatuan = row.querySelector('.text-gray-900'); // Sesuai temuan Anda
+                const appendSatuan = row.querySelector('.text-gray-900');
                 const hiddenInputSatuan = row.querySelector('.input-satuan');
                 const btnHitungDiv = row.querySelector('.container-button-hitung');
+                const btnHitung = row.querySelector('.btn-hitung');
 
                 const inputRendeman = row.querySelector('input[name="rendeman[]"]');
                 const inputNetto = row.querySelector('input[name="netto[]"]');
                 const inputBobot = row.querySelector('input[name="bobot[]"]');
+                const inputSatuan = row.querySelector('input[name="satuan[]"]');
 
-                const inputHargaMaster = row.querySelector('input[name="harga[]"]');
-                const inputHargaBasisUser = row.querySelector('input[name="harga_basis[]"]');
+                const inputHarga = row.querySelector('input[name="harga[]"]');
+                const inputHargaBasisMaster = row.querySelector('input[name="harga_basis[]"]');
+                const inputHargaBasisPembelian = row.querySelector('input[name="harga_basis_pembelian[]"]');
                 const inputHargaNetto = row.querySelector('input[name="harga_netto[]"]');
-                const containerHargas = row.querySelector('.container-hargas');
 
-
-
-                // Jika ada data lama, isi field-nya
-                if (data) {
-
-                    containerHargas.classList.remove('hidden'); // Pastikan container harga muncul jika ada data lama
-
-                    btnHitungDiv.classList.remove('hidden'); // Pastikan tombol hitung muncul jika ada data lama
-
-                    select.value = data.produk_id;
-                    inNetto.value = data.netto;
-                    inRendeman.value = data.rendeman;
-
-                    inputBobot.value = data.bobot;
-                    inputHargaMaster.value = data.harga;
-                    inputHargaBasisUser.value = data.harga_basis;
-                    inputHargaNetto.value = data.harga_netto;
-
-
-                    // Trigger tampilan manual karena value diset lewat JS
-                    row.querySelector('.container-netto').classList.remove('hidden');
-                    if (data.rendeman) row.querySelector('.container-rendeman').classList.remove('hidden');
-
-                }
-
-                // Event Listeners
-                select.addEventListener('change', () => {
+                function handleProductChange() {
                     const selectedOption = select.options[select.selectedIndex];
                     const val = selectedOption.value;
                     const satuan = selectedOption.getAttribute('data-satuan');
-                    const harga_basis = selectedOption.getAttribute('data-harga-basis');
+                    const hargaBasisMaster = parseFloat(selectedOption.getAttribute('data-harga-basis')) || 0;
+                    const productType = selectedOption.getAttribute('data-produk-tipe') || 'standar';
 
-                    console.log("harga_basis yang diambil dari data attribute:", harga_basis);
-
-                    // Reset
                     nettoDiv.classList.add('hidden');
                     rendemanDiv.classList.add('hidden');
                     bobotDiv.classList.add('hidden');
                     hargasDiv.classList.add('hidden');
                     btnHitungDiv.classList.add('hidden');
 
-
-
                     if (val !== "") {
                         nettoDiv.classList.remove('hidden');
-                        if (appendSatuan) appendSatuan.textContent = satuan || '-';
-
-                        // 2. Isi value ke input satuan[] yang tersembunyi
-                        if (hiddenInputSatuan) {
-                            hiddenInputSatuan.value = satuan || '';
-                        }
-
-
                         hargasDiv.classList.remove('hidden');
-                        containerHargas.classList.remove('hidden');
                         btnHitungDiv.classList.remove('hidden');
 
-                        inputHargaBasisUser.value = harga_basis;
+                        if (appendSatuan) appendSatuan.textContent = satuan || '-';
+                        if (hiddenInputSatuan) hiddenInputSatuan.value = satuan || '';
+                        if (inputSatuan) inputSatuan.value = satuan || '';
 
-                        // Logika Rendeman
-                        if (val === "2") {
-                            bobotDiv.classList.remove('hidden');
-                        }
+                        inputHargaBasisMaster.value = hargaBasisMaster;
+                        inputHargaBasisPembelian.value = '';
 
-
-                        // Logika Rendeman
-                        if (val === "1" || val === "2") {
-                            rendemanDiv.classList.remove('hidden');
-                        }
-                    }
-                });
-
-                function eksekusiKalkulasi() {
-                    const selectedOption = select.options[select.selectedIndex];
-                    const hargaMaster = parseFloat(selectedOption.getAttribute('data-harga-basis')) || 0;
-                    const hargaBasis = parseFloat(inputHargaBasisUser.value) || 0; 
-                    const val = selectedOption.value;
-
-                    console.log(val);
-
-                    if (val === '1') {
-                        //ini kopi
-                        //harga               = (harga_basis (dari master) * rendeman) => Rupiah
-                        //harga_basis_pembelian = secara otomatis terisi sesuai {harga} => tapi editable => Rupiah
-                        //harga_netto           = (harga_basis_pembelian * netto) => Rupiah
-
-
-                        const rendeman = parseFloat(inputRendeman.value) || 0;
-                        const netto = parseFloat(inputNetto.value) || 0;
-
-                        // 1. Hitung Harga (Master * Rendeman)
-                        const hasilHarga = Number(hargaBasis) + (Number(hargaBasis) * (rendeman / 100));
-                        inputHargaMaster.value = Math.round(hasilHarga);
-
-                        console.log(hasilHarga);
-
-
-                        const hargaBasisTerbaru = parseFloat(inputHargaBasisUser.value) || 0;
-                        const hasilNetto = hargaBasisTerbaru * netto;
-                        inputHargaNetto.value = Math.round(hasilNetto);
-
-                        console.log("Kalkulasi selesai untuk produk Kopi:", selectedOption.text);
-
-                    } else if (val === '2') {
-                        // ini Lada 
-                        // harga = (harga_basis + (harga_basis * rendeman)) => Rupiah
-                        //   Input bobot => Rupiah (bisa + / -) Misal : -5000
-                        //   harga_basis_pembelian = (harga_basis +/- bobot) => + atau - tergantung isi bobot => editable => rupiah
-                        //   harga_netto = (harga_basis_pembelian * netto) => Rupiah
-
-                        const rendeman = parseFloat(inputRendeman.value) || 0;
-                        const netto = parseFloat(inputNetto.value) || 0;
-                        const bobot = parseFloat(inputBobot.value) || 0;
-
-                        // 1. Hitung Harga (Master * Rendeman)
-                        const hasilHarga = Number(hargaBasis) + (Number(hargaBasis) * (rendeman / 100));
-                        inputHargaMaster.value = Math.round(hasilHarga);
-
-                        const hasilHargaBasis = Number(inputHargaBasisUser.value) + Number(bobot);
-                        inputHargaBasisUser.value = Math.round(hasilHargaBasis);
-
-                        const hasilNetto = hasilHargaBasis * netto;
-                        inputHargaNetto.value = Math.round(hasilNetto);
-
-                        console.log("Kalkulasi selesai untuk produk Lada:", selectedOption.text);
-                    } else {
-                        // ini produk lainya (misal gula, kemiri, dll) 
-                        // harga = harga_basis
-                        //    harga_basis_pembelian = secara otomatis terisi susuai {harga} => tapi editable => rupiah
-                        //    harga_netto = harga_basis * netto => Rupiah
-
-
-
-                        const netto = parseFloat(inputNetto.value) || 0;
-
-                        
-                        const hasilHarga = hargaBasis;
-                        inputHargaMaster.value = hargaBasis;
-
-
-                        
-
-                        const hasilNetto = hasilHarga * netto;
-                        inputHargaNetto.value = Math.round(hasilNetto);
-
-                        console.log("Kalkulasi selesai untuk produk lainya:", selectedOption.text);
+                        if (productType === 'lada') bobotDiv.classList.remove('hidden');
+                        if (productType === 'kopi' || productType === 'lada') rendemanDiv.classList.remove('hidden');
                     }
                 }
 
+                function eksekusiKalkulasi() {
+                    const selectedOption = select.options[select.selectedIndex];
+                    if (!selectedOption || !selectedOption.value) return;
 
+                    const productType = selectedOption.getAttribute('data-produk-tipe') || 'standar';
+                    const hargaBasisMaster = parseFloat(inputHargaBasisMaster.value) || 0;
+                    const rendeman = parseFloat(inputRendeman.value) || 0;
+                    const bobot = parseFloat(inputBobot.value) || 0;
+                    const netto = parseFloat(inputNetto.value) || 0;
+
+                    let harga = hargaBasisMaster;
+                    let rekomHargaBeli = hargaBasisMaster;
+
+                    if (productType === 'kopi') {
+                        harga = hargaBasisMaster + (hargaBasisMaster * (rendeman / 100));
+                        rekomHargaBeli = harga;
+                    } else if (productType === 'lada') {
+                        harga = hargaBasisMaster + (hargaBasisMaster * (rendeman / 100));
+                        rekomHargaBeli = harga + bobot;
+                    } else {
+                        harga = hargaBasisMaster;
+                        rekomHargaBeli = harga;
+                    }
+
+                    inputHarga.value = Math.round(harga);
+                    const hargaBeliInput = parseFloat(inputHargaBasisPembelian.value);
+                    const gunakanHargaBeliInput = inputHargaBasisPembelian.value !== '' && !Number.isNaN(hargaBeliInput);
+                    if (gunakanHargaBeliInput) {
+                        inputHargaNetto.value = Math.round(hargaBeliInput * netto);
+                    } else {
+                        inputHargaNetto.value = '';
+                    }
+                }
+
+                if (data) {
+                    select.value = data.produk_id;
+                    inputNetto.value = data.netto;
+                    inputRendeman.value = data.rendeman;
+                    inputBobot.value = data.bobot;
+                    inputHarga.value = data.harga;
+                    inputHargaBasisMaster.value = data.harga_basis;
+                    inputHargaBasisPembelian.value = data.harga_basis_pembelian ?? data.harga_basis;
+                    inputHargaNetto.value = data.harga_netto;
+                    handleProductChange();
+                }
+
+                select.addEventListener('change', handleProductChange);
                 btnHitung.addEventListener('click', function(e) {
-                    e.preventDefault(); // Mencegah submit form tidak sengaja
+                    e.preventDefault();
                     eksekusiKalkulasi();
                 });
-
                 row.querySelector('.btn-remove').addEventListener('click', () => row.remove());
             }
 
-            // 1. Render data lama jika ada
-            if ($olddata && $olddata.length > 0) {
-                $olddata.forEach(item => addRow(item));
+            if (oldData && oldData.length > 0) {
+                oldData.forEach(item => addRow(item));
             } else {
-                // 2. Jika create baru, kasih 1 baris kosong
                 addRow();
             }
 
-            // 3. Tombol tambah baris manual
             addButton.addEventListener('click', () => addRow());
         });
     </script>
 
-
-
     <style>
-        .hidden {
-            display: none;
+        .hidden { display: none; }
+
+        .produk-row .container-hargas {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed rgba(148, 163, 184, 0.3);
         }
     </style>
 </x-layouts.app>

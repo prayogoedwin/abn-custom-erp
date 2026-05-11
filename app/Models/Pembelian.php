@@ -50,16 +50,22 @@ class Pembelian extends Model
     protected static function booted()
     {
         static::creating(function ($pembelian) {
-
-            $date = now()->format('Ymd');
-            $random = strtoupper(bin2hex(random_bytes(3))); // Generates a short 6-char unique string
-
-            $pembelian->no_transaksi = "TRX-{$date}-{$random}";
+            // Placeholder sementara, akan diganti setelah ID terbentuk.
+            $pembelian->no_transaksi = 'TRX-TMP-' . now()->format('YmdHis');
 
             // Optional: Ensure 'created_by' is set to the logged-in user
             if (auth()->check()) {
                 $pembelian->created_by = auth()->id();
             }
+        });
+
+        static::created(function ($pembelian) {
+            $date = $pembelian->created_at?->format('Ymd') ?? now()->format('Ymd');
+            $transactionNumber = "TRX-{$date}-" . str_pad((string) $pembelian->id, 6, '0', STR_PAD_LEFT);
+
+            $pembelian->updateQuietly([
+                'no_transaksi' => $transactionNumber,
+            ]);
         });
     }
 

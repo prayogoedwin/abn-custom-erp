@@ -55,7 +55,7 @@
                 </div>
 
                 <div id="container-bobot" class="mb-4 hidden">
-                    <x-forms.input prepend="Rp." append=".00" label="Bobot" name="bobot" type="number" value="{{ old('bobot') }}" />
+                    <x-forms.input prepend="Rp." label="Bobot" name="bobot" type="number" value="{{ old('bobot') }}" />
                 </div>
 
                 

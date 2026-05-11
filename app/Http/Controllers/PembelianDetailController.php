@@ -6,6 +6,7 @@ use App\Exports\PembelianDetailExport;
 use App\Models\Pembelian;
 use App\Models\PembelianDetail;
 use App\Models\Produk;
+use App\Models\SimpanPinjamSupplier;
 use App\Models\Stok;
 use Illuminate\Http\Request;
 
@@ -17,6 +18,40 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PembelianDetailController extends Controller
 {
+    private function toIntMoney($value): int
+    {
+        if (is_null($value) || $value === '') {
+            return 0;
+        }
+
+        if (is_numeric($value)) {
+            return (int) round((float) $value);
+        }
+
+        $cleaned = preg_replace('/[^\d\-]/', '', (string) $value);
+        return $cleaned === '' || $cleaned === '-' ? 0 : (int) $cleaned;
+    }
+
+    private function syncPembelianTotals(int $pembelianId): void
+    {
+        $pembelian = Pembelian::find($pembelianId);
+        if (!$pembelian) {
+            return;
+        }
+
+        $totalNominalPembelian = (int) PembelianDetail::where('pembelian_id', $pembelianId)->sum('harga_netto');
+        $totalNominalTerbayar = (int) SimpanPinjamSupplier::where('pembelian_id', $pembelianId)->sum('nominal');
+        $kekurangan = max($totalNominalPembelian - $totalNominalTerbayar, 0);
+        $statusPembayaran = $kekurangan <= 0 ? 'Lunas' : 'Belum Lunas';
+
+        $pembelian->update([
+            'total_nominal_pembelian' => $totalNominalPembelian,
+            'total_nominal_terbayar' => $totalNominalTerbayar,
+            'kekurangan' => $kekurangan,
+            'status_pembayaran' => $statusPembayaran,
+        ]);
+    }
+
     private function getPagedata()
     {
         //     'pembelian_id',
@@ -171,6 +206,8 @@ class PembelianDetailController extends Controller
             }
         }
 
+        $this->syncPembelianTotals((int) $store_data['pembelian_id']);
+
 
 
         return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
@@ -216,13 +253,16 @@ class PembelianDetailController extends Controller
                     'netto'        => $request->netto[$index],
                     'satuan'       => $request->satuan[$index], // Nilai ini datang dari input hidden tadi
                     'rendeman'     => $request->rendeman[$index] ?? null,
-                    'harga'     => $request->harga[$index] ?? null,
-                    'harga_basis'     => $request->harga_basis[$index] ?? null,
-                    'harga_basis_pembelian'     => $request->harga_basis_pembelian[$index] ?? null,
-                    'harga_netto'     => $request->harga_netto[$index] ?? null,
+                    'bobot'     => $this->toIntMoney($request->bobot[$index] ?? 0),
+                    'harga'     => $this->toIntMoney($request->harga[$index] ?? 0),
+                    'harga_basis'     => $this->toIntMoney($request->harga_basis[$index] ?? 0),
+                    'harga_basis_pembelian'     => $this->toIntMoney($request->harga_basis_pembelian[$index] ?? ($request->harga_basis[$index] ?? 0)),
+                    'harga_netto'     => $this->toIntMoney($request->harga_netto[$index] ?? 0),
                 ]);
             }
         }
+
+        $this->syncPembelianTotals((int) $store_data['pembelian_id']);
 
 
 
@@ -313,6 +353,8 @@ class PembelianDetailController extends Controller
             }
         }
 
+        $this->syncPembelianTotals((int) $store_data['pembelian_id']);
+
 
         return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
 
@@ -351,15 +393,18 @@ class PembelianDetailController extends Controller
                     'netto'        => $request->netto[$index] ?? 0,
                     'satuan'       => $request->satuan[$index] ?? "satuan",
                     'rendeman'     => $request->rendeman[$index] ?? null,
-                    'harga'     => $request->harga[$index] ?? null,
-                    'harga_basis'     => $request->harga_basis[$index] ?? null,
-                    'harga_basis_pembelian'     => $request->harga_basis_pembelian[$index] ?? null,
-                    'harga_netto'     => $request->harga_netto[$index] ?? null,
+                    'bobot'     => $this->toIntMoney($request->bobot[$index] ?? 0),
+                    'harga'     => $this->toIntMoney($request->harga[$index] ?? 0),
+                    'harga_basis'     => $this->toIntMoney($request->harga_basis[$index] ?? 0),
+                    'harga_basis_pembelian'     => $this->toIntMoney($request->harga_basis_pembelian[$index] ?? ($request->harga_basis[$index] ?? 0)),
+                    'harga_netto'     => $this->toIntMoney($request->harga_netto[$index] ?? 0),
 
                     'updated_by' => auth()->id(),
                 ]);
             }
         }
+
+        $this->syncPembelianTotals((int) $store_data['pembelian_id']);
 
 
         return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
