@@ -11,17 +11,17 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">{{ $title ?? __('Create') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">{{ $title ?? __('Edit') }}</span>
     </div>
 
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Create {{ $title }}</h1>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit {{ $title }}</h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Fill in the details below') }}</p>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-5">
-            <form action="{{ route($tablename . '.update', $data) }}" method="PUT" id="pembelianForm">
+            <form action="{{ route($tablename . '.update', $data) }}" method="POST" id="pembelianForm">
                 @csrf
                 @method("PUT")
                 <input type="hidden" name="pengiriman_id" value="{{ $data->id }}">
@@ -86,7 +86,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Get the old data from the server
             const oldData = @json($pengirimandetails);
-            const form = document.getElementById('pembelianForm');
             const container = document.querySelector('.produk-row')?.parentNode || document.getElementById('add-produk').parentNode;
             const template = document.getElementById('row-template');
 
@@ -99,13 +98,13 @@
             });
             @endforeach
 
+            console.log(produkOptions);
+
             // Function to create a new row
             function createProdukRow(data = null) {
                 const clone = document.importNode(template.content, true);
                 const row = clone.querySelector('.produk-row');
 
-                // If this is the first row, we need to get the container properly
-                if (!row) return null;
 
                 // Setup event listeners for this row
                 setupRowEventListeners(row);
@@ -124,7 +123,6 @@
                 const produkSelect = row.querySelector('.produk-select');
                 if (produkSelect) {
                     produkSelect.addEventListener('change', function() {
-                        updateSatuanDisplay(row);
                         calculateRowValues(row);
                     });
                 }
@@ -174,17 +172,6 @@
                 }
             }
 
-            // Update satuan display based on selected product
-            function updateSatuanDisplay(row) {
-                const produkSelect = row.querySelector('.produk-select');
-                const satuanElement = row.querySelector('.container-jumlah_per_karung .satuan');
-
-                if (produkSelect && satuanElement) {
-                    const selectedOption = produkSelect.options[produkSelect.selectedIndex];
-                    const satuan = selectedOption.getAttribute('data-satuan') || '';
-                    satuanElement.textContent = satuan;
-                }
-            }
 
             // Calculate bruto value
             function calculateBruto(row) {
@@ -236,40 +223,28 @@
             function populateRowWithData(row, data) {
                 // Set produk select
                 const produkSelect = row.querySelector('.produk-select');
-                if (produkSelect && data.nama_produk) {
-                    produkSelect.value = data.nama_produk;
-                    updateSatuanDisplay(row);
-                }
+                produkSelect.value = data.nama_barang;
+                console.log(data);
 
                 // Set jumlah per karung
                 const jumlahPerKarung = row.querySelector('input[name="jumlah_per_karung[]"]');
-                if (jumlahPerKarung && data.jumlah_per_karung) {
-                    jumlahPerKarung.value = data.jumlah_per_karung;
-                }
+                jumlahPerKarung.value = data.jumlah_per_karung;
 
                 // Set jumlah karung
                 const jumlahKarung = row.querySelector('input[name="jumlah_karung[]"]');
-                if (jumlahKarung && data.jumlah_karung) {
-                    jumlahKarung.value = data.jumlah_karung;
-                }
+                jumlahKarung.value = data.jumlah_karung;
 
                 // Set bruto
                 const bruto = row.querySelector('input[name="bruto[]"]');
-                if (bruto && data.bruto) {
-                    bruto.value = data.bruto;
-                }
+                bruto.value = data.bruto;
 
                 // Set tara
                 const tara = row.querySelector('input[name="tara[]"]');
-                if (tara && data.tara) {
-                    tara.value = data.tara;
-                }
+                tara.value = data.tara;
 
                 // Set netto
                 const netto = row.querySelector('input[name="netto[]"]');
-                if (netto && data.netto) {
-                    netto.value = data.netto;
-                }
+                netto.value = data.netto;
 
                 // Recalculate to ensure consistency
                 calculateRowValues(row);
@@ -293,9 +268,7 @@
             // Load existing data into rows
             function loadExistingData() {
                 if (oldData && oldData.length > 0) {
-                    // Clear existing rows (keep the button)
-                    const existingRows = document.querySelectorAll('.produk-row');
-                    existingRows.forEach(row => row.remove());
+
 
                     // Create rows for each data item
                     oldData.forEach((item, index) => {
@@ -330,49 +303,7 @@
                 }
             });
 
-            // Form submission
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    // Ensure all rows have proper indexes
-                    const rows = document.querySelectorAll('.produk-row');
-                    if (rows.length === 0) {
-                        e.preventDefault();
-                        alert('Minimal harus ada satu produk!');
-                        return false;
-                    }
 
-                    // Validate each row
-                    let isValid = true;
-                    rows.forEach((row, index) => {
-                        const produkSelect = row.querySelector('.produk-select');
-                        const jumlahPerKarung = row.querySelector('input[name="jumlah_per_karung[]"]');
-                        const jumlahKarung = row.querySelector('input[name="jumlah_karung[]"]');
-
-                        if (!produkSelect.value) {
-                            alert('Produk harus diisi pada baris ' + (index + 1));
-                            isValid = false;
-                            return false;
-                        }
-
-                        if (!jumlahPerKarung.value || parseFloat(jumlahPerKarung.value) <= 0) {
-                            alert('Jumlah per karung harus diisi dengan nilai positif pada baris ' + (index + 1));
-                            isValid = false;
-                            return false;
-                        }
-
-                        if (!jumlahKarung.value || parseFloat(jumlahKarung.value) <= 0) {
-                            alert('Jumlah karung harus diisi dengan nilai positif pada baris ' + (index + 1));
-                            isValid = false;
-                            return false;
-                        }
-                    });
-
-                    if (!isValid) {
-                        e.preventDefault();
-                        return false;
-                    }
-                });
-            }
 
             // Initialize on page load
             loadExistingData();

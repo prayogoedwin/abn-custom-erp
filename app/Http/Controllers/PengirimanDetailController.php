@@ -12,14 +12,14 @@ class PengirimanDetailController extends Controller
 
     private function getPagedata()
     {
-        
+
 
 
         $pagedata = [
             'title' => 'PengirimanDetail',
             'tablename' => 'pengirimandetails',
             'tableaction' => true,
-            
+
         ];
 
         // dd($pagedata);
@@ -64,7 +64,7 @@ class PengirimanDetailController extends Controller
                     'nama_barang'    => $request->nama_produk[$index],
                     'jumlah_per_karung'    => $request->jumlah_per_karung[$index],
                     'jumlah_karung'    => $request->jumlah_karung[$index],
-                    'bruto'    =>$request->bruto[$index],
+                    'bruto'    => $request->bruto[$index],
                     'tara'    => $request->tara[$index],
                     'netto'    => $request->netto[$index]
 
@@ -81,12 +81,52 @@ class PengirimanDetailController extends Controller
 
         // dd($pengirimandetails);
         $data = $pengiriman;
-        
+
 
         $produks = Produk::where('deleted_at', null)->get();
 
         $pagedata = $this->getPagedata();
 
         return view('pengirimandetails.edit', compact('produks', 'pengirimandetails', 'data'), $pagedata);
+    }
+
+    public function update(Request $request)
+    {
+        $store_data = [
+            'pengiriman_id' => $request->input('pengiriman_id'),
+            'nama_produk' => $request->input('nama_produk'),
+            'jumlah_per_karung' => $request->input('jumlah_per_karung'),
+            'jumlah_karung' => $request->input('jumlah_karung'),
+            'bruto' => $request->input('bruto'),
+            'tara' => $request->input('tara'),
+            'netto' => $request->input('netto'),
+
+
+            'updated_by' => auth()->id(),
+        ];
+
+        // Hapus semua dulu
+        PengirimanDetail::where('pengiriman_id', $request->pengiriman_id)->delete();
+
+
+        foreach ($request->nama_produk as $index => $nama_produk) {
+            if (!empty($nama_produk)) {
+                // Simpan ulang setiap item ke database
+                PengirimanDetail::create([
+                    'pengiriman_id' => $store_data['pengiriman_id'],
+                    'nama_barang'    => $request->nama_produk[$index],
+                    'jumlah_per_karung'    => $request->jumlah_per_karung[$index],
+                    'jumlah_karung'    => $request->jumlah_karung[$index],
+                    'bruto'    => $request->bruto[$index],
+                    'tara'    => $request->tara[$index],
+                    'netto'    => $request->netto[$index],
+
+                    'updated_by' =>  $store_data['updated_by']
+                ]);
+            }
+        }
+
+        
+        return to_route('pengirimans.index')->with('status', 'Pengiriman updated successfully.');
     }
 }
