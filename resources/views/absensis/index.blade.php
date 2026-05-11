@@ -52,8 +52,11 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tahun</label>
                     <select name="year" id="filter-year" class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-2 mb-2" required>
                         <option value="">Semua Tahun</option>
-                        @for($y = date('Y') + 3; $y >= 2020; $y--)
-                        <option value="{{ $y }}">{{ $y }}</option>
+
+                        @for($y = $tahunMax; $y >= $tahunMin; $y--)
+                        <option value="{{ $y }}" {{ $y == $tahunSekarang ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
                         @endfor
                     </select>
                 </div>

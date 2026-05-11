@@ -63,6 +63,20 @@ class AbsensiController extends Controller
     {
         $pagedata = $this->getPagedata();
 
+        // Tahun default terpilih adalah tahun ini
+        // Tahun max ada alah tahun ini + 1
+        // Tahun min adalah sesuai tahun yang ada di database 
+
+        $tahunMin = Absensi::min('tahun') ?? date('Y');
+
+        $tahunMax = date('Y') + 1;
+
+        $tahunSekarang = date('Y');
+
+        $pagedata['tahunMin'] = $tahunMin;
+        $pagedata['tahunMax'] = $tahunMax;
+        $pagedata['tahunSekarang'] = $tahunSekarang;
+        
         return view('absensis.index', $pagedata);
     }
 
