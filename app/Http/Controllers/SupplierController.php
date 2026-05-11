@@ -94,8 +94,10 @@ class SupplierController extends Controller
         
 
         $pagedata = $this->getPagedata();
+        
+        
 
-        return view('dynamiccrud.create', compact('kategoris'), $pagedata);
+        return view('dynamiccrud.create', $pagedata);
     }
 
     public function store(Request $request): RedirectResponse
