@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->constrained('customers');
             $table->string('nopol');
-            $table->string('no_transaksi'); // id-nopo-random
+            $table->string('no_transaksi')->nullable(); // id-nopo-random
             $table->timestamps();
             $table->softDeletes();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

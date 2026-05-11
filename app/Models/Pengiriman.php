@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Pengiriman extends Model
 {
@@ -20,6 +21,8 @@ class Pengiriman extends Model
 
     // });
 
+    protected $table = "pengirimans";
+
     protected $fillable = [
         'customer_id',
         'nopol',
@@ -29,6 +32,15 @@ class Pengiriman extends Model
         'deleted_at',
         'deleted_by',
     ];
+
+    protected static function booted()
+    {
+        static::created(function ($pengiriman) {
+            $random = strtoupper(Str::random(5));
+            $pengiriman->no_transaksi = "{$pengiriman->id}-{$pengiriman->nopol}-{$random}";
+            $pengiriman->save();
+        });
+    }
 
     public function customer()
     {

@@ -26,6 +26,7 @@ class PengirimanDetail extends Model
     protected $fillable = [
         'pengiriman_id',
         'nama_barang',
+        'jumlah_per_karung',
         'jumlah_karung',
         'bruto',
         'tara', //(JUMLAH KARUNG X 0.3 KG )

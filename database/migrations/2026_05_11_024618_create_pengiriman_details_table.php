@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pengiriman_id')->constrained('pengirimans');
             $table->string('nama_barang');
-            $table->integer('jumlah_karung');
-            $table->integer('bruto');
-            $table->integer('tara');//(JUMLAH KARUNG X 0.3 KG )
-            $table->integer('netto');
+            $table->float('jumlah_per_karung');
+            $table->float('jumlah_karung');
+            $table->float('bruto');
+            $table->float('tara');//(JUMLAH KARUNG X 0.3 KG )
+            $table->float('netto');
             $table->timestamps();
             $table->softDeletes();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

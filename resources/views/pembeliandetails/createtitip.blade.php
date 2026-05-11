@@ -81,7 +81,7 @@
                 const select = row.querySelector('.produk-select');
                 const nettoDiv = row.querySelector('.container-netto');
                 const rendemanDiv = row.querySelector('.container-rendeman');
-                const appendSatuan = row.querySelector('.text-gray-900'); // Sesuai temuan Anda
+                const appendSatuan = row.querySelector('.text-gray-900'); 
                 const hiddenInputSatuan = row.querySelector('.input-satuan');
 
                 select.addEventListener('change', function() {
