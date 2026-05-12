@@ -41,7 +41,7 @@
                                 <x-layouts.sidebar-two-level-link href="{{ route('pembelians.index') }}" icon='fas-cart-arrow-down'
                                     :active="request()->routeIs('pembelians*')">Pembelian</x-layouts.sidebar-two-level-link>
 
-                                <x-layouts.sidebar-two-level-link href="{{ route('pengirimans.index') }}" icon='fas-cart-arrow-down'
+                                <x-layouts.sidebar-two-level-link href="{{ route('pengirimans.index') }}" icon='fas-truck'
                                     :active="request()->routeIs('pengirimans*')">Pengiriman</x-layouts.sidebar-two-level-link>
 
                             </x-layouts.sidebar-two-level-link-parent>
