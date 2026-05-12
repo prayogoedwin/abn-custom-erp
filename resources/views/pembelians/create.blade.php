@@ -32,14 +32,14 @@
                 @if(!$column['inform'] )
                 @continue
                 @endif
-                
+
                 @if($column['type'] === 'text')
                 <div class="mb-5">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="text" value="{{ old($column['name']) }}" required />
                 </div>
 
                 @elseif($column['type'] === 'email')
-                
+
                 <div class="mb-5">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="email" value="{{ old($column['name']) }}" required />
                 </div>
@@ -57,7 +57,7 @@
                 @elseif($column['type'] === 'number')
 
                 <div class="mb-5">
-                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="{{ $column['name'] === 'nominal' ? '1' : '0.01' }}" value="{{ old($column['name']) }}"  />
+                    <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="{{ $column['name'] === 'nominal' ? '1' : '0.01' }}" value="{{ old($column['name']) }}" />
                 </div>
                 @elseif($column['type'] === 'select')
                 <div class="mb-5">
@@ -91,8 +91,8 @@
 
                 <div class="mt-2 flex gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
                     <x-button type="primary">{{ __('Lanjut') }}</x-button>
-                    <a href="{{ route($tablename . '.index') }}">
-                        <x-button type="secondary">{{ __('Batal') }}</x-button>
+                    <a href="{{ route($tablename . '.index') }}" class="text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center justify-center cursor-pointer bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 dark:bg-gray-500 dark:hover:bg-gray-600">
+                        {{ __('Batal') }}
                     </a>
                 </div>
             </form>

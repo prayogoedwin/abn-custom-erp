@@ -174,7 +174,7 @@ class PengirimanController extends Controller
     }
 
 
-    public function show($id): View
+    public function show(int $id): View
     {
         $pengiriman = Pengiriman::find($id);
         $pengiriman->details = PengirimanDetail::where('pengiriman_id', $id)->get();
@@ -208,7 +208,7 @@ class PengirimanController extends Controller
             'nopol' => $request->input('nopol'),
             'customer_id' => $request->input('customer_id'),
 
-            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
         ];
 
         //$store_data['no_transaksi'] = terjadi di model
@@ -219,7 +219,7 @@ class PengirimanController extends Controller
             'nopol' => ['required', 'string', 'max:255'],
             'customer_id' => ['required', 'integer', 'max:255'],
 
-            'created_by' => ['required', 'integer']
+            'updated_by' => ['required', 'integer']
         ]);
 
 

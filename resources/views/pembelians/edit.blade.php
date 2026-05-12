@@ -36,9 +36,9 @@
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="text" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
                 </div>
 
-                
+
                 @elseif($column['type'] === 'email')
-                
+
                 <div class="mb-4">
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="email" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
                 </div>
@@ -62,7 +62,7 @@
                     <x-forms.input label="{{ $column['title'] }}" name="{{ $column['name'] }}" type="number" step="0.01" value="{{ old($column['name'], $data->{$column['name']}) }}" required />
                 </div>
 
-                
+
 
 
                 @elseif($column['type'] === 'select')
@@ -75,18 +75,18 @@
                         name="{{ $column['name'] }}"
                         class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
 
-                        
+
                         @foreach($column['options'] as $option)
                         @if(old($column['value'], $data->{$column['name']}) == $option['value'])
-                            <option value="{{ $option['value'] }}" selected>
+                        <option value="{{ $option['value'] }}" selected>
                             {{ $option['label'] }}
-                            </option>
+                        </option>
                         @else
-                            <option value="{{ $option['value'] }}">
+                        <option value="{{ $option['value'] }}">
                             {{ $option['label'] }}
-                            </option>
+                        </option>
                         @endif
-                        
+
                         @endforeach
                     </select>
 
@@ -100,8 +100,8 @@
 
                 <div class="flex gap-3">
                     <x-button type="primary">{{ __('Update') }}</x-button>
-                    <a href="{{ route('produks.index') }}">
-                        <x-button type="secondary">{{ __('Cancel') }}</x-button>
+                    <a href="{{ route($tablename . '.index') }}" class="text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center justify-center cursor-pointer bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 dark:bg-gray-500 dark:hover:bg-gray-600">
+                        {{ __('Batal') }}
                     </a>
                 </div>
             </form>
