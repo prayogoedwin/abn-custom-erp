@@ -126,7 +126,7 @@ class PengirimanController extends Controller
 
     public function export()
     {
-        // return Excel::download(new PengirimanExport, 'pengirimans-' . date('Y-m-d') . '.xlsx');
+        return Excel::download(new PengirimanExport, 'pengirimans-' . date('Y-m-d') . '.xlsx');
     }
 
     public function create(): View
