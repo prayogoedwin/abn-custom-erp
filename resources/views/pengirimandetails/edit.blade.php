@@ -98,7 +98,6 @@
             });
             @endforeach
 
-            console.log(produkOptions);
 
             // Function to create a new row
             function createProdukRow(data = null) {
@@ -224,7 +223,18 @@
                 // Set produk select
                 const produkSelect = row.querySelector('.produk-select');
                 produkSelect.value = data.nama_barang;
+
+                //handle satuan -----------------------------------------------------------------
+                const foundProduk = produkOptions.find(p => p.value === data.nama_barang);
+                data.satuan = foundProduk ? foundProduk.satuan : "a";
                 console.log(data);
+                const jumlahPerKarungDiv = row.querySelector('.container-jumlah_per_karung');
+                const appendSpan = jumlahPerKarungDiv.querySelector('.text-gray-900');
+                // console.log(appendSpan);
+                if (appendSpan) {
+                    appendSpan.textContent = data.satuan;
+                }
+                //------------------------------------------------------------------------------------
 
                 // Set jumlah per karung
                 const jumlahPerKarung = row.querySelector('input[name="jumlah_per_karung[]"]');
