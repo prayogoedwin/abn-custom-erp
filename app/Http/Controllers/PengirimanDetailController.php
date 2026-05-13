@@ -58,17 +58,19 @@ class PengirimanDetailController extends Controller
         foreach ($request->nama_produk as $index => $nama_produk) {
             if ($nama_produk) {
 
+                $produkId = Produk::where('produks.nama_produk', $request->nama_produk[$index])->first()->id;
 
                 PengirimanDetail::create([
                     'pengiriman_id' => $store_data['pengiriman_id'],
+                    'produk_id' => $produkId,
                     'nama_barang'    => $request->nama_produk[$index],
                     'jumlah_per_karung'    => $request->jumlah_per_karung[$index],
                     'jumlah_karung'    => $request->jumlah_karung[$index],
                     'bruto'    => $request->bruto[$index],
                     'tara'    => $request->tara[$index],
-                    'netto'    => $request->netto[$index]
+                    'netto'    => $request->netto[$index],
 
-
+                    'created_by' => $store_data['created_by'],
                 ]);
             }
         }
@@ -111,9 +113,14 @@ class PengirimanDetailController extends Controller
 
         foreach ($request->nama_produk as $index => $nama_produk) {
             if (!empty($nama_produk)) {
+
+                $produkId = Produk::where('produks.nama_produk', $request->nama_produk[$index])->first()->id;
+
+
                 // Simpan ulang setiap item ke database
                 PengirimanDetail::create([
                     'pengiriman_id' => $store_data['pengiriman_id'],
+                    'produk_id' => $produkId,
                     'nama_barang'    => $request->nama_produk[$index],
                     'jumlah_per_karung'    => $request->jumlah_per_karung[$index],
                     'jumlah_karung'    => $request->jumlah_karung[$index],
@@ -126,7 +133,7 @@ class PengirimanDetailController extends Controller
             }
         }
 
-        
+
         return to_route('pengirimans.index')->with('status', 'Pengiriman updated successfully.');
     }
 }

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('pengiriman_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pengiriman_id')->constrained('pengirimans');
+            $table->foreignId('produk_id')->constrained('produks');
             $table->string('nama_barang');
             $table->float('jumlah_per_karung');
             $table->float('jumlah_karung');

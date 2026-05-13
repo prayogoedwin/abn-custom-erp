@@ -25,6 +25,7 @@ class PengirimanDetail extends Model
 
     protected $fillable = [
         'pengiriman_id',
+        'produk_id',
         'nama_barang',
         'jumlah_per_karung',
         'jumlah_karung',
@@ -40,5 +41,10 @@ class PengirimanDetail extends Model
     public function pengiriman()
     {
         return $this->belongsTo(Pengiriman::class);
+    }
+
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class);
     }
 }
