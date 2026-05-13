@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\CashbonKaryawanExport;
-use App\Models\CashbonKaryawan;
+use App\Exports\CashbonKaryawanPembayaranExport;
+use App\Models\CashbonKaryawanPembayaran;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
 
@@ -13,7 +13,7 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
-class CashbonKaryawanController extends Controller
+class CashbonKaryawanPembayaranController extends Controller
 {
     private function getPagedata()
     {
@@ -32,8 +32,8 @@ class CashbonKaryawanController extends Controller
         $karyawans = Karyawan::where('deleted_at', null)->get();
 
         $pagedata = [
-            'title' => 'Cashbon Karyawan',
-            'tablename' => 'cashbonkaryawans',
+            'title' => 'Cashbon Karyawan Pembayaran',
+            'tablename' => 'cashbonkaryawanpembayarans',
             'tableaction' => true,
             'columns' => [
                 ['name' => 'karyawan_id', 'value' => 'karyawan',  'title' => 'Karyawan', 'type' => 'select', 'inform' => true, 'intable' => true, 'options' => [
@@ -43,13 +43,12 @@ class CashbonKaryawanController extends Controller
                         return ['value' => $karyawan->id, 'label' => $karyawan->nama];
                     })->toArray(),
                 ]],
-                ['name' => 'nominal_cashbon', 'value' => 'nominal_cashbon', 'title' => 'Nominal Cashbon', 'type' => 'number', 'inform' => true, 'intable' => true],
+                ['name' => 'nominal_bayar', 'value' => 'nominal_bayar', 'title' => 'Nominal Pembayaran', 'type' => 'number', 'inform' => true, 'intable' => true],
                 ['name' => 'tipe', 'value' => 'tipe',  'title' => 'Tipe', 'type' => 'select', 'inform' => true, 'intable' => false, 'options' => [
                     ['value' => 'Cash', 'label' => 'Cash'],
                     ['value' => 'Transfer', 'label' => 'Transfer'],
 
                 ]],
-
                 ['name' => 'keterangan', 'value' => 'keterangan', 'title' => 'Keterangan', 'type' => 'text', 'inform' => true, 'intable' => true],
 
             ],
@@ -61,19 +60,20 @@ class CashbonKaryawanController extends Controller
     public function index(Request $request)
     {
         // dd($request->headers->all());
-        // $cashbon_karyawans = CashbonKaryawan::join('karyawans', 'cashbon_karyawans.karyawan_id', '=', 'karyawans.id')
-        //     ->select('cashbon_karyawans.*', 'karyawans.nama as karyawan')
+        // $cashbon_karyawan_pembayarans = CashbonKaryawanPembayaran::where('cashbon_karyawan_pembayarans.deleted_at', null)
+        //     ->join('karyawans', 'cashbon_karyawan_pembayarans.karyawan_id', '=', 'karyawans.id')
+        //     ->select('cashbon_karyawan_pembayarans.*', 'karyawans.nama as karyawan')
         //     ->get();
-        // dd($cashbon_karyawans);
+        // dd($cashbon_karyawan_pembayarans);
         if ($request->ajax()) {
             // dd('masuk ajax');
-            $cashbon_karyawans = CashbonKaryawan::where('cashbon_karyawans.deleted_at', null)
-                ->join('karyawans', 'cashbon_karyawans.karyawan_id', '=', 'karyawans.id')
-                ->select('cashbon_karyawans.*', 'karyawans.nama as karyawan')
+            $cashbon_karyawan_pembayarans = CashbonKaryawanPembayaran::where('cashbon_karyawan_pembayarans.deleted_at', null)
+                ->join('karyawans', 'cashbon_karyawan_pembayarans.karyawan_id', '=', 'karyawans.id')
+                ->select('cashbon_karyawan_pembayarans.*', 'karyawans.nama as karyawan')
                 ->get();
-            // dd($cashbon_karyawans);
+            // dd($cashbon_karyawan_pembayarans);
 
-            return DataTables::of($cashbon_karyawans)
+            return DataTables::of($cashbon_karyawan_pembayarans)
 
 
 
@@ -81,16 +81,16 @@ class CashbonKaryawanController extends Controller
                 ->addColumn('actions', function ($cashbonkaryawan) {
                     $actions = '';
 
-                    if (auth()->user()->hasPermission('show-cashbonkaryawans')) {
-                        $actions .= '<a href="' . route('cashbonkaryawans.show', $cashbonkaryawan) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
+                    if (auth()->user()->hasPermission('show-cashbonkaryawanpembayarans')) {
+                        $actions .= '<a href="' . route('cashbonkaryawanpembayarans.show', $cashbonkaryawan) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
                     }
 
-                    if (auth()->user()->hasPermission('edit-cashbonkaryawans')) {
-                        $actions .= '<a href="' . route('cashbonkaryawans.edit', $cashbonkaryawan) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
+                    if (auth()->user()->hasPermission('edit-cashbonkaryawanpembayarans')) {
+                        $actions .= '<a href="' . route('cashbonkaryawanpembayarans.edit', $cashbonkaryawan) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
                     }
 
-                    if (auth()->user()->hasPermission('delete-cashbonkaryawans')) {
-                        $actions .= '<form action="' . route('cashbonkaryawans.destroy', $cashbonkaryawan) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
+                    if (auth()->user()->hasPermission('delete-cashbonkaryawanpembayarans')) {
+                        $actions .= '<form action="' . route('cashbonkaryawanpembayarans.destroy', $cashbonkaryawan) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
                             ' . csrf_field() . method_field('DELETE') . '
                             <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
                         </form>';
@@ -114,7 +114,7 @@ class CashbonKaryawanController extends Controller
     public function export()
     {
         // TODO:
-        // return Excel::download(new CashbonKaryawanExport, 'cashbon_karyawans-' . date('Y-m-d') . '.xlsx');
+        // return Excel::download(new CashbonKaryawanPembayaranExport, 'cashbon_karyawan_pembayarans-' . date('Y-m-d') . '.xlsx');
     }
 
     public function create(): View
@@ -130,7 +130,7 @@ class CashbonKaryawanController extends Controller
     {
         $store_data = [
             'karyawan_id' => $request->input('karyawan_id'),
-            'nominal_cashbon' => $request->input('nominal_cashbon'),
+            'nominal_bayar' => $request->input('nominal_bayar'),
             'tipe' => $request->input('tipe'),
             'keterangan' => $request->input('keterangan'),
 
@@ -140,7 +140,7 @@ class CashbonKaryawanController extends Controller
 
         $validate = Validator::make($store_data, [
             'karyawan_id' => ['required', 'integer', 'max:255'],
-            'nominal_cashbon' => ['required', 'integer'],
+            'nominal_bayar' => ['required', 'integer'],
             'tipe' => ['required', 'string', 'max:50'],
 
             'created_by' => ['required', 'integer']
@@ -153,16 +153,16 @@ class CashbonKaryawanController extends Controller
 
 
 
-        $cashbonKaryawan = CashbonKaryawan::create($store_data);
+        $cashbonKaryawan = CashbonKaryawanPembayaran::create($store_data);
 
 
-        return to_route('cashbonkaryawans.index')->with('status', 'CashbonKaryawan updated successfully.');
+        return to_route('cashbonkaryawanpembayarans.index')->with('status', 'CashbonKaryawanPembayaran updated successfully.');
     }
 
     public function show(int $cashbonKaryawan): View
     {
 
-        $data = CashbonKaryawan::find($cashbonKaryawan);
+        $data = CashbonKaryawanPembayaran::find($cashbonKaryawan);
         $data->karyawan = $data->karyawan->nama;
 
         // dd($data);
@@ -180,7 +180,7 @@ class CashbonKaryawanController extends Controller
     public function edit(int $cashbonKaryawan): View
     {
 
-        $data = CashbonKaryawan::find($cashbonKaryawan);
+        $data = CashbonKaryawanPembayaran::find($cashbonKaryawan);
 
 
         $pagedata = $this->getPagedata();
@@ -191,14 +191,14 @@ class CashbonKaryawanController extends Controller
     public function update(Request $request, int $cashbonKaryawan): RedirectResponse
     {
         // dd($request->all());
-        $cashbonKaryawan = CashbonKaryawan::find($cashbonKaryawan);
+        $cashbonKaryawan = CashbonKaryawanPembayaran::find($cashbonKaryawan);
 
 
 
         // dd("current user id: " . $current_user_id);
         $store_data = [
             'karyawan_id' => $request->input('karyawan_id'),
-            'nominal_cashbon' => $request->input('nominal_cashbon'),
+            'nominal_bayar' => $request->input('nominal_bayar'),
             'tipe' => $request->input('tipe'),
             'keterangan' => $request->input('keterangan'),
 
@@ -208,7 +208,7 @@ class CashbonKaryawanController extends Controller
 
         $validate = Validator::make($store_data, [
             'karyawan_id' => ['required', 'integer', 'max:255'],
-            'nominal_cashbon' => ['required', 'integer'],
+            'nominal_bayar' => ['required', 'integer'],
             'tipe' => ['required', 'string', 'max:50'],
 
             'updated_by' => ['required', 'integer']
@@ -234,16 +234,16 @@ class CashbonKaryawanController extends Controller
 
 
 
-        return to_route('cashbonkaryawans.index')->with('status', 'CashbonKaryawan updated successfully.');
+        return to_route('cashbonkaryawanpembayarans.index')->with('status', 'CashbonKaryawanPembayaran updated successfully.');
     }
 
     //soft delete
     public function destroy(int $cashbonKaryawan): RedirectResponse
     {
-        $cashbonKaryawan = CashbonKaryawan::find($cashbonKaryawan);
+        $cashbonKaryawan = CashbonKaryawanPembayaran::find($cashbonKaryawan);
         $cashbonKaryawan->update(['deleted_by' => auth()->id(), 'deleted_at' => now()]);
 
 
-        return to_route('cashbonkaryawans.index')->with('status', 'CashbonKaryawan deleted successfully.');
+        return to_route('cashbonkaryawanpembayarans.index')->with('status', 'CashbonKaryawanPembayaran deleted successfully.');
     }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\BackupRestoreController;
 use App\Http\Controllers\CashbonKaryawanController;
+use App\Http\Controllers\CashbonKaryawanPembayaranController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DinamisVariableController;
 use App\Http\Controllers\HistoryHargaBasisController;
@@ -295,16 +296,16 @@ Route::middleware(['auth'])->group(function () {
     Route::put('cashbonkaryawans/{cashbonkaryawan}', [CashbonKaryawanController::class, 'update'])->name('cashbonkaryawans.update')->middleware('permission:edit-cashbonkaryawans');
     Route::delete('cashbonkaryawans/{cashbonkaryawan}', [CashbonKaryawanController::class, 'destroy'])->name('cashbonkaryawans.destroy')->middleware('permission:delete-cashbonkaryawans');
 
-    //TODO:
+    
     //pembayaran
-    Route::get('cashbonkaryawanpembayarans', [CustomerController::class, 'index'])->name('cashbonkaryawanpembayarans.index')->middleware('permission:view-cashbonkaryawanpembayarans');
-    Route::get('cashbonkaryawanpembayarans/export', [CustomerController::class, 'export'])->name('cashbonkaryawanpembayarans.export')->middleware('permission:download-cashbonkaryawanpembayarans');
-    Route::get('cashbonkaryawanpembayarans/create', [CustomerController::class, 'create'])->name('cashbonkaryawanpembayarans.create')->middleware('permission:create-cashbonkaryawanpembayarans');
-    Route::post('cashbonkaryawanpembayarans', [CustomerController::class, 'store'])->name('cashbonkaryawanpembayarans.store')->middleware('permission:create-cashbonkaryawanpembayarans');
-    Route::get('cashbonkaryawanpembayarans/{cashbonkaryawanpembayaran}', [CustomerController::class, 'show'])->name('cashbonkaryawanpembayarans.show')->middleware('permission:show-cashbonkaryawanpembayarans');
-    Route::get('cashbonkaryawanpembayarans/{cashbonkaryawanpembayaran}/edit', [CustomerController::class, 'edit'])->name('cashbonkaryawanpembayarans.edit')->middleware('permission:edit-cashbonkaryawanpembayarans');
-    Route::put('cashbonkaryawanpembayarans/{cashbonkaryawanpembayaran}', [CustomerController::class, 'update'])->name('cashbonkaryawanpembayarans.update')->middleware('permission:edit-cashbonkaryawanpembayarans');
-    Route::delete('cashbonkaryawanpembayarans/{cashbonkaryawanpembayaran}', [CustomerController::class, 'destroy'])->name('cashbonkaryawanpembayarans.destroy')->middleware('permission:delete-cashbonkaryawanpembayarans');
+    Route::get('cashbonkaryawanpembayarans', [CashbonKaryawanPembayaranController::class, 'index'])->name('cashbonkaryawanpembayarans.index')->middleware('permission:view-cashbonkaryawanpembayarans');
+    Route::get('cashbonkaryawanpembayarans/export', [CashbonKaryawanPembayaranController::class, 'export'])->name('cashbonkaryawanpembayarans.export')->middleware('permission:download-cashbonkaryawanpembayarans');
+    Route::get('cashbonkaryawanpembayarans/create', [CashbonKaryawanPembayaranController::class, 'create'])->name('cashbonkaryawanpembayarans.create')->middleware('permission:create-cashbonkaryawanpembayarans');
+    Route::post('cashbonkaryawanpembayarans', [CashbonKaryawanPembayaranController::class, 'store'])->name('cashbonkaryawanpembayarans.store')->middleware('permission:create-cashbonkaryawanpembayarans');
+    Route::get('cashbonkaryawanpembayarans/{cashbonkaryawanpembayaran}', [CashbonKaryawanPembayaranController::class, 'show'])->name('cashbonkaryawanpembayarans.show')->middleware('permission:show-cashbonkaryawanpembayarans');
+    Route::get('cashbonkaryawanpembayarans/{cashbonkaryawanpembayaran}/edit', [CashbonKaryawanPembayaranController::class, 'edit'])->name('cashbonkaryawanpembayarans.edit')->middleware('permission:edit-cashbonkaryawanpembayarans');
+    Route::put('cashbonkaryawanpembayarans/{cashbonkaryawanpembayaran}', [CashbonKaryawanPembayaranController::class, 'update'])->name('cashbonkaryawanpembayarans.update')->middleware('permission:edit-cashbonkaryawanpembayarans');
+    Route::delete('cashbonkaryawanpembayarans/{cashbonkaryawanpembayaran}', [CashbonKaryawanPembayaranController::class, 'destroy'])->name('cashbonkaryawanpembayarans.destroy')->middleware('permission:delete-cashbonkaryawanpembayarans');
     //=============================================================================================================
 
     //TODO:
