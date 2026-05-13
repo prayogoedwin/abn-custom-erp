@@ -118,6 +118,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipe</label>
                                 <select name="tipe[]" class="tipe-select produk-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="">Pilih Tipe</option>
                                     <option value="Titip">Titip</option>
                                     <option value="Jual">Jual</option>
                                 </select>
@@ -128,7 +129,7 @@
                             </div>
 
                             <div class="container-netto">
-                                <x-forms.input label="Netto" name="netto[]" type="number" step="any" class="netto-input" />
+                                <x-forms.input label="Netto" name="netto[]" type="number" class="netto-input" />
                             </div>
 
                             <div class="container-selisih">
@@ -187,7 +188,7 @@
 
             // Function to calculate values for a row
             function calculateRow(row) {
-                const nettoInput = row.querySelector('.netto-input');
+                const nettoInput = row.querySelector('#netto[]');
                 const basisHargaInput = row.querySelector('.basis-harga-input');
                 const subTotalInput = row.querySelector('.sub-total-input');
                 const pphInput = row.querySelector('.pph-input');
