@@ -35,17 +35,34 @@
 
                             </x-layouts.sidebar-two-level-link-parent>
 
-                            <x-layouts.sidebar-two-level-link-parent title="Menu Transaksi" icon="fas-receipt"
+                            <!-- Menu Transaksi -->
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Transaksi" icon="fas-exchange-alt"
                                 :active="request()->routeIs('pembelians*') || request()->routeIs('pengirimans*') || request()->routeIs('penjualans*')">
 
-                                <x-layouts.sidebar-two-level-link href="{{ route('pembelians.index') }}" icon='fas-cart-arrow-down'
+                                <x-layouts.sidebar-two-level-link href="{{ route('pembelians.index') }}" icon='fas-shopping-basket'
                                     :active="request()->routeIs('pembelians*')">Pembelian</x-layouts.sidebar-two-level-link>
 
-                                <x-layouts.sidebar-two-level-link href="{{ route('pengirimans.index') }}" icon='fas-truck'
+                                <x-layouts.sidebar-two-level-link href="{{ route('pengirimans.index') }}" icon='fas-shipping-fast'
                                     :active="request()->routeIs('pengirimans*')">Pengiriman</x-layouts.sidebar-two-level-link>
 
-                                <x-layouts.sidebar-two-level-link href="{{ route('penjualans.index') }}" icon='fas-truck'
+                                <x-layouts.sidebar-two-level-link href="{{ route('penjualans.index') }}" icon='fas-cash-register'
                                     :active="request()->routeIs('penjualans*')">Penjualan</x-layouts.sidebar-two-level-link>
+
+                            </x-layouts.sidebar-two-level-link-parent>
+
+
+                            <!-- Menu Laporan -->
+                            <x-layouts.sidebar-two-level-link-parent title="Menu Laporan" icon="fas-chart-line"
+                                :active="request()->routeIs('laporanpembelians*') || request()->routeIs('laporanpengirimans*') || request()->routeIs('laporanpenjualans*')">
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('laporanpembelians.index') }}" icon='fas-file-invoice-dollar'
+                                    :active="request()->routeIs('laporanpembelians*')">Laporan Pembelian</x-layouts.sidebar-two-level-link>
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('laporanpengirimans.index') }}" icon='fas-clipboard-list'
+                                    :active="request()->routeIs('laporanpengirimans*')">Laporan Pengiriman</x-layouts.sidebar-two-level-link>
+
+                                <x-layouts.sidebar-two-level-link href="{{ route('laporanpenjualans.index') }}" icon='fas-file-medical-alt'
+                                    :active="request()->routeIs('laporanpenjualans*')">Laporan Penjualan</x-layouts.sidebar-two-level-link>
 
                             </x-layouts.sidebar-two-level-link-parent>
 

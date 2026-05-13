@@ -171,6 +171,10 @@ class RolePermissionSeeder extends Seeder
             'download-absensis',
             'delete-absensis',
 
+            'view-laporanpengiriman',
+            'view-laporanpenjualan',
+            'view-laporanpembelian',
+
         ];
 
         foreach ($permissions as $permissionName) {

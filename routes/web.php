@@ -7,6 +7,7 @@ use App\Http\Controllers\DinamisVariableController;
 use App\Http\Controllers\HistoryHargaBasisController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\KategoriProdukController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PembelianDetailController;
 use App\Http\Controllers\PengirimanController;
@@ -274,6 +275,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('penjualandetails/{penjualan}/edit', [PenjualanDetailController::class, 'edit'])->name('penjualandetails.edit')->middleware('permission:edit-penjualandetails');
     Route::put('penjualandetails/{penjualan}/update', [PenjualanDetailController::class, 'update'])->name('penjualandetails.update')->middleware('permission:edit-penjualandetails');
+    //-------------------------------------------------------------------------------------------------
+
+    //Laporan Laporan*************************************************************************************************
+    TODO:
+    Route::get('laporanpembelian', [LaporanController::class, 'index'])->name('laporanpembelians.index')->middleware('permission:view-laporanpembelian');
+    Route::get('laporanpengiriman', [LaporanController::class, 'index'])->name('laporanpengirimans.index')->middleware('permission:view-laporanpengiriman');
+    Route::get('laporanpenjualan', [LaporanController::class, 'index'])->name('laporanpenjualans.index')->middleware('permission:view-laporanpenjualan');
+    //************************************************************************************************************
 
 
 
