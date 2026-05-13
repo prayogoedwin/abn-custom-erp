@@ -91,6 +91,39 @@
 
                             </x-layouts.sidebar-two-level-link-parent>
 
+                            <x-layouts.sidebar-two-level-link-parent title="Cashbon" icon="fas-house"
+                                :active="request()->routeIs('cashbonkaryawans*') || request()->routeIs('cashbonkaryawanpembayarans*') || request()->routeIs('cashbonsuppliers*') || request()->routeIs('cashbonsupplierpembayarans*')">
+
+
+                                <x-layouts.sidebar-three-level-parent title="Karyawan" icon="fas-house"
+                                    :active="request()->routeIs('cashbonkaryawans*') || request()->routeIs('cashbonkaryawanpembayarans*')">
+
+
+                                    <x-layouts.sidebar-three-level-link href="{{ route('cashbonkaryawans.index') }}" :active="request()->routeIs('cashbonkaryawans*')">
+                                        Cashbon
+                                    </x-layouts.sidebar-three-level-link>
+
+                                    <x-layouts.sidebar-three-level-link href="{{ route('cashbonkaryawanpembayarans.index') }}" :active="request()->routeIs('cashbonkaryawanpembayarans*')">
+                                        Pembayaran Cashbon
+                                    </x-layouts.sidebar-three-level-link>
+                                </x-layouts.sidebar-three-level-parent>
+
+                                <x-layouts.sidebar-three-level-parent title="Supplier" icon="fas-house"
+                                    :active="request()->routeIs('cashbonsuppliers*') || request()->routeIs('cashbonsupplierpembayarans*')">
+
+
+                                    <x-layouts.sidebar-three-level-link href="{{ route('cashbonsuppliers.index') }}" :active="request()->routeIs('cashbonsuppliers*')">
+                                        Cashbon
+                                    </x-layouts.sidebar-three-level-link>
+
+                                    <x-layouts.sidebar-three-level-link href="{{ route('cashbonsupplierpembayarans.index') }}" :active="request()->routeIs('cashbonsupplierpembayarans*')">
+                                        Pembayaran Cashbon
+                                    </x-layouts.sidebar-three-level-link>
+                                </x-layouts.sidebar-three-level-parent>
+
+
+                            </x-layouts.sidebar-two-level-link-parent>
+
                             <x-layouts.sidebar-two-level-link-parent title="Menu Absensi" icon="fas-calendar-check"
                                 :active="request()->routeIs('absensis*')">
 

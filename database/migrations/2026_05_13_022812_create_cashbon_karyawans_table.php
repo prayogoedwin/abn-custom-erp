@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('cashbon_karyawans', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('karyawan_id')->constrained('karyawans');
+            $table->integer('nominal_cashbon')->default(0);
+            $table->string('tipe'); // Cash/Transfer
+            $table->string('keterangan')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 

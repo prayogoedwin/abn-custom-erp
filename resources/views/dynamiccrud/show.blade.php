@@ -23,7 +23,7 @@
         <div class="flex gap-2">
             @if(auth()->user()->hasPermission('edit-' . $tablename))
             <a href="{{ route($tablename . '.edit', $data) }}">
-                <x-button type="primary">{{ __('Edit' . $tablename) }}</x-button>
+                <x-button type="primary">{{ __('Edit') }}</x-button>
             </a>
             @endif
             <a href="{{ route($tablename . '.index') }}">
@@ -42,6 +42,7 @@
                 @continue
                 @endif
 
+                @if($column['type'] === 'select' )
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {{ $column['title']}}
@@ -50,6 +51,17 @@
                         {{ $data->{$column['value']} }}
                     </div>
                 </div>
+                @else
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {{ $column['title']}}
+                    </label>
+                    <div class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        {{ $data->{$column['value']} }}
+                    </div>
+                </div>
+                @endif
 
 
                 @endforeach

@@ -98,6 +98,15 @@ class RolePermissionSeeder extends Seeder
             'download-karyawans',
             'delete-karyawans',
 
+            //cashbonkaryawans
+            'view-cashbonkaryawans',
+            'show-cashbonkaryawans',
+            'create-cashbonkaryawans',
+            'edit-cashbonkaryawans',
+            'update-cashbonkaryawans',
+            'download-cashbonkaryawans',
+            'delete-cashbonkaryawans',
+
             //dinamisvariables
             'view-dinamisvariables',
             'show-dinamisvariables',
@@ -171,6 +180,7 @@ class RolePermissionSeeder extends Seeder
             'download-absensis',
             'delete-absensis',
 
+            //laporans
             'view-laporanpengiriman',
             'view-laporanpenjualan',
             'view-laporanpembelian',
