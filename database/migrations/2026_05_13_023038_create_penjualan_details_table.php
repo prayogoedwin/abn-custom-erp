@@ -13,7 +13,22 @@ return new class extends Migration
     {
         Schema::create('penjualan_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('pengiriman_detail_id')->constrained('pengiriman_details');
+            $table->foreignId('produk_id')->constrained('produks');
+            $table->string('tipe'); // (Titip/Jual)
+            $table->float('netto_pengiriman'); // ambil dari pengiriman detail
+            $table->float('netto'); 
+            $table->float('selisih'); 
+            $table->integer('basis_harga'); 
+            $table->integer('sub_total'); //  (netto * basis harga) 
+            $table->integer('pph'); 
+            $table->integer('ppn'); 
+            $table->integer('nominal_akhir'); 
             $table->timestamps();
+            $table->softDeletes();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 

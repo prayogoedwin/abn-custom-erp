@@ -11,6 +11,8 @@ use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PembelianDetailController;
 use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\PengirimanDetailController;
+use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\PenjualanDetailController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Pihak3Controller;
 use App\Http\Controllers\ProdukController;
@@ -222,7 +224,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('absensis/{absensi}', [AbsensiController::class, 'update'])->name('absensis.update')->middleware('permission:edit-absensis');
     Route::delete('absensis/{absensi}', [AbsensiController::class, 'destroy'])->name('absensis.destroy')->middleware('permission:delete-absensis');
 
-    // Pembelians Management - dengan permission check
+    // pengirimans Management - dengan permission check---------------------------------------------------------
     Route::get('pengirimans', [PengirimanController::class, 'index'])->name('pengirimans.index')->middleware('permission:view-pengirimans');
     Route::get('pengirimans/export', [PengirimanController::class, 'export'])->name('pengirimans.export')->middleware('permission:download-pengirimans');
     Route::get('pengirimans/create', [PengirimanController::class, 'create'])->name('pengirimans.create')->middleware('permission:create-pengirimans');
@@ -244,10 +246,34 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('pengirimandetails/create/{pengiriman}', [PengirimanDetailController::class, 'create'])->name('pengirimandetails.create')->middleware('permission:create-pengirimandetails');
     Route::Post('pengirimandetails/store', [PengirimanDetailController::class, 'store'])->name('pengirimandetails.store')->middleware('permission:create-pengirimandetails');
+    //--------------------------------------------------------------------------------------------------------
+
+    // penjualans Management - dengan permission check---------------------------------------------------------
+    Route::get('penjualans', [PenjualanController::class, 'index'])->name('penjualans.index')->middleware('permission:view-penjualans');
+    Route::get('penjualans/export', [PenjualanController::class, 'export'])->name('penjualans.export')->middleware('permission:download-penjualans');
+    Route::get('penjualans/create', [PenjualanController::class, 'create'])->name('penjualans.create')->middleware('permission:create-penjualans');
+
+    Route::get('penjualans/createlanjut/{penjualan}', [PenjualanController::class, 'createlanjut'])->name('penjualans.createlanjut')->middleware('permission:create-penjualans');
+
+    Route::post('penjualans', [PenjualanController::class, 'store'])->name('penjualans.store')->middleware('permission:create-penjualans');
+
+    //storelanjut
+    Route::post('penjualans/storelanjut/{penjualan}', [PenjualanController::class, 'storelanjut'])->name('penjualans.storelanjut')->middleware('permission:create-penjualans');
 
 
-    Route::get('pengirimandetails/{pengiriman}/edit', [PengirimanDetailController::class, 'edit'])->name('pengirimandetails.edit')->middleware('permission:edit-pengirimandetails');
-    Route::put('pengirimandetails/{pengiriman}/update', [PengirimanDetailController::class, 'update'])->name('pengirimandetails.update')->middleware('permission:edit-pengirimandetails');
+    Route::get('penjualans/{penjualan}', [PenjualanController::class, 'show'])->name('penjualans.show')->middleware('permission:show-penjualans');
+    Route::get('penjualans/{penjualan}/edit', [PenjualanController::class, 'edit'])->name('penjualans.edit')->middleware('permission:edit-penjualans');
+    Route::put('penjualans/{penjualan}/update', [PenjualanController::class, 'update'])->name('penjualans.update')->middleware('permission:edit-penjualans');
+    Route::delete('penjualans/{penjualan}', [PenjualanController::class, 'destroy'])->name('penjualans.destroy')->middleware('permission:delete-penjualans');
+
+    Route::get('penjualans/{penjualan}/cetaknota', [PenjualanController::class, 'cetakNota'])->name('penjualans.cetaknota')->middleware('permission:show-penjualans');
+
+    Route::get('penjualandetails/create/{penjualan}', [PenjualanDetailController::class, 'create'])->name('penjualandetails.create')->middleware('permission:create-penjualandetails');
+    Route::Post('penjualandetails/store', [PenjualanDetailController::class, 'store'])->name('penjualandetails.store')->middleware('permission:create-penjualandetails');
+
+
+    Route::get('penjualandetails/{penjualan}/edit', [PenjualanDetailController::class, 'edit'])->name('penjualandetails.edit')->middleware('permission:edit-penjualandetails');
+    Route::put('penjualandetails/{penjualan}/update', [PenjualanDetailController::class, 'update'])->name('penjualandetails.update')->middleware('permission:edit-penjualandetails');
 
 
 
