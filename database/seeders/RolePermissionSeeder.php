@@ -116,6 +116,24 @@ class RolePermissionSeeder extends Seeder
             'download-cashbonkaryawanpembayarans',
             'delete-cashbonkaryawanpembayarans',
 
+            //cashbonsuppliers
+            'view-cashbonsuppliers',
+            'show-cashbonsuppliers',
+            'create-cashbonsuppliers',
+            'edit-cashbonsuppliers',
+            'update-cashbonsuppliers',
+            'download-cashbonsuppliers',
+            'delete-cashbonsuppliers',
+
+            //cashbonsupplierpembayarans
+            'view-cashbonsupplierpembayarans',
+            'show-cashbonsupplierpembayarans',
+            'create-cashbonsupplierpembayarans',
+            'edit-cashbonsupplierpembayarans',
+            'update-cashbonsupplierpembayarans',
+            'download-cashbonsupplierpembayarans',
+            'delete-cashbonsupplierpembayarans',
+
             //dinamisvariables
             'view-dinamisvariables',
             'show-dinamisvariables',

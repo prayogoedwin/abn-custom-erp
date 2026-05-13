@@ -4,6 +4,8 @@ use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\BackupRestoreController;
 use App\Http\Controllers\CashbonKaryawanController;
 use App\Http\Controllers\CashbonKaryawanPembayaranController;
+use App\Http\Controllers\CashbonSupplierController;
+use App\Http\Controllers\CashbonSupplierPembayaranController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DinamisVariableController;
 use App\Http\Controllers\HistoryHargaBasisController;
@@ -308,27 +310,25 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('cashbonkaryawanpembayarans/{cashbonkaryawanpembayaran}', [CashbonKaryawanPembayaranController::class, 'destroy'])->name('cashbonkaryawanpembayarans.destroy')->middleware('permission:delete-cashbonkaryawanpembayarans');
     //=============================================================================================================
 
-    //TODO:
     //Cashbon supplier==================================================================================================
-    Route::get('cashbonsuppliers', [CustomerController::class, 'index'])->name('cashbonsuppliers.index')->middleware('permission:view-cashbonsuppliers');
-    Route::get('cashbonsuppliers/export', [CustomerController::class, 'export'])->name('cashbonsuppliers.export')->middleware('permission:download-cashbonsuppliers');
-    Route::get('cashbonsuppliers/create', [CustomerController::class, 'create'])->name('cashbonsuppliers.create')->middleware('permission:create-cashbonsuppliers');
-    Route::post('cashbonsuppliers', [CustomerController::class, 'store'])->name('cashbonsuppliers.store')->middleware('permission:create-cashbonsuppliers');
-    Route::get('cashbonsuppliers/{cashbonsupplier}', [CustomerController::class, 'show'])->name('cashbonsuppliers.show')->middleware('permission:show-cashbonsuppliers');
-    Route::get('cashbonsuppliers/{cashbonsupplier}/edit', [CustomerController::class, 'edit'])->name('cashbonsuppliers.edit')->middleware('permission:edit-cashbonsuppliers');
-    Route::put('cashbonsuppliers/{cashbonsupplier}', [CustomerController::class, 'update'])->name('cashbonsuppliers.update')->middleware('permission:edit-cashbonsuppliers');
-    Route::delete('cashbonsuppliers/{cashbonsupplier}', [CustomerController::class, 'destroy'])->name('cashbonsuppliers.destroy')->middleware('permission:delete-cashbonsuppliers');
+    Route::get('cashbonsuppliers', [CashbonSupplierController::class, 'index'])->name('cashbonsuppliers.index')->middleware('permission:view-cashbonsuppliers');
+    Route::get('cashbonsuppliers/export', [CashbonSupplierController::class, 'export'])->name('cashbonsuppliers.export')->middleware('permission:download-cashbonsuppliers');
+    Route::get('cashbonsuppliers/create', [CashbonSupplierController::class, 'create'])->name('cashbonsuppliers.create')->middleware('permission:create-cashbonsuppliers');
+    Route::post('cashbonsuppliers', [CashbonSupplierController::class, 'store'])->name('cashbonsuppliers.store')->middleware('permission:create-cashbonsuppliers');
+    Route::get('cashbonsuppliers/{cashbonsupplier}', [CashbonSupplierController::class, 'show'])->name('cashbonsuppliers.show')->middleware('permission:show-cashbonsuppliers');
+    Route::get('cashbonsuppliers/{cashbonsupplier}/edit', [CashbonSupplierController::class, 'edit'])->name('cashbonsuppliers.edit')->middleware('permission:edit-cashbonsuppliers');
+    Route::put('cashbonsuppliers/{cashbonsupplier}', [CashbonSupplierController::class, 'update'])->name('cashbonsuppliers.update')->middleware('permission:edit-cashbonsuppliers');
+    Route::delete('cashbonsuppliers/{cashbonsupplier}', [CashbonSupplierController::class, 'destroy'])->name('cashbonsuppliers.destroy')->middleware('permission:delete-cashbonsuppliers');
 
-    //TODO:
     //pembayaran
-    Route::get('cashbonsupplierpembayarans', [CustomerController::class, 'index'])->name('cashbonsupplierpembayarans.index')->middleware('permission:view-cashbonsupplierpembayarans');
-    Route::get('cashbonsupplierpembayarans/export', [CustomerController::class, 'export'])->name('cashbonsupplierpembayarans.export')->middleware('permission:download-cashbonsupplierpembayarans');
-    Route::get('cashbonsupplierpembayarans/create', [CustomerController::class, 'create'])->name('cashbonsupplierpembayarans.create')->middleware('permission:create-cashbonsupplierpembayarans');
-    Route::post('cashbonsupplierpembayarans', [CustomerController::class, 'store'])->name('cashbonsupplierpembayarans.store')->middleware('permission:create-cashbonsupplierpembayarans');
-    Route::get('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CustomerController::class, 'show'])->name('cashbonsupplierpembayarans.show')->middleware('permission:show-cashbonsupplierpembayarans');
-    Route::get('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}/edit', [CustomerController::class, 'edit'])->name('cashbonsupplierpembayarans.edit')->middleware('permission:edit-cashbonsupplierpembayarans');
-    Route::put('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CustomerController::class, 'update'])->name('cashbonsupplierpembayarans.update')->middleware('permission:edit-cashbonsupplierpembayarans');
-    Route::delete('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CustomerController::class, 'destroy'])->name('cashbonsupplierpembayarans.destroy')->middleware('permission:delete-cashbonsupplierpembayarans');
+    Route::get('cashbonsupplierpembayarans', [CashbonSupplierPembayaranController::class, 'index'])->name('cashbonsupplierpembayarans.index')->middleware('permission:view-cashbonsupplierpembayarans');
+    Route::get('cashbonsupplierpembayarans/export', [CashbonSupplierPembayaranController::class, 'export'])->name('cashbonsupplierpembayarans.export')->middleware('permission:download-cashbonsupplierpembayarans');
+    Route::get('cashbonsupplierpembayarans/create', [CashbonSupplierPembayaranController::class, 'create'])->name('cashbonsupplierpembayarans.create')->middleware('permission:create-cashbonsupplierpembayarans');
+    Route::post('cashbonsupplierpembayarans', [CashbonSupplierPembayaranController::class, 'store'])->name('cashbonsupplierpembayarans.store')->middleware('permission:create-cashbonsupplierpembayarans');
+    Route::get('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CashbonSupplierPembayaranController::class, 'show'])->name('cashbonsupplierpembayarans.show')->middleware('permission:show-cashbonsupplierpembayarans');
+    Route::get('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}/edit', [CashbonSupplierPembayaranController::class, 'edit'])->name('cashbonsupplierpembayarans.edit')->middleware('permission:edit-cashbonsupplierpembayarans');
+    Route::put('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CashbonSupplierPembayaranController::class, 'update'])->name('cashbonsupplierpembayarans.update')->middleware('permission:edit-cashbonsupplierpembayarans');
+    Route::delete('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CashbonSupplierPembayaranController::class, 'destroy'])->name('cashbonsupplierpembayarans.destroy')->middleware('permission:delete-cashbonsupplierpembayarans');
     //=============================================================================================================
 
 
