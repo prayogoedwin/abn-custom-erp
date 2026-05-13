@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\PenjualanExport;
 use App\Models\Customer;
 use App\Models\Pengiriman;
+use App\Models\PengirimanDetail;
 use App\Models\Penjualan;
 use App\Models\PenjualanDetail;
 use App\Models\SimpanPinjamSupplier;
@@ -70,14 +71,14 @@ class PenjualanController extends Controller
                     })->toArray(),
                 ]],
 
-                ['name' => 'customer_id', 'value' => 'customer',  'title' => 'Customer', 'type' => 'select', 'inform' => true, 'intable' => true, 'options' => [
+                ['name' => 'customer_id', 'value' => 'customer',  'title' => 'Customer', 'type' => 'select', 'inform' => false, 'intable' => true, 'options' => [
                     // Ambil data kategori dari database
 
                     ...$customers->map(function ($customer) {
                         return ['value' => $customer->id, 'label' => $customer->nama];
                     })->toArray(),
                 ]],
-                ['name' => 'nopol', 'value' => 'nopol',  'title' => 'Nopol', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
+                
 
             ],
         ];
@@ -147,11 +148,14 @@ class PenjualanController extends Controller
     public function create(): View
     {
         $customers = Customer::where('deleted_at', null)->get();
-        $pengiriman = Pengiriman::where('deleted_at', null)->get();
+        $pengirimans = Pengiriman::where('deleted_at', null)->get();
+        $pengirimandetails = PengirimanDetail::where('deleted_at', null)->get();
+
+        
 
         $pagedata = $this->getPagedata();
 
-        return view('penjualans.create', compact('customers', 'pengiriman'), $pagedata);
+        return view('penjualans.create', compact('customers', 'pengirimans', 'pengirimandetails'), $pagedata);
     }
 
 
@@ -159,19 +163,21 @@ class PenjualanController extends Controller
     {
 
         $store_data = [
-            'nopol' => $request->input('nopol'),
-            'customer_id' => $request->input('customer_id'),
+            
+            'pengiriman_id' => $request->input('pengiriman_id'),
 
             'created_by' => auth()->id(),
         ];
 
-        //$store_data['no_transaksi'] = terjadi di model
+        $pengiriman = Pengiriman::find($store_data['pengiriman_id']);
+
+        $store_data['no_transaksi_penjualan'] = $pengiriman->no_transaksi;
+        $store_data['customer_id'] = $pengiriman->customer_id;
 
 
 
         $validate = Validator::make($store_data, [
-            'nopol' => ['required', 'string', 'max:255'],
-            'customer_id' => ['required', 'integer', 'max:255'],
+            'pengiriman_id' => ['required', 'integer', 'max:255'],
 
             'created_by' => ['required', 'integer']
         ]);
