@@ -8,6 +8,7 @@ use App\Models\Pengiriman;
 use App\Models\PengirimanDetail;
 use App\Models\Penjualan;
 use App\Models\PenjualanDetail;
+use App\Models\Produk;
 use App\Models\SimpanPinjamSupplier;
 use App\Models\Supplier;
 use App\Models\User;
@@ -150,12 +151,13 @@ class PenjualanController extends Controller
         $customers = Customer::where('deleted_at', null)->get();
         $pengirimans = Pengiriman::where('deleted_at', null)->get();
         $pengirimandetails = PengirimanDetail::where('deleted_at', null)->get();
+        $produks = Produk::where('deleted_at', null)->get();
 
         
 
         $pagedata = $this->getPagedata();
 
-        return view('penjualans.create', compact('customers', 'pengirimans', 'pengirimandetails'), $pagedata);
+        return view('penjualans.create', compact('customers', 'pengirimans', 'pengirimandetails', 'produks'), $pagedata);
     }
 
 

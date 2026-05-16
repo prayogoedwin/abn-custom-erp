@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nama_produk');
             $table->string('satuan');
             $table->integer('harga_basis_pembelian');
+            $table->integer('harga_basis_penjualan');
             $table->float('stok_akhir');
             $table->boolean('isactive')->default(true);
 

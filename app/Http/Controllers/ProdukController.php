@@ -36,6 +36,7 @@ class ProdukController extends Controller
                 ]],
                 ['name' => 'satuan', 'value' => 'satuan', 'title' => 'Satuan', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'harga_basis_pembelian', 'value' => 'harga_basis_pembelian', 'title' => 'Harga Basis Pembelian', 'type' => 'number', 'inform' => true, 'intable' => true],
+                ['name' => 'harga_basis_pembelian', 'value' => 'harga_basis_penjualan', 'title' => 'Harga Basis Penjualan', 'type' => 'number', 'inform' => true, 'intable' => true],
                 ['name' => 'stok_akhir', 'value' => 'stok_akhir', 'title' => 'Stok Akhir', 'type' => 'number', 'inform' => true, 'intable' => true],
             ],
         ];

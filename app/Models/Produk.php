@@ -22,6 +22,7 @@ class Produk extends Model
         'nama_produk',
         'satuan',
         'harga_basis_pembelian',
+        'harga_basis_penjualan',
         'stok_akhir',
         'isactive',
         'created_by',
