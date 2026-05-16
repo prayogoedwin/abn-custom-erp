@@ -138,7 +138,27 @@
                                 <x-layouts.sidebar-two-level-link href="{{ route('laporanpenjualans.index') }}" icon='fas-file-medical-alt'
                                     :active="request()->routeIs('laporanpenjualans*')">Laporan Penjualan</x-layouts.sidebar-two-level-link>
 
+                                <x-layouts.sidebar-two-level-link href="#" icon='fas-clipboard'
+                                    :active="request()->routeIs('laporanpenjualans*')">
+                                    DLL
+                                </x-layouts.sidebar-two-level-link>
+                                <x-layouts.sidebar-two-level-link href="#" icon='fas-clipboard'
+                                    :active="request()->routeIs('laporanpenjualans*')">
+                                    DLL
+                                </x-layouts.sidebar-two-level-link>
+                                <x-layouts.sidebar-two-level-link href="#" icon='fas-clipboard'
+                                    :active="request()->routeIs('laporanpenjualans*')">
+                                    DLL
+                                </x-layouts.sidebar-two-level-link>
+
                             </x-layouts.sidebar-two-level-link-parent>
+
+                            <x-layouts.sidebar-link href="" icon='fas-clipboard'
+                                >DLL</x-layouts.sidebar-link>
+                            <x-layouts.sidebar-link href="" icon='fas-clipboard'
+                                >DLL</x-layouts.sidebar-link>
+                            <x-layouts.sidebar-link href="" icon='fas-clipboard'
+                                >DLL</x-layouts.sidebar-link>
 
 
                         </ul>
