@@ -242,15 +242,18 @@ class PenjualanController extends Controller
 
     public function show(int $id): View
     {
-        $pengiriman = Penjualan::find($id);
-        $pengiriman->details = PenjualanDetail::where('pengiriman_id', $id)->get();
-        $pengiriman->supplier = Supplier::find($pengiriman->customer_id);
+        $penjualan = Penjualan::find($id);
+        // dd($penjualan);
+
+        // dd($penjualan->details);
+        // dd(PenjualanDetail::get());
+        
 
         $pagedata = $this->getPagedata();
 
 
 
-        return view('penjualans.show', compact('pengiriman'), $pagedata);
+        return view('penjualans.show', compact('penjualan'), $pagedata);
     }
 
     public function edit(Penjualan $pengiriman): View
