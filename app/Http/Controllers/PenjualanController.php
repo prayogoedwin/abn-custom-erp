@@ -307,9 +307,10 @@ class PenjualanController extends Controller
     }
 
     //soft delete
-    public function destroy(Penjualan $pengiriman): RedirectResponse
+    public function destroy(Penjualan $penjualan): RedirectResponse
     {
-        $pengiriman->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
+
+        $penjualan->update(['deleted_by' => auth()->id(), 'deleted_at' => now()]);
 
 
         return to_route('penjualans.index')->with('status', 'Penjualan deleted successfully.');
