@@ -197,6 +197,23 @@ class PenjualanController extends Controller
 
                 $pengirimandetail = PengirimanDetail::find($pengiriman_detail_id);
 
+                $detail = [
+                    'selisih' => $request->selisih[$index],
+                    'sub_total' => $request->sub_total[$index],
+                    'pph' => $request->pph[$index],
+                    'ppn' => $request->ppn[$index],
+                    'nominal_akhir' => $request->nominal_akhir[$index],
+                ];
+
+                if ( $request->tipe[$index] == "Titip"){
+                    $detail['selisih'] = 0;
+                    $detail['sub_total'] = 0;
+                    $detail['pph'] = 0;
+                    $detail['ppn'] = 0;
+                    $detail['nominal_akhir'] = 0;
+                    
+                }
+
                 PenjualanDetail::create([
                     'penjualan_id' => $penjualans->id,
                     'pengiriman_detail_id' => $request->pengiriman_detail_id[$index],
@@ -204,12 +221,12 @@ class PenjualanController extends Controller
                     'tipe'    => $request->tipe[$index],
                     'netto_pengiriman'    => $pengirimandetail->netto,
                     'netto'    => $request->netto[$index],
-                    'selisih'    => $request->selisih[$index],
+                    'selisih'    => $detail['selisih'],
                     'basis_harga'    => $request->basis_harga[$index],
-                    'sub_total'    => $request->sub_total[$index],
-                    'pph'    => $request->pph[$index] ? $request->pph[$index] : 0,
-                    'ppn'    => $request->ppn[$index],
-                    'nominal_akhir'    => $request->nominal_akhir[$index],
+                    'sub_total'    => $detail['sub_total'],
+                    'pph'    => $detail['pph'] ? $detail['pph'] : 0,
+                    'ppn'    => $detail['ppn'],
+                    'nominal_akhir'    => $detail['nominal_akhir'],
 
                     'created_by' => $store_data['created_by'],
                 ]);
