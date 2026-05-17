@@ -5,7 +5,7 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <a href="{{ route('produks.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $title ?? __('Produks') }}</a>
+        <a href="{{ route($tablename . '.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $title ?? __('Produks') }}</a>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -356,7 +356,8 @@
     </script>
 
 
-
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
     <style>
         .ts-wrapper.single .ts-control {
@@ -405,20 +406,20 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const customerSelect = document.querySelector('select.searchable-select');
+            const pengirimanSelect = document.querySelector('select.searchable-select');
 
-            if (customerSelect) {
-                new TomSelect(customerSelect, {
+            if (pengirimanSelect) {
+                new TomSelect(pengirimanSelect, {
                     create: false,
                     allowEmptyOption: true,
                     maxOptions: 25,
                     closeAfterSelect: true,
                     openOnFocus: false,
                     hidePlaceholder: false,
-                    placeholder: customerSelect.getAttribute('placeholder') || 'Ketik nama customer...',
+                    placeholder: pengirimanSelect.getAttribute('placeholder') || 'Ketik pengiriman...',
                     render: {
                         no_results: function() {
-                            return '<div class="no-results">Supplier tidak ditemukan</div>';
+                            return '<div class="no-results">pengiriman tidak ditemukan</div>';
                         }
                     }
                 });

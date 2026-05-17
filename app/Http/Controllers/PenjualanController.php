@@ -205,13 +205,12 @@ class PenjualanController extends Controller
                     'nominal_akhir' => $request->nominal_akhir[$index],
                 ];
 
-                if ( $request->tipe[$index] == "Titip"){
+                if ($request->tipe[$index] == "Titip") {
                     $detail['selisih'] = 0;
                     $detail['sub_total'] = 0;
                     $detail['pph'] = 0;
                     $detail['ppn'] = 0;
                     $detail['nominal_akhir'] = 0;
-                    
                 }
 
                 PenjualanDetail::create([
@@ -247,7 +246,7 @@ class PenjualanController extends Controller
 
         // dd($penjualan->details);
         // dd(PenjualanDetail::get());
-        
+
 
         $pagedata = $this->getPagedata();
 
@@ -256,15 +255,21 @@ class PenjualanController extends Controller
         return view('penjualans.show', compact('penjualan'), $pagedata);
     }
 
-    public function edit(Penjualan $pengiriman): View
+    public function edit(Penjualan $penjualan): View
     {
 
-        $data = $pengiriman;
+        $data = $penjualan;
 
+        $customers = Customer::where('deleted_at', null)->get();
+        $pengirimans = Pengiriman::where('deleted_at', null)->get();
+        $pengirimandetails = PengirimanDetail::where('deleted_at', null)->get();
+        $produks = Produk::where('deleted_at', null)->get();
+
+        // dd($data);
 
         $pagedata = $this->getPagedata();
 
-        return view('penjualans.edit', compact('data'), $pagedata);
+        return view('penjualans.edit', compact('data', 'customers', 'pengirimans', 'pengirimandetails', 'produks'), $pagedata);
     }
 
     public function update(Request $request, Penjualan $pengiriman): RedirectResponse
