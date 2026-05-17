@@ -28,6 +28,7 @@ class PenjualanDetail extends Model
     //     });
 
     protected $fillable = [
+        'penjualan_id',
         'pengiriman_detail_id',
         'produk_id',
         'tipe',
@@ -54,4 +55,10 @@ class PenjualanDetail extends Model
     {
         return $this->belongsTo(Produk::class);
     }
+
+    public function penjualan()
+    {
+        return $this->belongsTo(Penjualan::class);
+    }
+
 }

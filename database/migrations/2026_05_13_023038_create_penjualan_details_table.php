@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('penjualan_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('penjualan_id')->constrained('penjualans');
             $table->foreignId('pengiriman_detail_id')->constrained('pengiriman_details');
             $table->foreignId('produk_id')->constrained('produks');
             $table->string('tipe'); // (Titip/Jual)

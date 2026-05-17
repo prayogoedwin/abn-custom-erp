@@ -79,7 +79,7 @@ class PenjualanController extends Controller
                         return ['value' => $customer->id, 'label' => $customer->nama];
                     })->toArray(),
                 ]],
-                
+
 
             ],
         ];
@@ -153,7 +153,7 @@ class PenjualanController extends Controller
         $pengirimandetails = PengirimanDetail::where('deleted_at', null)->get();
         $produks = Produk::where('deleted_at', null)->get();
 
-        
+
 
         $pagedata = $this->getPagedata();
 
@@ -164,18 +164,19 @@ class PenjualanController extends Controller
     public function store(Request $request): RedirectResponse
     {
 
+        // dd($request->all());
+        // dd(PengirimanDetail::find(1));
+
+
         $store_data = [
-            
             'pengiriman_id' => $request->input('pengiriman_id'),
 
             'created_by' => auth()->id(),
         ];
 
         $pengiriman = Pengiriman::find($store_data['pengiriman_id']);
-
         $store_data['no_transaksi_penjualan'] = $pengiriman->no_transaksi;
-        $store_data['customer_id'] = $pengiriman->customer_id;
-
+        $store_data['customer_id'] = $pengiriman->customer->id;
 
 
         $validate = Validator::make($store_data, [
@@ -190,11 +191,35 @@ class PenjualanController extends Controller
         }
 
 
-        $pengiriman = Penjualan::create($store_data);
+        $penjualans = Penjualan::create($store_data);
+        foreach ($request->pengiriman_detail_id as $index => $pengiriman_detail_id) {
+            if ($pengiriman_detail_id) {
+
+                $pengirimandetail = PengirimanDetail::find($pengiriman_detail_id);
+
+                PenjualanDetail::create([
+                    'penjualan_id' => $penjualans->id,
+                    'pengiriman_detail_id' => $request->pengiriman_detail_id[$index],
+                    'produk_id' => $request->produk_id[$index],
+                    'tipe'    => $request->tipe[$index],
+                    'netto_pengiriman'    => $pengirimandetail->netto,
+                    'netto'    => $request->netto[$index],
+                    'selisih'    => $request->selisih[$index],
+                    'basis_harga'    => $request->basis_harga[$index],
+                    'sub_total'    => $request->sub_total[$index],
+                    'pph'    => $request->pph[$index] ? $request->pph[$index] : 0,
+                    'ppn'    => $request->ppn[$index],
+                    'nominal_akhir'    => $request->nominal_akhir[$index],
+
+                    'created_by' => $store_data['created_by'],
+                ]);
+            }
+        }
 
 
 
-        return to_route('pengirimandetails.create', $pengiriman->id);
+
+        return to_route('penjualans.index')->with('status', "penjualans created succesfully");
     }
 
 

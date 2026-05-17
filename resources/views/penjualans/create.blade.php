@@ -20,7 +20,7 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-6">
-            <form action="{{ route('pengirimans.store') }}" method="POST" class="max-w-3xl">
+            <form action="{{ route('penjualans.store') }}" method="POST" class="max-w-3xl">
                 @csrf
                 @method('POST')
 
@@ -34,7 +34,7 @@
                     </label>
 
                     <select
-                        name="penjualan_id"
+                        name="pengiriman_id"
                         id="pengiriman-select"
                         placeholder="Ketik nama customer..."
                         class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/40 searchable-select">
@@ -49,7 +49,7 @@
                         @endforeach
                     </select>
 
-                    @error('penjualan_id')
+                    @error('pengiriman_id')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
@@ -112,6 +112,9 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div hidden>
+                                <input type="text" name="produk_id[]" class="produk-id">
+                            </div>
+                            <div hidden>
                                 <input type="text" name="pengiriman_detail_id[]" class="pengiriman-detail-id">
                             </div>
 
@@ -142,16 +145,20 @@
 
                             <div class="container-sub_total">
                                 <x-forms.input label="Sub Total" name="sub_total[]" type="number" step="any" readonly />
-                                <p class="text-xs text-gray-500 mt-1">*netto * basis harga</p>
+                                <p class="text-xs text-gray-500 mt-1">netto * basis harga</p>
                             </div>
                             <div class="container-pph">
                                 <x-forms.input label="PPH" name="pph[]" type="number" step="any" />
                             </div>
                             <div class="container-ppn">
                                 <x-forms.input label="PPN" name="ppn[]" type="number" step="any" />
+                                <p class="text-xs text-gray-500 mt-1">sub total * 12 %</p>
+
                             </div>
                             <div class="container-nominal_akhir">
                                 <x-forms.input label="Nominal Akhir" name="nominal_akhir[]" type="number" step="any" readonly=true />
+                                <p class="text-xs text-gray-500 mt-1">sub total - ppn - pph</p>
+
                             </div>
 
                             <div class="container-button_calculate">
@@ -210,11 +217,15 @@
                 const netto = parseFloat(nettoInput.value) || 0;
                 const basisHarga = parseFloat(basisHargaInput.value) || 0;
                 const pph = parseFloat(pphInput.value) || 0;
-                const ppn = parseFloat(ppnInput.value) || 0;
 
                 // Calculate sub total
                 const subTotal = netto * basisHarga;
                 subTotalInput.value = subTotal.toFixed(2);
+
+                const ppn = parseFloat(ppnInput.value) || subTotal * 0.12; //ppn = 12%
+                ppnInput.value = ppn.toFixed(2);
+
+
 
                 // Calculate nominal akhir (sub total + ppn - pph)
                 const nominalAkhir = subTotal + ppn - pph;
@@ -224,7 +235,7 @@
 
                 const nettoPengiriman = parseFloat(nettoPengirimanInput.value) || 0;
                 const selisih = nettoPengiriman - netto;
-                selisihInput.value = selisih.toFixed(2);
+                selisihInput.value = selisih;
 
             }
 
@@ -236,7 +247,33 @@
                     calculateBtn.addEventListener('click', () => calculateRow(row));
                 }
 
+                // Handle tipe change (show/hide netto_pengiriman)
+                const tipeSelect = row.querySelector('.tipe-select');
+                const containerNettoPengiriman = row.querySelector('.container-netto_pengiriman');
+                const basisHargaDiv = row.querySelector('.container-basis_harga');
+                const subTotalDiv = row.querySelector('.container-sub_total');
+                const pphDiv = row.querySelector('.container-pph');
+                const ppnDiv = row.querySelector('.container-ppn');
+                const nominalAkhirDiv = row.querySelector('.container-nominal_akhir');
+                const selisihDiv = row.querySelector('.container-selisih');
 
+                tipeSelect.addEventListener('change', function() {
+                    if (this.value === 'Titip') {
+                        basisHargaDiv.classList.add('hidden');
+                        subTotalDiv.classList.add('hidden');
+                        pphDiv.classList.add('hidden');
+                        ppnDiv.classList.add('hidden');
+                        nominalAkhirDiv.classList.add('hidden');
+                        selisihDiv.classList.add('hidden');
+                    } else {
+                        basisHargaDiv.classList.remove('hidden');
+                        subTotalDiv.classList.remove('hidden');
+                        pphDiv.classList.remove('hidden');
+                        ppnDiv.classList.remove('hidden');
+                        nominalAkhirDiv.classList.remove('hidden');
+                        selisihDiv.classList.remove('hidden');
+                    }
+                });
             }
 
             // Function to create product rows from pengiriman details
@@ -262,6 +299,7 @@
                     // Set pengiriman_detail_id
                     rowDiv.querySelector('.pengiriman-detail-id').value = detail.id;
                     let produk_id = detail.produk_id;
+                    rowDiv.querySelector('.produk-id').value = produk_id;
                     let produkTerpilih = Produks.find(produk => produk.id == produk_id);
                     let basis_harga_penjualan = produkTerpilih.harga_basis_penjualan;
                     // Set quick info
