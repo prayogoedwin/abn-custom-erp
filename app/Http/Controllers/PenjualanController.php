@@ -91,15 +91,17 @@ class PenjualanController extends Controller
     {
         // dd($request->headers->all());
         // $penjualans = Penjualan::join('customers', 'penjualans.customer_id', '=', 'customers.id')
-        //         // Select everything from pengiriman, and specific fields from users
-        //         ->select('penjualans.*', 'customers.nama as customer')
-        //         ->where('penjualans.deleted_at', null)
-        //         ->get();
+        //     ->join('pengirimans', 'penjualans.pengiriman_id', '=', 'pengirimans.id')
+
+        //     // Select everything from pengiriman, and specific fields from users
+        //     ->select('penjualans.*', 'customers.nama as customer')
+        //     ->where('penjualans.deleted_at', null)
+        //     ->get();
         // dd($penjualans);
         if ($request->ajax()) {
             // dd('masuk ajax');
             $penjualans = Penjualan::join('customers', 'penjualans.customer_id', '=', 'customers.id')
-                ->join('pengirimans', 'penjualans.customer_id', '=', 'pengirimans.id')
+                ->join('pengirimans', 'penjualans.pengiriman_id', '=', 'pengirimans.id')
                 // Select everything from pengiriman, and specific fields from users
                 ->select('penjualans.*', 'customers.nama as customer', 'pengirimans.no_transaksi as pengiriman')
                 ->where('penjualans.deleted_at', null)
@@ -191,46 +193,49 @@ class PenjualanController extends Controller
         }
 
 
-        $penjualans = Penjualan::create($store_data);
-        foreach ($request->pengiriman_detail_id as $index => $pengiriman_detail_id) {
-            if ($pengiriman_detail_id) {
+        $penjualan = Penjualan::create($store_data);
+        if ($request->pengiriman_detail_id != null) {
+            foreach ($request->pengiriman_detail_id as $index => $pengiriman_detail_id) {
+                if ($pengiriman_detail_id) {
 
-                $pengirimandetail = PengirimanDetail::find($pengiriman_detail_id);
+                    $pengirimandetail = PengirimanDetail::find($pengiriman_detail_id);
 
-                $detail = [
-                    'selisih' => $request->selisih[$index],
-                    'sub_total' => $request->sub_total[$index],
-                    'pph' => $request->pph[$index],
-                    'ppn' => $request->ppn[$index],
-                    'nominal_akhir' => $request->nominal_akhir[$index],
-                ];
+                    $detail = [
+                        'selisih' => $request->selisih[$index],
+                        'sub_total' => $request->sub_total[$index],
+                        'pph' => $request->pph[$index],
+                        'ppn' => $request->ppn[$index],
+                        'nominal_akhir' => $request->nominal_akhir[$index],
+                    ];
 
-                if ($request->tipe[$index] == "Titip") {
-                    $detail['selisih'] = 0;
-                    $detail['sub_total'] = 0;
-                    $detail['pph'] = 0;
-                    $detail['ppn'] = 0;
-                    $detail['nominal_akhir'] = 0;
+                    if ($request->tipe[$index] == "Titip") {
+                        $detail['selisih'] = 0;
+                        $detail['sub_total'] = 0;
+                        $detail['pph'] = 0;
+                        $detail['ppn'] = 0;
+                        $detail['nominal_akhir'] = 0;
+                    }
+
+                    PenjualanDetail::create([
+                        'penjualan_id' => $penjualan->id,
+                        'pengiriman_detail_id' => $request->pengiriman_detail_id[$index],
+                        'produk_id' => $request->produk_id[$index],
+                        'tipe'    => $request->tipe[$index],
+                        'netto_pengiriman'    => $pengirimandetail->netto,
+                        'netto'    => $request->netto[$index],
+                        'selisih'    => $detail['selisih'],
+                        'basis_harga'    => $request->basis_harga[$index],
+                        'sub_total'    => $detail['sub_total'],
+                        'pph'    => $detail['pph'] ? $detail['pph'] : 0,
+                        'ppn'    => $detail['ppn'],
+                        'nominal_akhir'    => $detail['nominal_akhir'],
+
+                        'created_by' => $store_data['created_by'],
+                    ]);
                 }
-
-                PenjualanDetail::create([
-                    'penjualan_id' => $penjualans->id,
-                    'pengiriman_detail_id' => $request->pengiriman_detail_id[$index],
-                    'produk_id' => $request->produk_id[$index],
-                    'tipe'    => $request->tipe[$index],
-                    'netto_pengiriman'    => $pengirimandetail->netto,
-                    'netto'    => $request->netto[$index],
-                    'selisih'    => $detail['selisih'],
-                    'basis_harga'    => $request->basis_harga[$index],
-                    'sub_total'    => $detail['sub_total'],
-                    'pph'    => $detail['pph'] ? $detail['pph'] : 0,
-                    'ppn'    => $detail['ppn'],
-                    'nominal_akhir'    => $detail['nominal_akhir'],
-
-                    'created_by' => $store_data['created_by'],
-                ]);
             }
         }
+
 
 
 
@@ -272,28 +277,23 @@ class PenjualanController extends Controller
         return view('penjualans.edit', compact('data', 'customers', 'pengirimans', 'pengirimandetails', 'produks'), $pagedata);
     }
 
-    public function update(Request $request, Penjualan $pengiriman): RedirectResponse
+    public function update(Request $request, Penjualan $penjualan): RedirectResponse
     {
-        // dd($request->all());
-
-
-        // dd("current user id: " . $current_user_id);
         $store_data = [
-            'nopol' => $request->input('nopol'),
-            'customer_id' => $request->input('customer_id'),
+            'pengiriman_id' => $request->input('pengiriman_id'),
 
-            'updated_by' => auth()->id(),
+            'created_by' => auth()->id(),
         ];
 
-        //$store_data['no_transaksi'] = terjadi di model
-
+        $pengiriman = Pengiriman::find($store_data['pengiriman_id']);
+        $store_data['no_transaksi_penjualan'] = $pengiriman->no_transaksi;
+        $store_data['customer_id'] = $pengiriman->customer->id;
 
 
         $validate = Validator::make($store_data, [
-            'nopol' => ['required', 'string', 'max:255'],
-            'customer_id' => ['required', 'integer', 'max:255'],
+            'pengiriman_id' => ['required', 'integer', 'max:255'],
 
-            'updated_by' => ['required', 'integer']
+            'created_by' => ['required', 'integer']
         ]);
 
 
@@ -302,13 +302,56 @@ class PenjualanController extends Controller
         }
 
 
+        $penjualan->update($store_data);
+        // Hapus semua dulu
+        PenjualanDetail::where('penjualan_id', $penjualan->id)->delete();
 
-        $pengiriman->update($store_data);
+        if ($request->pengiriman_detail_id != null) {
+            foreach ($request->pengiriman_detail_id as $index => $pengiriman_detail_id) {
+                if ($pengiriman_detail_id) {
+
+                    $pengirimandetail = PengirimanDetail::find($pengiriman_detail_id);
+
+                    $detail = [
+                        'selisih' => $request->selisih[$index],
+                        'sub_total' => $request->sub_total[$index],
+                        'pph' => $request->pph[$index],
+                        'ppn' => $request->ppn[$index],
+                        'nominal_akhir' => $request->nominal_akhir[$index],
+                    ];
+
+                    if ($request->tipe[$index] == "Titip") {
+                        $detail['selisih'] = 0;
+                        $detail['sub_total'] = 0;
+                        $detail['pph'] = 0;
+                        $detail['ppn'] = 0;
+                        $detail['nominal_akhir'] = 0;
+                    }
+
+                    PenjualanDetail::create([
+                        'penjualan_id' => $penjualan->id,
+                        'pengiriman_detail_id' => $request->pengiriman_detail_id[$index],
+                        'produk_id' => $request->produk_id[$index],
+                        'tipe'    => $request->tipe[$index],
+                        'netto_pengiriman'    => $pengirimandetail->netto,
+                        'netto'    => $request->netto[$index],
+                        'selisih'    => $detail['selisih'],
+                        'basis_harga'    => $request->basis_harga[$index],
+                        'sub_total'    => $detail['sub_total'],
+                        'pph'    => $detail['pph'] ? $detail['pph'] : 0,
+                        'ppn'    => $detail['ppn'],
+                        'nominal_akhir'    => $detail['nominal_akhir'],
+
+                        'created_by' => $store_data['created_by'],
+                    ]);
+                }
+            }
+        }
 
 
 
 
-        return to_route('pengirimandetails.edit', $pengiriman->id);
+        return to_route('penjualans.index')->with('status', 'Penjualan updated successfully.');
     }
 
     //soft delete

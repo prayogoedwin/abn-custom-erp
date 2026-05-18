@@ -251,6 +251,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('pengirimandetails/create/{pengiriman}', [PengirimanDetailController::class, 'create'])->name('pengirimandetails.create')->middleware('permission:create-pengirimandetails');
     Route::Post('pengirimandetails/store', [PengirimanDetailController::class, 'store'])->name('pengirimandetails.store')->middleware('permission:create-pengirimandetails');
+    
+    Route::get('pengirimandetails/edit/{pengiriman}', [PengirimanDetailController::class, 'edit'])->name('pengirimandetails.edit')->middleware('permission:edit-pengirimandetails');
+    Route::put('pengirimandetails/update', [PengirimanDetailController::class, 'update'])->name('pengirimandetails.update')->middleware('permission:edit-pengirimandetails');
     //--------------------------------------------------------------------------------------------------------
 
     // penjualans Management - dengan permission check---------------------------------------------------------

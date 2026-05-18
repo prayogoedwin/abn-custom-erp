@@ -124,18 +124,20 @@
                                 <input type="text" name="pengiriman_detail_id[]" class="pengiriman-detail-id">
                             </div>
 
+                            <div hidden>
+                                <input type="text" name="netto_pengiriman[]" class="netto-pengiriman" />
+                            </div>
+
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipe</label>
                                 <select name="tipe[]" class="tipe-select produk-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                    <option value="">Pilih Tipe</option>
-                                    <option value="Titip">Titip</option>
                                     <option value="Jual">Jual</option>
+                                    <option value="Titip">Titip</option>
+
                                 </select>
                             </div>
 
-                            <div class="container-netto_pengiriman hidden">
-                                <x-forms.input append="satuan" label="Netto Pengiriman" name="netto_pengiriman[]" type="number" step="any" />
-                            </div>
+
 
                             <div class="container-netto">
                                 <x-forms.input label="Netto" name="netto[]" type="number" />
@@ -216,8 +218,7 @@
                 const nominalAkhirInput = nominalAkhirDiv.querySelector('input');
                 const selisihDiv = row.querySelector('.container-selisih');
                 const selisihInput = selisihDiv.querySelector('input');
-                const nettoPengirimanDiv = row.querySelector('.container-netto_pengiriman');
-                const nettoPengirimanInput = nettoPengirimanDiv.querySelector('input');
+
                 const tipeSelect = row.querySelector('.tipe-select');
 
                 const netto = parseFloat(nettoInput.value) || 0;
@@ -239,7 +240,8 @@
 
                 // Calculate selisih if netto pengiriman exists and tipe is Titip
 
-                const nettoPengiriman = parseFloat(nettoPengirimanInput.value) || 0;
+                const nettoPengirimanval = row.querySelector('.netto-pengiriman').value
+                const nettoPengiriman = parseFloat(nettoPengirimanval);
                 const selisih = nettoPengiriman - netto;
                 selisihInput.value = selisih;
 
@@ -253,9 +255,8 @@
                     calculateBtn.addEventListener('click', () => calculateRow(row));
                 }
 
-                // Handle tipe change (show/hide netto_pengiriman)
+                // Handle tipe change (show/hide)
                 const tipeSelect = row.querySelector('.tipe-select');
-                const containerNettoPengiriman = row.querySelector('.container-netto_pengiriman');
                 const basisHargaDiv = row.querySelector('.container-basis_harga');
                 const subTotalDiv = row.querySelector('.container-sub_total');
                 const pphDiv = row.querySelector('.container-pph');
@@ -308,6 +309,9 @@
                     rowDiv.querySelector('.produk-id').value = produk_id;
                     let produkTerpilih = Produks.find(produk => produk.id == produk_id);
                     let basis_harga_penjualan = produkTerpilih.harga_basis_penjualan;
+
+                    rowDiv.querySelector('.netto-pengiriman').value = detail.netto;
+
                     // Set quick info
                     rowDiv.querySelector('.produk-nama').textContent = detail.nama_barang || '-';
                     rowDiv.querySelector('.produk-jumlah-per-karung').textContent = detail.jumlah_per_karung || '-';
