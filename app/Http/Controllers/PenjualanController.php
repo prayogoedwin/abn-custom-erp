@@ -209,7 +209,6 @@ class PenjualanController extends Controller
                     ];
 
                     if ($request->tipe[$index] == "Titip") {
-                        $detail['selisih'] = 0;
                         $detail['sub_total'] = 0;
                         $detail['pph'] = 0;
                         $detail['ppn'] = 0;
@@ -321,7 +320,6 @@ class PenjualanController extends Controller
                     ];
 
                     if ($request->tipe[$index] == "Titip") {
-                        $detail['selisih'] = 0;
                         $detail['sub_total'] = 0;
                         $detail['pph'] = 0;
                         $detail['ppn'] = 0;
@@ -339,7 +337,7 @@ class PenjualanController extends Controller
                         'basis_harga'    => $request->basis_harga[$index],
                         'sub_total'    => $detail['sub_total'],
                         'pph'    => $detail['pph'] ? $detail['pph'] : 0,
-                        'ppn'    => $detail['ppn'],
+                        'ppn'    => $detail['ppn'] ? $detail['ppn'] : 0,
                         'nominal_akhir'    => $detail['nominal_akhir'],
 
                         'created_by' => $store_data['created_by'],

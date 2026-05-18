@@ -107,6 +107,10 @@
                                     <span class="text-gray-500 dark:text-gray-400">Netto:</span>
                                     <span class="produk-netto ml-2 font-medium text-gray-800 dark:text-gray-200"></span>
                                 </div>
+                                <div>
+                                    <span class="text-gray-500 dark:text-gray-400">Satuan:</span>
+                                    <span class="produk-satuan ml-2 font-medium text-gray-800 dark:text-gray-200"></span>
+                                </div>
                             </div>
                         </div>
 
@@ -310,6 +314,7 @@
                     rowDiv.querySelector('.produk-bruto').textContent = detail.bruto || '-';
                     rowDiv.querySelector('.produk-tara').textContent = detail.tara || '-';
                     rowDiv.querySelector('.produk-netto').textContent = detail.netto || '-';
+                    rowDiv.querySelector('.produk-satuan').textContent = produkTerpilih.satuan || '-';
 
                     // Set initial input value
                     const nettoDiv = rowDiv.querySelector('.container-netto');

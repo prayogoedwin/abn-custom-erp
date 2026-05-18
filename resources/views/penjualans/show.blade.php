@@ -121,7 +121,7 @@
                             @foreach($penjualan->details as $detail)
                             <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50">
                                 <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                                    {{ $detail->produk->name ?? $detail->produk_id }}
+                                    {{ $detail->produk->nama_produk }}
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <span class="px-2 py-1 text-xs rounded-full 

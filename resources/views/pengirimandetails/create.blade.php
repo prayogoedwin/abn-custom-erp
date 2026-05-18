@@ -195,16 +195,10 @@
 
                     // Update satuan display for "Jumlah per Karung" field
                     if (jumlahPerKarungDiv) {
-                        const appendSpan = jumlahPerKarungDiv.querySelector('.append-satuan');
-                        if (appendSpan) {
-                            appendSpan.textContent = satuan;
-                        } else {
-                            // If using x-forms.input with append parameter
-                            const appendElement = jumlahPerKarungDiv.querySelector('[data-append]');
-                            if (appendElement) {
-                                appendElement.textContent = satuan;
-                            }
-                        }
+                        console.log(satuan);
+                        const appendSpan = jumlahPerKarungDiv.querySelector('.text-gray-900');
+                        appendSpan.textContent = satuan;
+
                     }
 
                     // Hide all containers first
@@ -280,7 +274,6 @@
                     }
                     // Remove readonly attribute from cloned inputs
                     input.readOnly = false;
-                    input.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'cursor-not-allowed');
                 });
 
                 newRow.querySelectorAll('select').forEach(select => {
