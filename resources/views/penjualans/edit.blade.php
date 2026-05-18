@@ -144,7 +144,7 @@
 
 
                             <div class="container-netto">
-                                <x-forms.input label="Netto" name="netto[]" type="number" />
+                                <x-forms.input label="Netto" name="netto[]" type="decimal" />
                             </div>
 
                             <div class="container-selisih">
