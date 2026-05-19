@@ -31,7 +31,7 @@ use App\Models\HistoryHargaBasis;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('dashboard');
 })->name('home');
 
 Route::view('dashboard', 'dashboard', ['withbackup' => false])
@@ -251,7 +251,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('pengirimandetails/create/{pengiriman}', [PengirimanDetailController::class, 'create'])->name('pengirimandetails.create')->middleware('permission:create-pengirimandetails');
     Route::Post('pengirimandetails/store', [PengirimanDetailController::class, 'store'])->name('pengirimandetails.store')->middleware('permission:create-pengirimandetails');
-    
+
     Route::get('pengirimandetails/edit/{pengiriman}', [PengirimanDetailController::class, 'edit'])->name('pengirimandetails.edit')->middleware('permission:edit-pengirimandetails');
     Route::put('pengirimandetails/update', [PengirimanDetailController::class, 'update'])->name('pengirimandetails.update')->middleware('permission:edit-pengirimandetails');
     //--------------------------------------------------------------------------------------------------------
@@ -301,7 +301,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('cashbonkaryawans/{cashbonkaryawan}', [CashbonKaryawanController::class, 'update'])->name('cashbonkaryawans.update')->middleware('permission:edit-cashbonkaryawans');
     Route::delete('cashbonkaryawans/{cashbonkaryawan}', [CashbonKaryawanController::class, 'destroy'])->name('cashbonkaryawans.destroy')->middleware('permission:delete-cashbonkaryawans');
 
-    
+
     //pembayaran
     Route::get('cashbonkaryawanpembayarans', [CashbonKaryawanPembayaranController::class, 'index'])->name('cashbonkaryawanpembayarans.index')->middleware('permission:view-cashbonkaryawanpembayarans');
     Route::get('cashbonkaryawanpembayarans/export', [CashbonKaryawanPembayaranController::class, 'export'])->name('cashbonkaryawanpembayarans.export')->middleware('permission:download-cashbonkaryawanpembayarans');
