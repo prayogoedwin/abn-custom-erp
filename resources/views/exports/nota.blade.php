@@ -54,8 +54,8 @@
 
 <body>
     <div class="header">
-        <h2>NAMA TOKO ANDA</h2>
-        <p>Alamat Lengkap Toko <br> Telp: 08123456789</p>
+        <h2>Asiwa Bumi Niaga</h2>
+        <p>Alamat Lengkap Toko <br> Telp: -</p>
     </div>
 
     <table style="width: 100%">
@@ -100,7 +100,7 @@
     </div>
 
     <div class="footer">
-        <p>Terima Kasih Telah Bertransaksi</p>
+        <p></p>
     </div>
 </body>
 

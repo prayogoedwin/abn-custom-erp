@@ -150,10 +150,16 @@ class PenjualanController extends Controller
 
     public function create(): View
     {
+
         $customers = Customer::where('deleted_at', null)->get();
-        $pengirimans = Pengiriman::where('deleted_at', null)->get();
         $pengirimandetails = PengirimanDetail::where('deleted_at', null)->get();
         $produks = Produk::where('deleted_at', null)->get();
+
+        //cuma ambil pengiriman yang belum ada penjualan
+        $pengirimans = Pengiriman::where('deleted_at', null)->whereNotIn('id', function ($query) {
+            $query->select('pengiriman_id')->from('penjualans');
+        })->get();
+
 
 
 
