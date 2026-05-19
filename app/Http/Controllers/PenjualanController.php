@@ -156,8 +156,9 @@ class PenjualanController extends Controller
         $produks = Produk::where('deleted_at', null)->get();
 
         //cuma ambil pengiriman yang belum ada penjualan
+        //pastikan juga penjualans deleted_at null, karena kalau penjualan dihapus, pengiriman bisa dipakai lagi
         $pengirimans = Pengiriman::where('deleted_at', null)->whereNotIn('id', function ($query) {
-            $query->select('pengiriman_id')->from('penjualans');
+            $query->select('pengiriman_id')->from('penjualans')->where('deleted_at', null);
         })->get();
 
 
@@ -271,11 +272,13 @@ class PenjualanController extends Controller
         $data = $penjualan;
 
         $customers = Customer::where('deleted_at', null)->get();
-        $pengirimans = Pengiriman::where('deleted_at', null)->get();
+
         $pengirimandetails = PengirimanDetail::where('deleted_at', null)->get();
         $produks = Produk::where('deleted_at', null)->get();
 
-        // dd($data);
+        $pengirimans = Pengiriman::where('deleted_at', null)->get();
+
+        // dd($pengirimans->toArray());
 
         $pagedata = $this->getPagedata();
 
@@ -285,19 +288,16 @@ class PenjualanController extends Controller
     public function update(Request $request, Penjualan $penjualan): RedirectResponse
     {
         $store_data = [
-            'pengiriman_id' => $request->input('pengiriman_id'),
 
             'created_by' => auth()->id(),
         ];
 
-        $pengiriman = Pengiriman::find($store_data['pengiriman_id']);
+        $pengiriman = Pengiriman::find($penjualan->pengiriman_id);
         $store_data['no_transaksi_penjualan'] = $pengiriman->no_transaksi;
         $store_data['customer_id'] = $pengiriman->customer->id;
 
 
         $validate = Validator::make($store_data, [
-            'pengiriman_id' => ['required', 'integer', 'max:255'],
-
             'created_by' => ['required', 'integer']
         ]);
 

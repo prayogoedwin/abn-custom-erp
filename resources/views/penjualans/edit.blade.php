@@ -24,41 +24,7 @@
                 @csrf
                 @method('PUT')
 
-                <div class="mb-5 rounded-lg border border-blue-200 bg-blue-50/70 px-4 py-3 text-sm text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-200">
-                    Pilih Pengiriman, lalu lanjut ke penjualan detail.
-                </div>
 
-                <div class="mb-5">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Pengiriman
-                    </label>
-
-                    <select
-                        name="pengiriman_id"
-                        id="pengiriman-select"
-                        placeholder="Ketik nama customer..."
-                        class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/40">
-
-                        <option value="">
-                            {{ __('Select pengiriman') }}
-                        </option>
-                        @foreach($pengirimans as $option)
-                        @if($data->pengiriman_id == $option->id)
-                        <option value="{{ $option->id }}" selected>
-                            {{ $option->no_transaksi . ' - ' . $option->nopol . ' - ' . $option->customer->nama; }}
-                        </option>
-                        @else
-                        <option value="{{ $option->id }}">
-                            {{ $option->no_transaksi . ' - ' . $option->nopol . ' - ' . $option->customer->nama; }}
-                        </option>
-                        @endif
-                        @endforeach
-                    </select>
-
-                    @error('pengiriman_id')
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
 
                 <!-- Quick info dari pengiriman -->
                 <div id="pengiriman-info" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hidden">
@@ -186,21 +152,30 @@
 
                 <div class="mt-2 flex gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
                     <x-button type="primary">{{ __('Edit') }}</x-button>
-                    <a href="{{ route($tablename . '.index') }}">
-                        <x-button type="secondary">{{ __('Batal') }}</x-button>
+                    <a href="{{ route($tablename . '.index') }}" class="text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center justify-center cursor-pointer bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 dark:bg-gray-500 dark:hover:bg-gray-600">
+                        {{ __('Batal') }}
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- harus di trigger supaya relasi customer terisi -->
+    @php
+    foreach ($pengirimans as $pengiriman) {
+        $pengiriman->customer->nama;
+    }
+    @endphp
+
     <script>
         const pengirimanDetails = @json($pengirimandetails); // all pengirimandetails in db
         const Pengiriman = @json($pengirimans); // all pengiriman in db
+        console.log('Pengiriman:', Pengiriman);
+
         const Produks = @json($produks); // all produks in db
+        const penjualan = @json($data); // current penjualan being edited
 
         document.addEventListener('DOMContentLoaded', function() {
-            const pengirimanSelect = document.getElementById('pengiriman-select');
             const pengirimanInfo = document.getElementById('pengiriman-info');
             const produkListContainer = document.getElementById('produk-list-container');
             const produkList = document.getElementById('produk-list');
@@ -344,32 +319,9 @@
                 });
             }
 
-            // Handle pengiriman selection change
-            pengirimanSelect.addEventListener('change', function() {
-                const selectedId = this.value;
+            console.log('penjualan:', penjualan);
 
-                if (!selectedId) {
-                    pengirimanInfo.classList.add('hidden');
-                    produkListContainer.classList.add('hidden');
-                    return;
-                }
-
-                // Find selected pengiriman
-                const selectedPengiriman = Pengiriman.find(p => p.id == selectedId);
-
-                if (selectedPengiriman) {
-                    // Update quick info
-                    document.getElementById('customer-name').textContent = selectedPengiriman.customer?.nama || '-';
-                    document.getElementById('nopol').textContent = selectedPengiriman.nopol || '-';
-                    document.getElementById('no-transaksi').textContent = selectedPengiriman.no_transaksi || '-';
-                    pengirimanInfo.classList.remove('hidden');
-
-                    // Load pengiriman details
-                    loadPengirimanDetails(selectedId);
-                }
-            });
-
-            const selectedId = pengirimanSelect.value;
+            const selectedId = penjualan.pengiriman_id;
             if (!selectedId) {
                 pengirimanInfo.classList.add('hidden');
                 produkListContainer.classList.add('hidden');
@@ -377,9 +329,11 @@
             }
             const selectedPengiriman = Pengiriman.find(p => p.id == selectedId);
 
+            console.log('selectedPengiriman:', selectedPengiriman);
+
             if (selectedPengiriman) {
                 // Update quick info
-                document.getElementById('customer-name').textContent = selectedPengiriman.customer?.nama || '-';
+                document.getElementById('customer-name').textContent = selectedPengiriman.customer.nama;
                 document.getElementById('nopol').textContent = selectedPengiriman.nopol || '-';
                 document.getElementById('no-transaksi').textContent = selectedPengiriman.no_transaksi || '-';
                 pengirimanInfo.classList.remove('hidden');
@@ -392,74 +346,4 @@
 
 
 
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-
-    <style>
-        .ts-wrapper.single .ts-control {
-            min-height: 42px;
-            border-radius: 0.5rem;
-            border-color: rgb(209 213 219);
-            background: rgb(255 255 255);
-            box-shadow: none;
-        }
-
-        .dark .ts-wrapper.single .ts-control {
-            border-color: rgb(75 85 99);
-            background: rgb(17 24 39);
-            color: rgb(243 244 246);
-        }
-
-        .ts-wrapper .ts-control input {
-            color: rgb(17 24 39);
-        }
-
-        .ts-wrapper .ts-control input::placeholder {
-            color: rgb(107 114 128);
-            opacity: 1;
-        }
-
-        .dark .ts-wrapper .ts-control input {
-            color: rgb(243 244 246) !important;
-        }
-
-        .dark .ts-wrapper .ts-control input::placeholder {
-            color: rgb(156 163 175);
-            opacity: 1;
-        }
-
-        .ts-dropdown {
-            border-radius: 0.5rem;
-            border-color: rgb(75 85 99);
-            background: rgb(17 24 39);
-            color: rgb(243 244 246);
-        }
-
-        .ts-dropdown .active {
-            background: rgb(30 64 175);
-            color: #fff;
-        }
-    </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const pengirimanSelect = document.querySelector('select.searchable-select');
-
-            if (pengirimanSelect) {
-                new TomSelect(pengirimanSelect, {
-                    create: false,
-                    allowEmptyOption: true,
-                    maxOptions: 25,
-                    closeAfterSelect: true,
-                    openOnFocus: false,
-                    hidePlaceholder: false,
-                    placeholder: pengirimanSelect.getAttribute('placeholder') || 'Ketik nama pengiriman...',
-                    render: {
-                        no_results: function() {
-                            return '<div class="no-results">pengiriman tidak ditemukan</div>';
-                        }
-                    }
-                });
-            }
-        });
-    </script>
 </x-layouts.app>

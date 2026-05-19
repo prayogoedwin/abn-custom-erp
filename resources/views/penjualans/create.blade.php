@@ -179,8 +179,8 @@
 
                 <div class="mt-2 flex gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
                     <x-button type="primary">{{ __('Create') }}</x-button>
-                    <a href="{{ route($tablename . '.index') }}">
-                        <x-button type="secondary">{{ __('Batal') }}</x-button>
+                    <a href="{{ route($tablename . '.index') }}" class="text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center justify-center cursor-pointer bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 dark:bg-gray-500 dark:hover:bg-gray-600">
+                        {{ __('Batal') }}
                     </a>
                 </div>
             </form>
@@ -190,6 +190,7 @@
     <script>
         const pengirimanDetails = @json($pengirimandetails); // all pengirimandetails in db
         const Pengiriman = @json($pengirimans); // all pengiriman in db
+        console.log('Pengiriman:', Pengiriman);
         const Produks = @json($produks); // all produks in db
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -215,7 +216,7 @@
                 const nominalAkhirInput = nominalAkhirDiv.querySelector('input');
                 const selisihDiv = row.querySelector('.container-selisih');
                 const selisihInput = selisihDiv.querySelector('input');
-                
+
                 const tipeSelect = row.querySelector('.tipe-select');
 
                 const netto = parseFloat(nettoInput.value) || 0;
@@ -346,10 +347,12 @@
 
                 // Find selected pengiriman
                 const selectedPengiriman = Pengiriman.find(p => p.id == selectedId);
+                console.log('selectedPengiriman:', selectedPengiriman);
+
 
                 if (selectedPengiriman) {
                     // Update quick info
-                    document.getElementById('customer-name').textContent = selectedPengiriman.customer?.nama || '-';
+                    document.getElementById('customer-name').textContent = selectedPengiriman.customer.nama;
                     document.getElementById('nopol').textContent = selectedPengiriman.nopol || '-';
                     document.getElementById('no-transaksi').textContent = selectedPengiriman.no_transaksi || '-';
                     pengirimanInfo.classList.remove('hidden');
