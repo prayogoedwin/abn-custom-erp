@@ -20,6 +20,7 @@ class DinamisVariableController extends Controller
             'title' => 'Variable Dinamis',
             'tablename' => 'dinamisvariables',
             'tableaction' => true,
+            'canCreate' => false,
             'columns' => [
                 ['name' => 'nama_variable', 'value' => 'nama_variable',  'title' => 'Nama Variable Dinamis', 'type' => 'text', 'inform' => true, 'intable' => true],
 
@@ -70,12 +71,7 @@ class DinamisVariableController extends Controller
                         $actions .= '<a href="' . route('dinamisvariables.edit', $dinamisvariable) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
                     }
 
-                    if (auth()->user()->hasPermission('delete-dinamisvariables')) {
-                        $actions .= '<form action="' . route('dinamisvariables.destroy', $dinamisvariable) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
-                            ' . csrf_field() . method_field('DELETE') . '
-                            <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
-                        </form>';
-                    }
+                    
 
                     return $actions;
                 })

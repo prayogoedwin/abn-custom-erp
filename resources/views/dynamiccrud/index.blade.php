@@ -26,9 +26,11 @@
                 </a>
             @endif
             @if(auth()->user()->hasPermission('create-' . strtolower($tablename)))
+                @if (($canCreate ?? true) !== false)
                 <a href="{{ route(strtolower($tablename) . '.create') }}">
                     <x-button type="primary">{{ __('Create ' . $title) }}</x-button>
                 </a>
+                @endif
             @endif
             
             
