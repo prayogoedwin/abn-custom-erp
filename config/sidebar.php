@@ -90,13 +90,13 @@ return [
     ],
     [
         'title' => 'Cashbon',
-        'icon' => 'fas-house',
+        'icon' => 'fas-money-bill-wave',
         'active' => ['cashbonkaryawans*', 'cashbonkaryawanpembayarans*', 'cashbonsuppliers*', 'cashbonsupplierpembayarans*'],
         'permission' => ['view-cashbonkaryawans', 'view-cashbonsuppliers'],
         'children' => [
             [
                 'title' => 'Karyawan',
-                'icon' => 'fas-house',
+                'icon' => 'fas-person',
                 'active' => ['cashbonkaryawans*', 'cashbonkaryawanpembayarans*'],
                 'permission' => 'view-cashbonkaryawans',
                 'children' => [ // Mendukung Level 3
@@ -116,7 +116,7 @@ return [
             ],
             [
                 'title' => 'Supplier',
-                'icon' => 'fas-house',
+                'icon' => 'fas-person',
                 'active' => ['cashbonsuppliers*', 'cashbonsupplierpembayarans*'],
                 'permission' => 'view-cashbonsuppliers',
                 'children' => [
