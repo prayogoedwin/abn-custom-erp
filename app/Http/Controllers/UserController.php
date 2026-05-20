@@ -19,7 +19,10 @@ class UserController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $users = User::with('roles')->select('users.*');
+            $users = User::with('roles')
+            ->where('id', '!=', 2) // hide super admin, only 1 super admin
+            ->select('users.*')
+            ->get();
             
             return DataTables::of($users)
                 ->addColumn('roles', function ($user) {
@@ -66,7 +69,9 @@ class UserController extends Controller
 
     public function create(): View
     {
-        $roles = Role::orderBy('name')->get();
+        $roles = Role::orderBy('name')
+        ->where('id', '!=', 1) //hide super admin role
+        ->get();
 
         return view('users.create', compact('roles'));
     }
@@ -103,7 +108,9 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        $roles = Role::orderBy('name')->get();
+        $roles = Role::orderBy('name')
+        ->where('id', '!=', 1) //hide super admin role
+        ->get();
         $user->load('roles');
 
         return view('users.edit', compact('user', 'roles'));

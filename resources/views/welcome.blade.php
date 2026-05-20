@@ -207,7 +207,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top py-3">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#hero">
-                <img src="{{asset('logo.png')}}" alt="logo" style="max-width: 100px;">
+                <img src="logo.png" alt="logo" style="max-width: 100px;">
                 <div class="d-flex flex-column">
                     <span class="font-serif fw-bold text-white tracking-wide mb-0 lh-1" style="letter-spacing: 1px;">Asiwa Bumi Niaga</span>
                     <span class="text-white-50 uppercase fs-6 fw-light tracking-widest mt-1" style="font-size: 0.65rem; letter-spacing: 2px;"></span>
@@ -218,7 +218,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center">
-                    <li class="nav-item px-2"><a class="nav-link" href="#tentang">Korporasi</a></li>
+                    <li class="nav-item px-2"><a class="nav-link" href="#tentang">Tentang</a></li>
                     <li class="nav-item px-2"><a class="nav-link" href="#lokasi">Lokasi</a></li>
                     <li class="nav-item px-2"><a class="nav-link" href="#kontak">Kontak</a></li>
                     <li class="nav-item px-2"><a class="nav-link" href="#faq">FAQ</a></li>
@@ -484,9 +484,9 @@
         <div class="container py-4">
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
-                    <h4 class="font-serif fw-bold text-amber-secondary mb-3"><img src="{{ asset('logo.png') }}" alt="logo" style="max-width: 100px;">Asiwa Bumi Niaga</h4>
+                    <h4 class="font-serif fw-bold text-amber-secondary mb-3"><img src='logo.png' alt="logo" style="max-width: 100px;">Asiwa Bumi Niaga</h4>
                     <p class="text-white-50 small">Memperkokoh kedaulatan hasil bumi Indonesia melalui standarisasi mutu kelas dunia, perdagangan yang berkeadilan, dan ekosistem perkebunan kopi & lada yang modern, berkelanjutan, dan transparan.</p>
-                    <div class="d-flex gap-3 fs-5 mt-4">
+                    <div class="d-flex gap-4 fs-5 mt-4">
                         <a href="#" class="text-white hover:text-amber-secondary"><i class="fa-brands fa-facebook-f"></i></a>
                         <a href="#" class="text-white hover:text-amber-secondary"><i class="fa-brands fa-instagram"></i></a>
                         <a href="#" class="text-white hover:text-amber-secondary"><i class="fa-brands fa-linkedin-in"></i></a>
@@ -494,7 +494,7 @@
                     </div>
                 </div>
                 
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <h5 class="fw-bold mb-3 text-amber-secondary">Navigasi Bisnis</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="#tentang" class="text-white-50 text-decoration-none small">Profil Korporat</a></li>
@@ -505,7 +505,7 @@
                     </ul>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <h5 class="fw-bold mb-3 text-amber-secondary">Layanan Tambahan</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2"><span class="text-white-50 small">Pembersihan Pengayakan Lada</span></li>
@@ -524,8 +524,7 @@
                     <p class="mb-0 text-white-50 small">&copy; 2026 PT Asiwa Bumi Niaga Agro. Hak Cipta Dilindungi Undang-Undang.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
-                    <a href="#" class="text-white-50 text-decoration-none small me-3">Kebijakan Fitosanitasi</a>
-                    <a href="#" class="text-white-50 text-decoration-none small">Syarat & Ketentuan Sourcing</a>
+                    <a href="https://gulabedmediatek.com/">Developed by GMT</a>
                 </div>
             </div>
         </div>

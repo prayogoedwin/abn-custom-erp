@@ -238,7 +238,7 @@ class RolePermissionSeeder extends Seeder
             ['email' => 'superadmin@example.com'],
             [
                 'name' => 'Super Admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Password!@#26'),
             ]
         );
 
