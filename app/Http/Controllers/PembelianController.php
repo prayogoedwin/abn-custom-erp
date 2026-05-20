@@ -294,7 +294,7 @@ class PembelianController extends Controller
 
         $pagedata = $this->getPagedata();
 
-        return view('dynamiccrud.edit', compact('data'), $pagedata);
+        return view('pembelians.edit', compact('data'), $pagedata);
     }
 
     public function update(Request $request, Pembelian $pembelian): RedirectResponse
