@@ -66,7 +66,7 @@
                                 <x-forms.input label="Nominal" name="nominal" type="number" value="{{ old('nominal', $simpanpinjamsupplier->nominal) }}" required />
                             </div>
                             <div>
-                                <x-forms.input label="Keterangan" name="keterangan" type="string" value="{{ old('keterangan', $simpanpinjamsupplier->keterangan) }}" required />
+                                <x-forms.input label="Keterangan" name="keterangan" type="string" value="{{ old('keterangan', $simpanpinjamsupplier->keterangan) }}" />
                             </div>
                         </div>
                     </div>

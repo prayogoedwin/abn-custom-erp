@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Produk;
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -11,7 +12,7 @@ class ProdukExport implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return User::with('roles')->get();
+        return Produk::with('kategori')->get();
     }
 
     public function headings(): array
@@ -22,6 +23,7 @@ class ProdukExport implements FromCollection, WithHeadings, WithMapping
             'Kategori Produk',
             'Satuan',
             'Harga Basis Pembelian',
+            'Harga Basis Penjualan',
             'Stok Akhir',
             'Status',
             'Created At',
@@ -35,12 +37,15 @@ class ProdukExport implements FromCollection, WithHeadings, WithMapping
 
     public function map($produk): array
     {
+        $produk->load('kategori'); // Pastikan relasi kategori sudah dimuat
+        // dd($produk);
         return [
             $produk->id,
             $produk->nama_produk,
-            $produk->kategori_produk->name,
+            $produk->kategori->nama,
             $produk->satuan,
-            $produk->harga_basis_pembelian,
+            str_replace('.', ',', number_format($produk->harga_basis_pembelian, 0, ',', '.')),
+            str_replace('.', ',', number_format($produk->harga_basis_penjualan, 0, ',', '.')),
             $produk->stok_akhir,
             $produk->isactive ? 'Active' : 'Inactive',
             $produk->created_at->format('d-m-Y H:i:s'),

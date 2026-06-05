@@ -220,7 +220,14 @@ class KaryawanController extends Controller
             ]);
         }
 
-        $karyawan->update($store_data);
+        $toupdate = [
+            'nama' => $store_data['nama'],
+            'kontak' => $store_data['kontak'],
+            'alamat' => $store_data['alamat'],
+            'updated_by' => auth()->id(),
+        ];
+
+        $karyawan->update($toupdate);
 
 
 

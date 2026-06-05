@@ -74,7 +74,10 @@ class CashbonSupplierController extends Controller
             // dd($cashbon_suppliers);
 
             return DataTables::of($cashbon_suppliers)
-
+                ->editColumn('nominal_cashbon', function ($cashbonsupplier) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    return number_format($cashbonsupplier->nominal_cashbon, 0, ',', '.');
+                })
 
 
 

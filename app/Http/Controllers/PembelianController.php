@@ -101,7 +101,10 @@ class PembelianController extends Controller
             // dd($pembelians);
 
             return DataTables::of($pembelians)
-                
+                ->editColumn('kekurangan', function ($pembelian) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    return number_format($pembelian->kekurangan, 0, ',', '.');
+                })
 
 
 
@@ -254,7 +257,7 @@ class PembelianController extends Controller
         return to_route('pembelians.index');
     }
 
-    
+
 
     public function cetakNota($id)
     {
@@ -281,7 +284,7 @@ class PembelianController extends Controller
 
         $pagedata = $this->getPagedata();
 
-        
+
 
         return view('pembelians.show', compact('pembelian'), $pagedata);
     }

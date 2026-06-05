@@ -36,7 +36,7 @@ class ProdukController extends Controller
                 ]],
                 ['name' => 'satuan', 'value' => 'satuan', 'title' => 'Satuan', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'harga_basis_pembelian', 'value' => 'harga_basis_pembelian', 'title' => 'Harga Basis Pembelian', 'type' => 'number', 'inform' => true, 'intable' => true],
-                ['name' => 'harga_basis_pembelian', 'value' => 'harga_basis_penjualan', 'title' => 'Harga Basis Penjualan', 'type' => 'number', 'inform' => true, 'intable' => true],
+                ['name' => 'harga_basis_penjualan', 'value' => 'harga_basis_penjualan', 'title' => 'Harga Basis Penjualan', 'type' => 'number', 'inform' => true, 'intable' => true],
                 ['name' => 'stok_akhir', 'value' => 'stok_akhir', 'title' => 'Stok Akhir', 'type' => 'number', 'inform' => true, 'intable' => true],
             ],
         ];
@@ -59,14 +59,14 @@ class ProdukController extends Controller
             // dd($produks);
 
             return DataTables::of($produks)
-                // ->filterColumn('name', function ($query, $keyword) {
-                //     $query->where('produks.nama_produk', 'like', "%{$keyword}%");
-                // })
-                // ->filterColumn('kategori', function ($query, $keyword) {
-                //     $query->where('kategori_produks.nama', 'like', "%{$keyword}%");
-                // })
-
-
+                ->editColumn('harga_basis_pembelian', function ($produk) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    return number_format($produk->harga_basis_pembelian, 0, ',', '.');
+                })
+                ->editColumn('harga_basis_penjualan', function ($produk) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    return number_format($produk->harga_basis_penjualan, 0, ',', '.');
+                })
 
                 ->addColumn('actions', function ($produk) {
                     $actions = '';

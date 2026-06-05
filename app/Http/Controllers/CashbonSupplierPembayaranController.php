@@ -74,23 +74,26 @@ class CashbonSupplierPembayaranController extends Controller
             // dd($cashbon_supplier_pembayarans);
 
             return DataTables::of($cashbon_supplier_pembayarans)
+                ->editColumn('nominal_bayar', function ($cashbon_supplier_pembayaran) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    return number_format($cashbon_supplier_pembayaran->nominal_bayar, 0, ',', '.');
+                })
 
 
 
-
-                ->addColumn('actions', function ($cashbonsupplier) {
+                ->addColumn('actions', function ($cashbon_supplier_pembayaran) {
                     $actions = '';
 
                     if (auth()->user()->hasPermission('show-cashbonsupplierpembayarans')) {
-                        $actions .= '<a href="' . route('cashbonsupplierpembayarans.show', $cashbonsupplier) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
+                        $actions .= '<a href="' . route('cashbonsupplierpembayarans.show', $cashbon_supplier_pembayaran) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
                     }
 
                     if (auth()->user()->hasPermission('edit-cashbonsupplierpembayarans')) {
-                        $actions .= '<a href="' . route('cashbonsupplierpembayarans.edit', $cashbonsupplier) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
+                        $actions .= '<a href="' . route('cashbonsupplierpembayarans.edit', $cashbon_supplier_pembayaran) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
                     }
 
                     if (auth()->user()->hasPermission('delete-cashbonsupplierpembayarans')) {
-                        $actions .= '<form action="' . route('cashbonsupplierpembayarans.destroy', $cashbonsupplier) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
+                        $actions .= '<form action="' . route('cashbonsupplierpembayarans.destroy', $cashbon_supplier_pembayaran) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
                             ' . csrf_field() . method_field('DELETE') . '
                             <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
                         </form>';
