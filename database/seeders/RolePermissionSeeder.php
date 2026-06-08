@@ -65,12 +65,12 @@ class RolePermissionSeeder extends Seeder
             // 'delete-stoks',
 
             //history_harga_bases permission
-            'view-history_harga_bases',
-            'show-history_harga_bases',
+            'view-history-harga',
+            'show-history-harga',
             // 'create-history_harga_bases',
             // 'edit-history_harga_bases',
             // 'update-history_harga_bases',
-            'download-history_harga_bases',
+            'download-history-harga',
             // 'delete-history_harga_bases',
 
             //customer permission

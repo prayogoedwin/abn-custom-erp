@@ -168,7 +168,7 @@ return [
                 'icon' => 'fas-history',
                 'route' => 'history_harga_bases.index',
                 'active' => 'history_harga_bases*',
-                'permission' => 'view-history-harga',
+                'permission' => 'view-history_harga_bases',
             ],
         ],
     ],
