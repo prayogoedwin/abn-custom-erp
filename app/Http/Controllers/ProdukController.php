@@ -37,7 +37,7 @@ class ProdukController extends Controller
                 ['name' => 'satuan', 'value' => 'satuan', 'title' => 'Satuan', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'harga_basis_pembelian', 'value' => 'harga_basis_pembelian', 'title' => 'Harga Basis Pembelian', 'type' => 'number', 'inform' => true, 'intable' => true],
                 ['name' => 'harga_basis_penjualan', 'value' => 'harga_basis_penjualan', 'title' => 'Harga Basis Penjualan', 'type' => 'number', 'inform' => true, 'intable' => true],
-                ['name' => 'stok_akhir', 'value' => 'stok_akhir', 'title' => 'Stok Akhir', 'type' => 'number', 'inform' => true, 'intable' => true],
+                ['name' => 'stok_akhir', 'value' => 'stok_akhir', 'title' => 'Stok Akhir', 'type' => 'number', 'inform' => false, 'intable' => true],
             ],
         ];
 
@@ -166,11 +166,21 @@ class ProdukController extends Controller
 
     public function show(Produk $produk): View
     {
+        
+        $stokHistories = Stok::where('produk_id', $produk->id)->orderBy('created_at', 'desc')->get();
+        $hargaHistories = HistoryHargaBasis::where('produk_id', $produk->id)->orderBy('tanggal', 'desc')->get();
+
+        // calculate total stok masuk and keluar
+        $totalStokMasuk = $stokHistories->where('tipe_stok', 'Masuk')->sum('stok');
+        $totalStokKeluar = $stokHistories->where('tipe_stok', 'Keluar')->sum('stok');
+
+        $produk->stok_akhir = $totalStokMasuk - $totalStokKeluar;
+
+        $produk->update(['stok_akhir' => $produk->stok_akhir]);
+
         $produk->kategori_nama = KategoriProduk::find($produk->kategori_produk_id)->nama;
 
-        $data = $produk;
-
-        $kategori = KategoriProduk::get();
+        // dd($produk, $totalStokKeluar, $totalStokMasuk, $produk->stok_akhir);
 
         $pagedata = $this->getPagedata();
 
@@ -178,7 +188,7 @@ class ProdukController extends Controller
 
         
 
-        return view('produks.show', compact('produk'), $pagedata);
+        return view('produks.show', compact('produk', 'stokHistories', 'hargaHistories'), $pagedata);
     }
 
     public function edit(Produk $produk): View
@@ -206,7 +216,6 @@ class ProdukController extends Controller
             'kategori_produk_id' => $request->input('kategori_produk_id'),
             'satuan' => $request->input('satuan'),
             'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
-            'stok_akhir' => $request->input('stok_akhir'),
 
             'updated_by' => auth()->id(),
         ];
@@ -217,7 +226,6 @@ class ProdukController extends Controller
             'kategori_produk_id' => ['required'],
             'satuan' => ['required', 'string', 'max:50'],
             'harga_basis_pembelian' => ['required', 'numeric'],
-            'stok_akhir' => ['required', 'integer'],
             'created_by' => ['required', 'integer']
         ]);
 

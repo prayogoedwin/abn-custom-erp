@@ -37,7 +37,7 @@ class Produk extends Model
 
             Stok::create([
                 'produk_id' => $produk->id,
-                'tipe_stok' =>  'masuk',
+                'tipe_stok' =>  'Masuk',
                 'satuan' => $produk->satuan,
                 'stok' => $produk->stok_akhir,
             ]);
@@ -66,7 +66,7 @@ class Produk extends Model
                 // Simpan riwayat ke tabel mutasi
                 Stok::create([
                     'produk_id' => $produk->id,
-                    'tipe_stok' => $selisih > 0 ? 'masuk' : 'keluar',
+                    'tipe_stok' => $selisih > 0 ? 'Masuk' : 'Keluar',
                     'satuan' => $produk->satuan,
                     'stok' => abs($selisih),
                 ]);
