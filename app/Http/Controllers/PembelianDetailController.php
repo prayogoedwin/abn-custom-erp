@@ -147,6 +147,18 @@ class PembelianDetailController extends Controller
         return Excel::download(new PembelianDetailExport, 'pembeliandetails-' . date('Y-m-d') . '.xlsx');
     }
 
+    public function createnow(Pembelian $pembelian):View
+    {
+        $produks = Produk::where('isActive', true)->get();
+
+
+
+        $pagedata = $this->getPagedata();
+        $pagedata['pembelian_id'] = $pembelian->id;
+
+        return view('pembeliandetails.createnow', compact('produks'), $pagedata);
+    }
+
 
     public function createtitip($pembelian_id): View
     {
@@ -211,6 +223,50 @@ class PembelianDetailController extends Controller
 
 
         return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
+    }
+    public function store(Request $request): RedirectResponse
+    {
+       
+        //      'pembelian_id',
+        //     'produk_id',
+        //     'tipe_transaksi_pembelian'
+        //     'netto',
+        //     'satuan',
+        //     'rendeman',
+        //     'bobot',
+        //     'harga',
+        //     'harga_basis',
+        //     'harga_basis_pembelian',
+        //     'harga_netto',
+
+
+        foreach ($request->produk_id as $index => $produk_id) {
+            if ($produk_id) {
+
+                
+                PembelianDetail::create([
+                    'pembelian_id' => $request->pembelian_id,
+                    'produk_id'    => $produk_id,
+                    'tipe_transaksi_pembelian'         => $request->tipe_pembelian[$index],
+                    'netto'        => $request->netto[$index],
+                    //TODO:
+                    'satuan'       => 'kg', //sementara hardcode
+                    'rendeman'     => $request->rendeman[$index] ?? null,
+                    'bobot'     => $this->toIntMoney($request->bobot[$index] ?? 0),
+                    'harga'     => $this->toIntMoney($request->harga[$index] ?? 0),
+                    'harga_basis'     => $this->toIntMoney($request->harga_basis[$index] ?? 0),
+                    'harga_basis_pembelian'     => $this->toIntMoney($request->harga_basis_pembelian[$index] ?? ($request->harga_basis[$index] ?? 0)),
+                    'harga_netto'     => $this->toIntMoney($request->harga_netto[$index] ?? 0),
+                ]);
+            }
+        }
+
+        $this->syncPembelianTotals((int) $request->pembelian_id);
+
+
+
+
+        return to_route('pembelians.createlanjut', $request->pembelian_id);
     }
     public function jualstore(Request $request): RedirectResponse
     {

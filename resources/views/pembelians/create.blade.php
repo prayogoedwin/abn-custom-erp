@@ -179,9 +179,9 @@
                     searchEnabled: true,
                     removeItemButton: true,
                     itemSelectText: '',
-                    noResultsText: 'Produk tidak ditemukan',
+                    noResultsText: 'Supplier tidak ditemukan',
                     placeholder: true,
-                    placeholderValue: 'Cari atau Pilih Product',
+                    placeholderValue: 'Cari atau Pilih Supplier',
                     shouldSort: false,
                     classNames: {
                         containerOuter: 'choices',

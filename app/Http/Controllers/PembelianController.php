@@ -63,11 +63,8 @@ class PembelianController extends Controller
                     })->toArray(),
                 ]],
                 ['name' => 'nopol', 'value' => 'nopol',  'title' => 'Nopol', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
-                ['name' => 'nominal', 'value' => 'nominal',  'title' => 'Nominal DP', 'type' => 'number', 'inform' => true, 'inshow' => false, 'intable' => false],
-                ['name' => 'tipe_transaksi_pembelian', 'value' => 'tipe_transaksi_pembelian',  'title' => 'Tipe Transaksi Pembelian', 'type' => 'select', 'inform' => true, 'inshow' => true, 'intable' => true, 'options' => [
-                    ['value' => 'Titip', 'label' => 'Titip'],
-                    ['value' => 'Jual', 'label' => 'Jual'],
-                ]],
+                
+                
                 ['name' => 'total_nominal_pembelian', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Pembelian', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => false],
                 ['name' => 'total_nominal_terbayar', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Terbayar', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => false],
                 ['name' => 'kekurangan', 'value' => 'kekurangan',  'title' => 'Kekurangan', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => true],
@@ -170,7 +167,6 @@ class PembelianController extends Controller
         $store_data = [
             'nopol' => $request->input('nopol'),
             'supplier_id' => $request->input('supplier_id'),
-            'tipe_transaksi_pembelian' => $request->input('tipe_transaksi_pembelian'),
 
             'created_by' => auth()->id(),
         ];
@@ -179,7 +175,6 @@ class PembelianController extends Controller
         $validate = Validator::make($store_data, [
             'nopol' => ['required', 'string', 'max:255'],
             'supplier_id' => ['required', 'integer', 'max:255'],
-            'tipe_transaksi_pembelian' => ['required', 'string'],
 
             'created_by' => ['required', 'integer']
         ]);
@@ -192,19 +187,11 @@ class PembelianController extends Controller
 
         $pembelian = Pembelian::create($store_data);
 
-        $simpanpinjamsupplier = SimpanPinjamSupplier::create([
-            'supplier_id' => $store_data['supplier_id'],
-            'pembelian_id' => $pembelian->id,
-            'nominal' => $request->nominal ?? 0,
-            'keterangan' => 'isi keterangan',
+        
 
-        ]);
+        
 
-        if ($store_data['tipe_transaksi_pembelian'] === 'Titip') {
-            return to_route('pembeliandetails.createtitip', $pembelian->id);
-        }
-
-        return to_route('pembeliandetails.createjual', $pembelian->id);
+        return to_route('pembeliandetails.createnow', $pembelian->id);
     }
 
     public function storelanjut(Pembelian $pembelian, Request $request): RedirectResponse

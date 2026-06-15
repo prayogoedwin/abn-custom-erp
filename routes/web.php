@@ -192,6 +192,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pembeliandetails', [PembelianDetailController::class, 'index'])->name('pembeliandetails.index')->middleware('permission:view-pembeliandetails');
     Route::get('pembeliandetails/export', [PembelianDetailController::class, 'export'])->name('pembeliandetails.export')->middleware('permission:download-pembeliandetails');
     Route::get('pembeliandetails/create', [PembelianDetailController::class, 'create'])->name('pembeliandetails.create')->middleware('permission:create-pembeliandetails');
+    Route::get('pembeliandetails/createnow/{pembelian}', [PembelianDetailController::class, 'createnow'])->name('pembeliandetails.createnow')->middleware('permission:create-pembeliandetails');
     Route::get('pembeliandetails/createtitip/{pembelian}', [PembelianDetailController::class, 'createtitip'])->name('pembeliandetails.createtitip')->middleware('permission:create-pembeliandetails');
 
     Route::get('pembeliandetails/createjual/{pembelian}', [PembelianDetailController::class, 'createjual'])->name('pembeliandetails.createjual')->middleware('permission:create-pembeliandetails');

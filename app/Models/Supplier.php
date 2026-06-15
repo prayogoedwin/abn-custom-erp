@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Supplier extends Model
 {
@@ -35,5 +36,15 @@ class Supplier extends Model
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function cashbons(): HasMany
+    {
+        return $this->hasMany(CashbonSupplier::class);
+    }
+
+    public function totalCashbon()
+    {
+        return $this->cashbons->sum('nominal_cashbon');
     }
 }

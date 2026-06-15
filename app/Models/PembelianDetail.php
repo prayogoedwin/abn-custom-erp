@@ -28,6 +28,7 @@ class PembelianDetail extends Model
     protected $fillable = [
         'pembelian_id',
         'produk_id',
+        'tipe_transaksi_pembelian',
         'netto',
         'satuan',
         'rendeman',
