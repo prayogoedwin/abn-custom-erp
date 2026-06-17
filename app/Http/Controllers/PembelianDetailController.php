@@ -240,6 +240,7 @@ class PembelianDetailController extends Controller
         //     'harga_netto',
 
 
+
         foreach ($request->produk_id as $index => $produk_id) {
             if ($produk_id) {
 

@@ -150,15 +150,21 @@ class PembelianController extends Controller
 
     public function createlanjut(Pembelian $pembelian): View
     {
+        // dd($pembelian);
+
         $supplier = Supplier::find($pembelian->supplier_id);
+        
+
 
         $simpanpinjamsupplier = SimpanPinjamSupplier::where("supplier_id", $supplier->id)->first();
 
         $pagedata = $this->getPagedata();
 
         $data = $pembelian;
+        $pembelian->load('details');
+        // dd($pembelian);
 
-        return view('pembelians.createlanjut', compact('supplier', 'simpanpinjamsupplier', 'data'), $pagedata,);
+        return view('pembelians.createlanjut', compact('pembelian', 'supplier', 'simpanpinjamsupplier', 'data'), $pagedata,);
     }
 
     public function store(Request $request): RedirectResponse

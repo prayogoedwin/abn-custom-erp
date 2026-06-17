@@ -22,73 +22,7 @@
                 @csrf
                 @method('POST')
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 border-b border-gray-100 dark:border-gray-700 pb-6">
-                    <div>
-                        <h3 class="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-4">Informasi Transaksi</h3>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kode Transaksi</label>
-                                <div class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $pembelian->no_transaksi }}</div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Supplier</label>
-                                <div class="text-md font-semibold text-gray-900 dark:text-gray-100">{{ $pembelian->supplier->nama ?? '-' }}</div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tanggal</label>
-                                <div class="text-md font-semibold text-gray-900 dark:text-gray-100">{{ $pembelian->created_at->format('d F Y H:i') }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    @php
-                        $totalTagihan = $pembelian->details->sum('harga_netto');
-                        // Memanggil method totalCashbon() dari model Supplier Anda
-                        $totalCashbonSupplier = $pembelian->supplier ? $pembelian->supplier->totalCashbon() : 0; 
-                    @endphp
-
-                    <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 space-y-4">
-                        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase">Ringkasan Pembayaran</h3>
-                        
-                        <div class="space-y-2 text-sm border-b border-gray-200 dark:border-gray-700 pb-3">
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Total Netto Keseluruhan:</span>
-                                <span class="font-semibold text-gray-900 dark:text-gray-100">{{ number_format($pembelian->details->sum('netto'), 2) }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Total Tagihan Awal:</span>
-                                <span class="font-semibold text-gray-900 dark:text-gray-100">Rp {{ number_format($totalTagihan, 0, ',', '.') }}</span>
-                            </div>
-                            <div class="flex justify-between text-red-500">
-                                <span>Total Cashbon Supplier:</span>
-                                <span class="font-semibold" id="label-total-cashbon" data-value="{{ $totalCashbonSupplier }}">Rp {{ number_format($totalCashbonSupplier, 0, ',', '.') }}</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Potong Cashbon</label>
-                                <input type="number" name="potong_bon" id="potong_bon" min="0" max="{{ min($totalTagihan, $totalCashbonSupplier) }}" value="0"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                                <span class="text-[11px] text-gray-500 mt-1 block">Sisa Bon: <strong id="sisa-bon-live">Rp {{ number_format($totalCashbonSupplier, 0, ',', '.') }}</strong></span>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Titip Uang/Modal</label>
-                                <input type="number" name="titip" id="titip" min="0" value="0"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                            </div>
-                        </div>
-
-                        <div class="flex justify-between text-xl border-t border-gray-200 dark:border-gray-700 pt-3 mt-2">
-                            <span class="font-bold text-gray-700 dark:text-gray-300">Total Dibayarkan:</span>
-                            <span class="font-black text-indigo-600 dark:text-indigo-400" id="total-tagihan-akhir" data-awal="{{ $totalTagihan }}">Rp {{ number_format($totalTagihan, 0, ',', '.') }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4">
+                <div class="mb-4">
                     <h3 class="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-4">Daftar Produk</h3>
                     <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -130,6 +64,81 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 border-b border-gray-100 dark:border-gray-700 pb-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-4">Informasi Transaksi</h3>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kode Transaksi</label>
+                                <div class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $pembelian->no_transaksi }}</div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Supplier</label>
+                                <div class="text-md font-semibold text-gray-900 dark:text-gray-100">{{ $pembelian->supplier->nama ?? '-' }}</div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tanggal</label>
+                                <div class="text-md font-semibold text-gray-900 dark:text-gray-100">{{ $pembelian->created_at->format('d F Y H:i') }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @php
+                    $totalTagihan = $pembelian->details->sum('harga_netto');
+                    // Memanggil method totalCashbon() dari model Supplier Anda
+                    $totalCashbonSupplier = $pembelian->supplier ? $pembelian->supplier->totalCashbon() : 0;
+                    @endphp
+
+                    <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 space-y-4">
+                        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase">Ringkasan Pembayaran</h3>
+
+                        <div class="space-y-2 text-sm border-b border-gray-200 dark:border-gray-700 pb-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Total Netto Keseluruhan:</span>
+                                <span class="font-semibold text-gray-900 dark:text-gray-100">{{ number_format($pembelian->details->sum('netto'), 2) }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Total Tagihan Awal:</span>
+                                <span class="font-semibold text-gray-900 dark:text-gray-100">Rp {{ number_format($totalTagihan, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex justify-between text-red-500">
+                                <span>Total Cashbon Supplier:</span>
+                                <span class="font-semibold" id="label-total-cashbon" data-value="{{ $supplier->totalCashbon() }}">Rp {{ number_format($supplier->totalCashbon(), 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Potong Cashbon</label>
+                                <input type="number" name="potong_bon" id="potong_bon" min="0" value="0"
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                                <span class="text-[11px] text-gray-500 mt-1 block">Sisa Bon: <strong id="sisa-bon-live">Rp {{ number_format($supplier->totalCashbon(), 0, ',', '.') }}</strong></span>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Titip Uang/Modal</label>
+                                <input type="number" name="titip" id="titip" min="0" value="0"
+                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between text-xl border-t border-gray-200 dark:border-gray-700 pt-3 mt-2">
+                            <span class="font-bold text-gray-700 dark:text-gray-300">Total Dibayarkan:</span>
+                            <span class="font-black text-indigo-600 dark:text-indigo-400" id="total-tagihan-akhir" data-awal="{{ $totalTagihan }}">Rp {{ number_format($totalTagihan, 0, ',', '.') }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <x-forms.input label="Ambil Tunai" name="ambil_tunai" type="number" />
+                </div>
+                <div class="mb-4">
+                    <x-forms.input label="Ambil Transfer" name="ambil_transfer" type="number"/>
+                </div>
+
+
+
                 <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
                     <x-button type="primary">Simpan</x-button>
                     <a href="{{ route('pembelians.cetaknota', $data->id) }}" target="_blank">
@@ -144,10 +153,10 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const inputPotongBon = document.getElementById('potong_bon');
             const inputTitip = document.getElementById('titip');
-            
+
             const labelSisaBonLive = document.getElementById('sisa-bon-live');
             const labelTotalTagihanAkhir = document.getElementById('total-tagihan-akhir');
 
@@ -156,7 +165,9 @@
             const tagihanAwal = parseFloat(labelTotalTagihanAkhir.getAttribute('data-awal')) || 0;
 
             function formatRupiah(angka) {
-                return 'Rp ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(angka);
+                return 'Rp ' + new Intl.NumberFormat('id-ID', {
+                    maximumFractionDigits: 0
+                }).format(angka);
             }
 
             function hitungOtomatis() {
@@ -168,10 +179,7 @@
                     nilaiPotongBon = totalCashbonAwal;
                     inputPotongBon.value = totalCashbonAwal;
                 }
-                if (nilaiPotongBon > tagihanAwal) {
-                    nilaiPotongBon = tagihanAwal;
-                    inputPotongBon.value = tagihanAwal;
-                }
+                
 
                 // 1. Hitung Sisa Bon
                 const sisaBon = totalCashbonAwal - nilaiPotongBon;

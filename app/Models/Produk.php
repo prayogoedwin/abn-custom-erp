@@ -57,20 +57,7 @@ class Produk extends Model
             if (auth()->check()) {
                 $produk->updated_by = auth()->id();
             }
-            // Cek apakah kolom 'stok_akhir' yang berubah
-            if ($produk->isDirty('stok_akhir')) {
-                $stokLama = $produk->getOriginal('stok_akhir');
-                $stokBaru = $produk->stok_akhir;
-                $selisih = $stokBaru - $stokLama;
-
-                // Simpan riwayat ke tabel mutasi
-                Stok::create([
-                    'produk_id' => $produk->id,
-                    'tipe_stok' => $selisih > 0 ? 'Masuk' : 'Keluar',
-                    'satuan' => $produk->satuan,
-                    'stok' => abs($selisih),
-                ]);
-            }
+            
             // Cek apakah kolom 'harga_basis_pembelian' yang berubah
             if ($produk->isDirty('harga_basis_pembelian')) {
                 $old_harga = $produk->getOriginal('harga_basis_pembelian');

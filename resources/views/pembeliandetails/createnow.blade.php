@@ -14,10 +14,18 @@
         <span class="text-gray-500 dark:text-gray-400">{{ $title ?? __('Create') }}</span>
     </div>
 
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Create {{ $title }}</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Fill in the details below') }}</p>
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Create {{ $title }}</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Fill in the details below') }}</p>
+        </div>
+        <div class="flex gap-2">
+
+            <x-button type="primary" form="pembelianForm">Lanjut</x-button>
+
+        </div>
     </div>
+
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-5">
@@ -107,7 +115,7 @@
                 </button>
 
                 <div class="flex gap-3 mt-3 border-t pt-4">
-                    <x-button type="primary">Simpan Semua</x-button>
+
                     <a href="{{ route('pembelians.index') }}"><x-button type="secondary">Batal</x-button></a>
                 </div>
             </form>

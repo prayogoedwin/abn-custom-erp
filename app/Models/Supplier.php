@@ -43,8 +43,13 @@ class Supplier extends Model
         return $this->hasMany(CashbonSupplier::class);
     }
 
+    public function cashbonspembayaran(): HasMany
+    {
+        return $this->hasMany(CashbonSupplierPembayaran::class);
+    }
+
     public function totalCashbon()
     {
-        return $this->cashbons->sum('nominal_cashbon');
+        return $this->cashbons->sum('nominal_cashbon') - $this->cashbonspembayaran->sum('nominal_bayar');
     }
 }
