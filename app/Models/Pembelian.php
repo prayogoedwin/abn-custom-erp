@@ -34,6 +34,8 @@ class Pembelian extends Model
         'supplier_id',
         'nopol',
         'tipe_transaksi_pembelian',
+        'ambil_transfer',
+        'ambil_tunai',
         'total_nominal_pembelian',
         'total_nominal_terbayar',
         'kekurangan',

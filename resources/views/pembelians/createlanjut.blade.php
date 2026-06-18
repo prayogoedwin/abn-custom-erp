@@ -52,7 +52,7 @@
                                         {{ number_format($detail->netto, 2) }} <span class="text-xs text-gray-400">{{ $detail->satuan }}</span>
                                     </td>
                                     <td class="px-4 py-3">
-                                        Rp {{ number_format($detail->harga_basis, 0, ',', '.') }}
+                                        Rp {{ number_format($detail->harga_basis_pembelian, 0, ',', '.') }}
                                     </td>
                                     <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
                                         Rp {{ number_format($detail->harga_netto, 0, ',', '.') }}
@@ -86,7 +86,6 @@
 
                     @php
                     $totalTagihan = $pembelian->details->sum('harga_netto');
-                    // Memanggil method totalCashbon() dari model Supplier Anda
                     $totalCashbonSupplier = $pembelian->supplier ? $pembelian->supplier->totalCashbon() : 0;
                     @endphp
 
@@ -104,7 +103,7 @@
                             </div>
                             <div class="flex justify-between text-red-500">
                                 <span>Total Cashbon Supplier:</span>
-                                <span class="font-semibold" id="label-total-cashbon" data-value="{{ $supplier->totalCashbon() }}">Rp {{ number_format($supplier->totalCashbon(), 0, ',', '.') }}</span>
+                                <span class="font-semibold" id="label-total-cashbon" data-value="{{ $totalCashbonSupplier }}">Rp {{ number_format($totalCashbonSupplier, 0, ',', '.') }}</span>
                             </div>
                         </div>
 
@@ -113,7 +112,7 @@
                                 <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Potong Cashbon</label>
                                 <input type="number" name="potong_bon" id="potong_bon" min="0" value="0"
                                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                                <span class="text-[11px] text-gray-500 mt-1 block">Sisa Bon: <strong id="sisa-bon-live">Rp {{ number_format($supplier->totalCashbon(), 0, ',', '.') }}</strong></span>
+                                <span class="text-[11px] text-gray-500 mt-1 block">Sisa Bon: <strong id="sisa-bon-live">Rp {{ number_format($totalCashbonSupplier, 0, ',', '.') }}</strong></span>
                             </div>
 
                             <div>
@@ -130,22 +129,49 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <x-forms.input label="Ambil Tunai" name="ambil_tunai" type="number" />
-                </div>
-                <div class="mb-4">
-                    <x-forms.input label="Ambil Transfer" name="ambil_transfer" type="number"/>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <x-forms.input label="Ambil Tunai" name="ambil_tunai" class="ambil_tunai" type="number" value="0" />
+                    </div>
+                    <div>
+                        <x-forms.input label="Ambil Transfer" name="ambil_transfer" class="ambil_transfer" type="number" value="0" />
+                    </div>
                 </div>
 
+                <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-900/30 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Kekurangan: <span id="kekuranganspan" class="font-bold text-red-500">Rp 0</span>
+                    </p>
+                </div>
 
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Simpan Sebagai
+                    </label>
+                    <select
+                        name="status"
+                        id="status_select"
+                        class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/40">
+                        <option value="Belum Lunas">Belum Lunas</option>
+                        <option value="Lunas">Lunas</option>
+                    </select>
+                </div>
+
+                <div class="mb-5">
+                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="" />
+                </div>
 
                 <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-                    <x-button type="primary">Simpan</x-button>
-                    <a href="{{ route('pembelians.cetaknota', $data->id) }}" target="_blank">
-                        <x-button type="secondary">Cetak Nota</x-button>
-                    </a>
-                    <a href="{{ route($tablename . '.index') }}">
-                        <x-button type="secondary">Batal</x-button>
+                    <button type="submit" name="action" value="save" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">
+                        Simpan
+                    </button>
+
+                    <button type="submit" name="action" value="save_and_print" class="px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-semibold hover:bg-amber-600">
+                        Simpan & Cetak Nota
+                    </button>
+
+                    <a href="{{ route($tablename . '.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-300">
+                        Batal
                     </a>
                 </div>
             </form>
@@ -156,44 +182,87 @@
         document.addEventListener('DOMContentLoaded', function() {
             const inputPotongBon = document.getElementById('potong_bon');
             const inputTitip = document.getElementById('titip');
+            const inputAmbilTunai = document.querySelector('input[name="ambil_tunai"]');
+            const inputAmbilTransfer = document.querySelector('input[name="ambil_transfer"]');
+
+            console.log(inputAmbilTunai);
 
             const labelSisaBonLive = document.getElementById('sisa-bon-live');
             const labelTotalTagihanAkhir = document.getElementById('total-tagihan-akhir');
+            const labelKekurangan = document.getElementById('kekuranganspan');
+            const selectStatus = document.getElementById('status_select');
 
-            // Mengambil data angka murni dari attribute data
+            // Flag untuk mendeteksi jika user mengubah status secara manual
+            let userInteractedWithStatus = false;
+
             const totalCashbonAwal = parseFloat(document.getElementById('label-total-cashbon').getAttribute('data-value')) || 0;
             const tagihanAwal = parseFloat(labelTotalTagihanAkhir.getAttribute('data-awal')) || 0;
 
             function formatRupiah(angka) {
-                return 'Rp ' + new Intl.NumberFormat('id-ID', {
+                const isNegative = angka < 0;
+                const absoluteValue = Math.abs(angka);
+                const formatted = 'Rp ' + new Intl.NumberFormat('id-ID', {
                     maximumFractionDigits: 0
-                }).format(angka);
+                }).format(absoluteValue);
+                return isNegative ? '-' + formatted : formatted;
             }
 
             function hitungOtomatis() {
+                console.log("hitung");
                 let nilaiPotongBon = parseFloat(inputPotongBon.value) || 0;
-                let nilaiTitip = parseFloat(inputTitip.value) || 0;
+                let nilaiAmbilTunai = parseFloat(inputAmbilTunai.value) || 0;
+                let nilaiAmbilTransfer = parseFloat(inputAmbilTransfer.value) || 0;
 
-                // Validasi agar input potong bon tidak melebihi bon yang ada / tagihan awal
+                // Validasi agar input potong bon tidak melebihi bon yang ada
                 if (nilaiPotongBon > totalCashbonAwal) {
                     nilaiPotongBon = totalCashbonAwal;
                     inputPotongBon.value = totalCashbonAwal;
                 }
-                
 
                 // 1. Hitung Sisa Bon
                 const sisaBon = totalCashbonAwal - nilaiPotongBon;
                 labelSisaBonLive.textContent = formatRupiah(sisaBon);
 
-                // 2. Hitung Total yang Harus Dibayarkan Bersih ke Supplier
-                // Rumus: Tagihan Awal - Potongan Cashbon - Titipan Uang
-                const tagihanAkhir = tagihanAwal - nilaiPotongBon - nilaiTitip;
+                const tagihanAkhir = tagihanAwal
                 labelTotalTagihanAkhir.textContent = formatRupiah(tagihanAkhir);
+
+                // 3. Hitung Kekurangan Pembayaran
+                // Kekurangan = Total yang harus dibayar - (Tunai + Transfer yang diambil)
+                const totalDiambil = nilaiAmbilTunai + nilaiAmbilTransfer;
+                const kekurangan = tagihanAkhir - totalDiambil;
+
+                labelKekurangan.textContent = formatRupiah(kekurangan);
+
+                // Styling warna teks kekurangan berdasarkan statusnya
+                if (kekurangan > 0) {
+                    labelKekurangan.className = "font-bold text-red-500";
+                } else {
+                    labelKekurangan.className = "font-bold text-green-500";
+                }
+
+                // 4. Auto-set Dropdown Status (hanya jika user belum menyentuhnya secara manual)
+
+                if (kekurangan <= 0) {
+                    selectStatus.value = "Lunas";
+                } else {
+                    selectStatus.value = "Belum Lunas";
+                }
+
             }
 
             // Pasang event listener ketik (input)
             inputPotongBon.addEventListener('input', hitungOtomatis);
             inputTitip.addEventListener('input', hitungOtomatis);
+            inputAmbilTunai.addEventListener('input', hitungOtomatis);
+            inputAmbilTransfer.addEventListener('input', hitungOtomatis);
+
+            // Deteksi jika user merubah select status secara sengaja (manual override)
+            selectStatus.addEventListener('change', function() {
+                userInteractedWithStatus = true;
+            });
+
+            // Jalankan kalkulasi awal saat halaman dimuat
+            hitungOtomatis();
         });
     </script>
 </x-layouts.app>

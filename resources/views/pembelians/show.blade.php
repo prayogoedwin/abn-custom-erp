@@ -54,17 +54,34 @@
                     </div>
                 </div>
 
-                <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
-                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase mb-4">Ringkasan Pembayaran</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Total Netto Keseluruhan:</span>
-                            <span class="font-semibold text-gray-900 dark:text-gray-100">{{ number_format($pembelian->details->sum('netto'), 2) }}</span>
+                <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase mb-4">Ringkasan Rincian</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Total Netto Keseluruhan:</span>
+                                <span class="font-semibold text-gray-900 dark:text-gray-100">{{ number_format($pembelian->details->sum('netto'), 2) }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Ambil Tunai:</span>
+                                <span class="font-semibold text-gray-900 dark:text-gray-100">Rp {{ number_format($pembelian->ambil_tunai ?? 0, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Ambil Transfer:</span>
+                                <span class="font-semibold text-gray-900 dark:text-gray-100">Rp {{ number_format($pembelian->ambil_transfer ?? 0, 0, ',', '.') }}</span>
+                            </div>
+                            @if(($pembelian->kekurangan ?? 0) > 0)
+                            <div class="flex justify-between text-red-500">
+                                <span>Sisa Kekurangan:</span>
+                                <span class="font-bold">Rp {{ number_format($pembelian->kekurangan, 0, ',', '.') }}</span>
+                            </div>
+                            @endif
                         </div>
-                        <div class="flex justify-between text-xl border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                            <span class="font-bold text-gray-700 dark:text-gray-300">Total Tagihan:</span>
-                            <span class="font-black text-indigo-600 dark:text-indigo-400">Rp {{ number_format($pembelian->details->sum('harga_netto'), 0, ',', '.') }}</span>
-                        </div>
+                    </div>
+
+                    <div class="flex justify-between text-xl border-t border-gray-200 dark:border-gray-700 pt-2 mt-4">
+                        <span class="font-bold text-gray-700 dark:text-gray-300">Total Tagihan:</span>
+                        <span class="font-black text-indigo-600 dark:text-indigo-400">Rp {{ number_format($pembelian->details->sum('harga_netto'), 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
@@ -75,10 +92,11 @@
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                                <th class="px-4 py-3">Produk</th>
-                                <th class="px-4 py-3 text-center">Rendeman</th>
-                                <th class="px-4 py-3 text-center">Netto</th>
-                                <th class="px-4 py-3">Harga Basis</th>
+                                <th class="px-4 py-3">Barang</th>
+                                <th class="px-4 py-3 text-right">Netto</th>
+                                <th class="px-4 py-3 text-right">Basis</th>
+                                <th class="px-4 py-3 text-right">Rendeman</th>
+                                <th class="px-4 py-3 text-right">Harga</th>
                                 <th class="px-4 py-3 text-right">Subtotal</th>
                             </tr>
                         </thead>
@@ -88,14 +106,19 @@
                                 <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
                                     {{ $detail->produk->nama_produk }}
                                 </td>
-                                <td class="px-4 py-3 text-center">
-                                    {{ $detail->rendeman ? $detail->rendeman . '%' : '-' }}
-                                </td>
-                                <td class="px-4 py-3 text-center">
+
+
+                                <td class="px-4 py-3 text-right">
                                     {{ number_format($detail->netto, 2) }} <span class="text-xs text-gray-400">{{ $detail->satuan }}</span>
                                 </td>
-                                <td class="px-4 py-3">
-                                    Rp {{ number_format($detail->harga_basis, 0, ',', '.') }}
+                                <td class="px-4 py-3 text-right">
+                                    Rp {{ number_format($detail->harga_basis_pembelian, 0, ',', '.') }}
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    {{ $detail->rendeman ? $detail->rendeman . '%' : '-' }}
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    Rp {{ number_format($detail->harga, 0, ',', '.') }}
                                 </td>
                                 <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
                                     Rp {{ number_format($detail->harga_netto, 0, ',', '.') }}

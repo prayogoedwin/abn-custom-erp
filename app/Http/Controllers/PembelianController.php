@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\PembelianExport;
+use App\Models\CashbonSupplierPembayaran;
 use App\Models\Pembelian;
 use App\Models\PembelianDetail;
 use App\Models\SimpanPinjamSupplier;
@@ -63,8 +64,8 @@ class PembelianController extends Controller
                     })->toArray(),
                 ]],
                 ['name' => 'nopol', 'value' => 'nopol',  'title' => 'Nopol', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true],
-                
-                
+
+
                 ['name' => 'total_nominal_pembelian', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Pembelian', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => false],
                 ['name' => 'total_nominal_terbayar', 'value' => 'total_nominal_pembelian',  'title' => 'Total Nominal Terbayar', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => false],
                 ['name' => 'kekurangan', 'value' => 'kekurangan',  'title' => 'Kekurangan', 'type' => 'rupiah', 'inform' => true, 'inshow' => true, 'intable' => true],
@@ -153,7 +154,7 @@ class PembelianController extends Controller
         // dd($pembelian);
 
         $supplier = Supplier::find($pembelian->supplier_id);
-        
+
 
 
         $simpanpinjamsupplier = SimpanPinjamSupplier::where("supplier_id", $supplier->id)->first();
@@ -193,20 +194,23 @@ class PembelianController extends Controller
 
         $pembelian = Pembelian::create($store_data);
 
-        
 
-        
+
+
 
         return to_route('pembeliandetails.createnow', $pembelian->id);
     }
 
     public function storelanjut(Pembelian $pembelian, Request $request): RedirectResponse
     {
+        // dd($request->all());
 
         $store_data = [
-            'metode_pembayaran' => $request->input('metode_pembayaran'),
-            'tipe_pembayaran' => $request->input('tipe_pembayaran'),
-            'nominal' => $this->toIntMoney($request->input('nominal')),
+            'potong_bon' => $this->toIntMoney($request->input('potong_bon')),
+            'titip' => $this->toIntMoney($request->input('titip')),
+            'ambil_tunai' => $this->toIntMoney($request->input('ambil_tunai')),
+            'ambil_transfer' => $this->toIntMoney($request->input('ambil_transfer')),
+            'status' => $request->input('status'),
             'keterangan' => $request->input('keterangan'),
 
             'created_by' => auth()->id(),
@@ -214,59 +218,90 @@ class PembelianController extends Controller
 
 
 
-        $p = Pembelian::find($pembelian->id);
-        $p->update([
-            'metode_pembayaran' => $store_data['metode_pembayaran'],
-            'tipe_pembayaran' => $store_data['tipe_pembayaran'],
+        $pembelian->update([
+            'ambil_transfer' => $store_data['ambil_transfer'],
+            'ambil_tunai' => $store_data['ambil_tunai'],
+            'total_nominal_terbayar' => $store_data['ambil_transfer'] + $store_data['ambil_tunai'],
+            'kekurangan' => $pembelian->total_nominal_pembelian - ($store_data['ambil_transfer'] + $store_data['ambil_tunai']),
+            'status' => $store_data['status'],
         ]);
 
 
 
 
-        SimpanPinjamSupplier::updateOrCreate(
-            ['pembelian_id' => $pembelian->id],
-            [
-                'supplier_id' => $pembelian->supplier_id,
-                'tipe' => 'IN',
-                'nominal' => $store_data['nominal'] ?? 0,
-                'keterangan' => $store_data['keterangan'],
-                'created_by' => auth()->id(),
-            ]
-        );
+        CashbonSupplierPembayaran::create([
 
-        $totalNominalPembelian = (int) PembelianDetail::where('pembelian_id', $pembelian->id)->sum('harga_netto');
-        $totalNominalTerbayar = (int) SimpanPinjamSupplier::where('pembelian_id', $pembelian->id)->sum('nominal');
-        $kekurangan = max($totalNominalPembelian - $totalNominalTerbayar, 0);
-        $statusPembayaran = $kekurangan <= 0 ? 'Lunas' : 'Belum Lunas';
+            'supplier_id' => $pembelian->supplier_id,
+            'tipe' => 'Lewat Pembelian',
+            'nominal_bayar' => $store_data['potong_bon'] ?? 0,
+            'keterangan' => 'Lewat Pembelian' . $pembelian->no_transaksi,
+            'created_by' => auth()->id(),
 
-        $p->update([
-            'total_nominal_pembelian' => $totalNominalPembelian,
-            'total_nominal_terbayar' => $totalNominalTerbayar,
-            'kekurangan' => $kekurangan,
-            'status_pembayaran' => $statusPembayaran,
         ]);
 
+        if ($request->input('action') === 'save_and_print') {
+            return redirect()->route('pembelians.cetaknota', $pembelian)->with('success', 'Data berhasil disimpan!');
+        }
 
-        return to_route('pembelians.index');
+        return to_route('pembelians.index')->with('success', 'Data berhasil disimpan!');;
     }
 
 
 
-    public function cetakNota($id)
+    public function cetakNota(Pembelian $pembelian)
     {
-        $pembelian = Pembelian::find($id);
-        $pembelian->details = PembelianDetail::where('pembelian_id', $id)->get();
-        $pembelian->supplier = Supplier::find($pembelian->supplier_id);
+        // 1. Load relasi yang dibutuhkan
+        $pembelian->load('details.produk', 'supplier');
 
-        // dd($pembelian);
+        // 2. Cari riwayat pemotongan cashbon yang spesifik untuk pembelian ini
+        // Menggunakan no_transaksi agar akurat dan tidak tertukar dengan transaksi lain
+        $pembayarancashbon = CashbonSupplierPembayaran::where('supplier_id', $pembelian->supplier_id)
+            ->where('keterangan', 'like', '%' . $pembelian->no_transaksi . '%')
+            ->latest()
+            ->first();
 
-        // Opsional: Atur ukuran kertas (khusus nota thermal biasanya 80mm atau 58mm)
-        // Jika kertas A4 gunakan 'a4', jika thermal gunakan array [0, 0, 226.77, 500] (80mm x sesuai panjang)
-        $pdf = Pdf::loadView('exports.nota', compact('pembelian'))
+        $nominalPotong = $pembayarancashbon ? $pembayarancashbon->nominal_bayar : 0;
+
+        $cashbonsebelum = $pembelian->supplier->totalCashbon() + $nominalPotong;
+
+        $terbilang = $this->konversiTerbilang($pembelian->total_nominal_pembelian) . " Rupiah";
+        // dd($pembelian, $pembayarancashbon, $cashbonsebelum);
+
+        $pdf = Pdf::loadView('exports.nota', compact('pembelian', 'pembayarancashbon', 'cashbonsebelum', 'terbilang'))
             ->setPaper('a4', 'portrait');
 
-        // Stream untuk melihat di browser, atau download() untuk langsung unduh
-        return $pdf->download('Nota-' . $pembelian->kode_transaksi . '.pdf');
+        return $pdf->download('Nota-' . $pembelian->no_transaksi . '.pdf');
+    }
+
+    private function konversiTerbilang(int $angka)
+    {
+        $angka = abs((int)$angka);
+        $baca = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+        $terbilang = "";
+
+        if ($angka < 12) {
+            $terbilang = " " . $baca[$angka];
+        } elseif ($angka < 20) {
+            $terbilang = $this->konversiTerbilang($angka - 10) . " Belas ";
+        } elseif ($angka < 100) {
+            $terbilang = $this->konversiTerbilang($angka / 10) . " Puluh " . $this->konversiTerbilang($angka % 10);
+        } elseif ($angka < 200) {
+            $terbilang = " Seratus" . $this->konversiTerbilang($angka - 100);
+        } elseif ($angka < 1000) {
+            $terbilang = $this->konversiTerbilang($angka / 100) . " Ratus " . $this->konversiTerbilang($angka % 100);
+        } elseif ($angka < 2000) {
+            $terbilang = " Seribu" . $this->konversiTerbilang($angka - 1000);
+        } elseif ($angka < 1000000) {
+            $terbilang = $this->konversiTerbilang($angka / 1000) . " Ribu " . $this->konversiTerbilang($angka % 1000);
+        } elseif ($angka < 1000000000) {
+            $terbilang = $this->konversiTerbilang($angka / 1000000) . " Juta " . $this->konversiTerbilang($angka % 1000000);
+        } elseif ($angka < 1000000000000) {
+            $terbilang = $this->konversiTerbilang($angka / 1000000000) . " Milyar " . $this->konversiTerbilang(fmod($angka, 1000000000));
+        } elseif ($angka < 1000000000000000) {
+            $terbilang = $this->konversiTerbilang($angka / 1000000000000) . " Trilyun " . $this->konversiTerbilang(fmod($angka, 1000000000000));
+        }
+
+        return trim($terbilang);
     }
 
     public function show($id): View

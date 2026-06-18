@@ -8,6 +8,7 @@
             font-family: 'Courier', sans-serif;
             font-size: 12px;
             line-height: 1.4;
+            font-weight: bold;
         }
 
         .header {
@@ -25,7 +26,6 @@
 
         .table th {
             border-bottom: 1px solid #000;
-            text-align: left;
             padding: 5px;
         }
 
@@ -41,13 +41,43 @@
         .total-section {
             margin-top: 20px;
             border-top: 1px dashed #000;
+            border-bottom: 1px solid #000;
             padding-top: 10px;
+            padding-bottom: 10px;
         }
 
         .footer {
-            margin-top: 30px;
-            text-align: center;
+            margin-top: 15px;
+        }
+
+        .terbilang-box {
+            border: 1px solid #000;
+            padding: 8px;
+            margin-top: 10px;
+            margin-bottom: 25px;
             font-style: italic;
+        }
+
+        /* Style Tambahan untuk Tanda Tangan */
+        .signature-container {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .signature-table td {
+            width: 50%;
+            text-align: center;
+            vertical-align: bottom;
+        }
+
+        .signature-space {
+            height: 70px;
+            /* Jarak untuk tanda tangan manual */
         }
     </style>
 </head>
@@ -65,16 +95,18 @@
         </tr>
         <tr>
             <td>Supplier: {{ $pembelian->supplier->nama }}</td>
-            <td></td>
+            <td class="text-right">Mobil: {{ $pembelian->nopol }}</td>
         </tr>
     </table>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Produk</th>
-                <th>Qty</th>
-                <th>Harga</th>
+                <th style="text-align: left;">BARANG</th>
+                <th class="text-right">QTTY</th>
+                <th class="text-right">BASIS</th>
+                <th class="text-right">RENDEMEN</th>
+                <th class="text-right">HARGA</th>
                 <th class="text-right">Subtotal</th>
             </tr>
         </thead>
@@ -82,8 +114,10 @@
             @foreach($pembelian->details as $detail)
             <tr>
                 <td>{{ $detail->produk->nama_produk }}</td>
-                <td>{{ $detail->netto }} {{ $detail->produk->satuan }}</td>
-                <td>{{ number_format($detail->harga_basis, 0, ',', '.') }}</td>
+                <td class="text-right">{{ $detail->netto }} {{ $detail->produk->satuan }}</td>
+                <td class="text-right">{{ number_format($detail->harga_basis_pembelian, 0, ',', '.') }}</td>
+                <td class="text-right">{{ number_format($detail->rendeman, 0, ',', '.') }} %</td>
+                <td class="text-right">{{ number_format($detail->harga, 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($detail->harga_netto, 0, ',', '.') }}</td>
             </tr>
             @endforeach
@@ -93,15 +127,60 @@
     <div class="total-section">
         <table style="width: 100%">
             <tr>
-                <td style="width: 70%" class="text-right"><strong>Grand Total:</strong></td>
-                <td class="text-right"><strong>Rp {{ number_format($pembelian->details->sum('harga_netto'), 0, ',', '.') }}</strong></td>
+                <td class="text-right"><strong>Saldo Titipan:</strong></td>
+                <td class="text-right"><strong></strong></td>
+                <td class="text-right"><strong>Grand Total: Rp</strong></td>
+                <td class="text-right"><strong>{{ number_format($pembelian->details->sum('harga_netto'), 0, ',', '.') }}</strong></td>
+            </tr>
+            <tr>
+                <td class="text-right"><strong>Cashbon: Rp</strong></td>
+                <td class="text-right"><strong>{{ number_format($cashbonsebelum, 0, ',', '.') }}</strong></td>
+                <td class="text-right"><strong>Pot Cashbon: Rp</strong></td>
+                <td class="text-right"><strong>{{ number_format($pembayarancashbon->nominal_bayar ?? 0, 0, ',', '.') }}</strong></td>
+            </tr>
+            <tr>
+                <td class="text-right"><strong></strong></td>
+                <td class="text-right"><strong></strong></td>
+                <td class="text-right"><strong>Sisa Cashbon: Rp</strong></td>
+                <td class="text-right"><strong>{{ number_format($pembelian->supplier->totalCashbon(), 0, ',', '.') }}</strong></td>
+            </tr>
+            <tr>
+                <td class="text-right"><strong></strong></td>
+                <td class="text-right"><strong></strong></td>
+                <td class="text-right"><strong>Bank (Transfer): Rp</strong></td>
+                <td class="text-right"><strong>{{ number_format($pembelian->ambil_transfer, 0, ',', '.') }}</strong></td>
+            </tr>
+            <tr>
+                <td class="text-right"><strong></strong></td>
+                <td class="text-right"><strong></strong></td>
+                <td class="text-right"><strong>Tunai: Rp</strong></td>
+                <td class="text-right"><strong>{{ number_format($pembelian->ambil_tunai, 0, ',', '.') }}</strong></td>
             </tr>
         </table>
     </div>
 
     <div class="footer">
-        <p></p>
+        <div class="terbilang-title"><strong>Terbilang :</strong></div>
+        <div class="terbilang-box">
+            <strong>## {{ $terbilang }} ##</strong>
+        </div>
     </div>
+
+    <div class="signature-container">
+        <table class="signature-table">
+            <tr>
+                <td>
+                    
+                </td>
+                <td>
+                    <p>{{ $setting->alamat ?? 'Baturaja' }} | {{ date('d/m/Y') }}</p>
+                    <div class="signature-space"></div>
+                    <p>( ........................ )</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
 </body>
 
 </html>

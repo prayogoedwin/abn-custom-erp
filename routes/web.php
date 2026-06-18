@@ -204,12 +204,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'show'])->name('pembeliandetails.show')->middleware('permission:show-pembeliandetails');
 
-    Route::get('pembeliandetails/{pembelian}/edittitip', [PembelianDetailController::class, 'edittitip'])->name('pembeliandetails.edittitip')->middleware('permission:edit-pembeliandetails');
-    Route::get('pembeliandetails/{pembelian}/editjual', [PembelianDetailController::class, 'editjual'])->name('pembeliandetails.editjual')->middleware('permission:edit-pembeliandetails');
+    Route::get('pembeliandetails/{pembelian}/editnow', [PembelianDetailController::class, 'editnow'])->name('pembeliandetails.edittitip')->middleware('permission:edit-pembeliandetails');
 
-    Route::post('pembeliandetails/{pembelian}/titipupdate', [PembelianDetailController::class, 'titipupdate'])->name('pembeliandetails.titipupdate');
-    Route::post('pembeliandetails/{pembelian}/jualupdate', [PembelianDetailController::class, 'jualupdate'])->name('pembeliandetails.jualupdate')->middleware('permission:edit-pembeliandetails');
-
+    Route::post('pembeliandetails/{pembelian}/update', [PembelianDetailController::class, 'update'])->name('pembeliandetails.titipupdate');
 
     Route::delete('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'destroy'])->name('pembeliandetails.destroy')->middleware('permission:delete-pembeliandetails');
 

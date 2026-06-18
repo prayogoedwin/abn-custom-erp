@@ -22,7 +22,7 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-6 min-h-[500px]">
-            <form action="{{ route($tablename . '.update', $data) }}" method="POST" class="max-w-2xl">
+            <form action="{{ route('pembelian', $data) }}" method="POST" class="max-w-2xl">
                 @csrf
                 @method('PUT')
 
