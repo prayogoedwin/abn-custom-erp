@@ -147,7 +147,7 @@ class PembelianDetailController extends Controller
         return Excel::download(new PembelianDetailExport, 'pembeliandetails-' . date('Y-m-d') . '.xlsx');
     }
 
-    public function createnow(Pembelian $pembelian):View
+    public function createnow(Pembelian $pembelian): View
     {
         $produks = Produk::where('isActive', true)->get();
 
@@ -162,7 +162,7 @@ class PembelianDetailController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-       
+
         //      'pembelian_id',
         //     'produk_id',
         //     'tipe_transaksi_pembelian'
@@ -180,7 +180,7 @@ class PembelianDetailController extends Controller
         foreach ($request->produk_id as $index => $produk_id) {
             if ($produk_id) {
 
-                
+
                 PembelianDetail::create([
                     'pembelian_id' => $request->pembelian_id,
                     'produk_id'    => $produk_id,
@@ -214,7 +214,7 @@ class PembelianDetailController extends Controller
 
         $pagedata = $this->getPagedata();
 
-       
+
 
         return view('dynamiccrud.show', compact('data'), $pagedata);
     }
@@ -222,7 +222,7 @@ class PembelianDetailController extends Controller
 
     public function editnow(Pembelian $pembelian): View
     {
-        
+
         $produks = Produk::all();
 
         $pagedata = $this->getPagedata();
@@ -232,23 +232,11 @@ class PembelianDetailController extends Controller
         return view('pembeliandetails.editnow', compact('pembelian', 'produks'), $pagedata);
     }
 
-    public function titipupdate(Request $request): RedirectResponse 
+
+    public function update(Request $request): RedirectResponse
     {
 
-        $store_data = [
-            'pembelian_id' => $request->input('pembelian_id'),
-            'produk_id' => $request->input('produk_id'),
-            'netto' => $request->input('netto'),
-            'satuan' => $request->input('satuan'),
-            'rendeman' => $request->input('rendeman'),
-            'bobot' => $request->input('bobot'),
-            'harga' => $request->input('harga'),
-            'harga_basis' => $request->input('harga_basis'),
-            'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
-            'harga_netto' => $request->input('harga_netto'),
-
-            'created_by' => auth()->id(),
-        ];
+        
 
         // dd($request->all());
 
@@ -257,76 +245,30 @@ class PembelianDetailController extends Controller
 
 
         foreach ($request->produk_id as $index => $produk_id) {
-            if (!empty($produk_id)) {
-                // Simpan ulang setiap item ke database
+            if ($produk_id) {
+
+
                 PembelianDetail::create([
                     'pembelian_id' => $request->pembelian_id,
                     'produk_id'    => $produk_id,
-                    'netto'        => $request->netto[$index] ?? 0,
-                    'satuan'       => $request->satuan[$index] ?? "satuan",
-                    'rendeman'     => $request->rendeman[$index] ?? null,
-
-                    'updated_by' => auth()->id(),
-                ]);
-            }
-        }
-
-        $this->syncPembelianTotals((int) $store_data['pembelian_id']);
-
-
-        return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
-
-    }
-
-    public function jualupdate(Request $request): RedirectResponse 
-    {
-
-        $store_data = [
-            'pembelian_id' => $request->input('pembelian_id'),
-            'produk_id' => $request->input('produk_id'),
-            'netto' => $request->input('netto'),
-            'satuan' => $request->input('satuan'),
-            'rendeman' => $request->input('rendeman'),
-            'bobot' => $request->input('bobot'),
-            'harga' => $request->input('harga'),
-            'harga_basis' => $request->input('harga_basis'),
-            'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
-            'harga_netto' => $request->input('harga_netto'),
-
-            'created_by' => auth()->id(),
-        ];
-
-        // dd($request->all());
-
-        // Hapus semua dulu
-        PembelianDetail::where('pembelian_id', $request->pembelian_id)->delete();
-
-
-        foreach ($request->produk_id as $index => $produk_id) {
-            if (!empty($produk_id)) {
-                // Simpan ulang setiap item ke database
-                PembelianDetail::create([
-                    'pembelian_id' => $request->pembelian_id,
-                    'produk_id'    => $produk_id,
-                    'netto'        => $request->netto[$index] ?? 0,
-                    'satuan'       => $request->satuan[$index] ?? "satuan",
+                    'tipe_transaksi_pembelian'         => $request->tipe_pembelian[$index],
+                    'netto'        => $request->netto[$index],
+                    //TODO:
+                    'satuan'       => 'kg', //sementara hardcode
                     'rendeman'     => $request->rendeman[$index] ?? null,
                     'bobot'     => $this->toIntMoney($request->bobot[$index] ?? 0),
                     'harga'     => $this->toIntMoney($request->harga[$index] ?? 0),
                     'harga_basis'     => $this->toIntMoney($request->harga_basis[$index] ?? 0),
                     'harga_basis_pembelian'     => $this->toIntMoney($request->harga_basis_pembelian[$index] ?? ($request->harga_basis[$index] ?? 0)),
                     'harga_netto'     => $this->toIntMoney($request->harga_netto[$index] ?? 0),
-
-                    'updated_by' => auth()->id(),
                 ]);
             }
         }
 
-        $this->syncPembelianTotals((int) $store_data['pembelian_id']);
+        $this->syncPembelianTotals((int) $request->pembelian_id);
 
 
-        return to_route('pembelians.createlanjut', $store_data['pembelian_id']);
-
+        return to_route('pembelians.editlanjut', $request->pembelian_id);
     }
 
 

@@ -337,7 +337,6 @@ class PembelianController extends Controller
         $store_data = [
             'nopol' => $request->input('nopol'),
             'supplier_id' => $request->input('supplier_id'),
-            'tipe_transaksi_pembelian' => $request->input('tipe_transaksi_pembelian'),
 
             'created_by' => auth()->id(),
         ];
@@ -346,7 +345,6 @@ class PembelianController extends Controller
         $validate = Validator::make($store_data, [
             'nopol' => ['required', 'string', 'max:255'],
             'supplier_id' => ['required', 'integer', 'max:255'],
-            'tipe_transaksi_pembelian' => ['required', 'string'],
 
             'created_by' => ['required', 'integer']
         ]);
@@ -361,11 +359,21 @@ class PembelianController extends Controller
 
 
 
-        if ($store_data['tipe_transaksi_pembelian'] === 'Titip') {
-            return to_route('pembeliandetails.edittitip', $pembelian->id);
-        }
+        return to_route('pembeliandetails.editnow', $pembelian->id);
+    }
 
-        return to_route('pembeliandetails.editjual', $pembelian->id);
+    public function editlanjut(Pembelian $pembelian)
+    {
+        $supplier = $pembelian->supplier;
+
+
+        $pagedata = $this->getPagedata();
+
+        $data = $pembelian;
+        $pembelian->load('details');
+        // dd($pembelian);
+
+        return view('pembelians.editlanjut', compact('pembelian', 'supplier', 'data'), $pagedata);
     }
 
     //soft delete

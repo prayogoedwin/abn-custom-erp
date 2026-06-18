@@ -182,7 +182,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('pembelians/{pembelian}', [PembelianController::class, 'show'])->name('pembelians.show')->middleware('permission:show-pembelians');
     Route::get('pembelians/{pembelian}/edit', [PembelianController::class, 'edit'])->name('pembelians.edit')->middleware('permission:edit-pembelians');
-    Route::put('pembelians/{pembelian}', [PembelianController::class, 'update'])->name('pembelians.update')->middleware('permission:edit-pembelians');
+    Route::get('pembelians/{pembelian}/editlanjut', [PembelianController::class, 'editlanjut'])->name('pembelians.editlanjut')->middleware('permission:edit-pembelians');
+    Route::put('pembelians/{pembelian}/update', [PembelianController::class, 'update'])->name('pembelians.update')->middleware('permission:edit-pembelians');
+    Route::put('pembelians/{pembelian}/updatelanjut', [PembelianController::class, 'updatelanjut'])->name('pembelians.updatelanjut')->middleware('permission:edit-pembelians');
     Route::delete('pembelians/{pembelian}', [PembelianController::class, 'destroy'])->name('pembelians.destroy')->middleware('permission:delete-pembelians');
 
     Route::get('pembelians/{pembelian}/cetaknota', [PembelianController::class, 'cetakNota'])->name('pembelians.cetaknota')->middleware('permission:show-pembelians');
@@ -193,22 +195,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pembeliandetails/export', [PembelianDetailController::class, 'export'])->name('pembeliandetails.export')->middleware('permission:download-pembeliandetails');
     Route::get('pembeliandetails/create', [PembelianDetailController::class, 'create'])->name('pembeliandetails.create')->middleware('permission:create-pembeliandetails');
     Route::get('pembeliandetails/createnow/{pembelian}', [PembelianDetailController::class, 'createnow'])->name('pembeliandetails.createnow')->middleware('permission:create-pembeliandetails');
-    Route::get('pembeliandetails/createtitip/{pembelian}', [PembelianDetailController::class, 'createtitip'])->name('pembeliandetails.createtitip')->middleware('permission:create-pembeliandetails');
-
-    Route::get('pembeliandetails/createjual/{pembelian}', [PembelianDetailController::class, 'createjual'])->name('pembeliandetails.createjual')->middleware('permission:create-pembeliandetails');
-
     Route::post('pembeliandetails', [PembelianDetailController::class, 'store'])->name('pembeliandetails.store')->middleware('permission:create-pembeliandetails');
-    Route::post('pembeliandetails/titipstore', [PembelianDetailController::class, 'titipstore'])->name('pembeliandetails.titipstore')->middleware('permission:create-pembeliandetails');
-    Route::post('pembeliandetails/jualstore', [PembelianDetailController::class, 'jualstore'])->name('pembeliandetails.jualstore')->middleware('permission:create-pembeliandetails');
 
 
     Route::get('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'show'])->name('pembeliandetails.show')->middleware('permission:show-pembeliandetails');
 
-    Route::get('pembeliandetails/{pembelian}/editnow', [PembelianDetailController::class, 'editnow'])->name('pembeliandetails.edittitip')->middleware('permission:edit-pembeliandetails');
+    Route::get('pembeliandetails/{pembelian}/editnow', [PembelianDetailController::class, 'editnow'])->name('pembeliandetails.editnow')->middleware('permission:edit-pembeliandetails');
 
-    Route::post('pembeliandetails/{pembelian}/update', [PembelianDetailController::class, 'update'])->name('pembeliandetails.titipupdate');
+    Route::put('pembeliandetails/{pembelian}/update', [PembelianDetailController::class, 'update'])->name('pembeliandetails.update');
 
-    Route::delete('pembeliandetails/{pembeliandetail}', [PembelianDetailController::class, 'destroy'])->name('pembeliandetails.destroy')->middleware('permission:delete-pembeliandetails');
+    Route::delete('pembeliandetails/{pembeliandetail}/destroy', [PembelianDetailController::class, 'destroy'])->name('pembeliandetails.destroy')->middleware('permission:delete-pembeliandetails');
 
 
 

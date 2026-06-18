@@ -15,14 +15,19 @@
         <span class="text-gray-500 dark:text-gray-400">{{ __('Edit') }}</span>
     </div>
 
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit {{ $title }}</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">Update {{ $title }} details</p>
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit {{ $title }}</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Ubah detail pembelian di bawah ini') }}</p>
+        </div>
+        <div class="flex gap-2">
+            <x-button type="primary" form="pembelianForm">Edit Detail Pembelian</x-button>
+        </div>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-6 min-h-[500px]">
-            <form action="{{ route('pembelian', $data) }}" method="POST" class="max-w-2xl">
+            <form id="pembelianForm" action="{{ route('pembelians.update', $data) }}" method="POST" class="max-w-2xl">
                 @csrf
                 @method('PUT')
 
@@ -99,7 +104,6 @@
 
 
                 <div class="flex gap-3">
-                    <x-button type="primary">{{ __('Update') }}</x-button>
                     <a href="{{ route($tablename . '.index') }}" class="text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center justify-center cursor-pointer bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 dark:bg-gray-500 dark:hover:bg-gray-600">
                         {{ __('Batal') }}
                     </a>
