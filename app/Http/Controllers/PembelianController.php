@@ -228,16 +228,18 @@ class PembelianController extends Controller
 
 
 
+        if ($store_data['potong_bon'] > 0) {
+            CashbonSupplierPembayaran::create([
 
-        CashbonSupplierPembayaran::create([
+                'supplier_id' => $pembelian->supplier_id,
+                'tipe' => 'Lewat Pembelian',
+                'nominal_bayar' => $store_data['potong_bon'] ?? 0,
+                'keterangan' => 'Lewat Pembelian' . $pembelian->no_transaksi,
+                'created_by' => auth()->id(),
 
-            'supplier_id' => $pembelian->supplier_id,
-            'tipe' => 'Lewat Pembelian',
-            'nominal_bayar' => $store_data['potong_bon'] ?? 0,
-            'keterangan' => 'Lewat Pembelian' . $pembelian->no_transaksi,
-            'created_by' => auth()->id(),
+            ]);
+        }
 
-        ]);
 
         if ($request->input('action') === 'save_and_print') {
             return redirect()->route('pembelians.cetaknota', $pembelian)->with('success', 'Data berhasil disimpan!');

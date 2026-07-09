@@ -281,7 +281,7 @@
                 // Reset nilai di baris baru
                 newRow.querySelectorAll('input').forEach(input => input.value = '');
                 newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-                newRow.querySelector('.container-netto').classList.add('hidden');
+                // newRow.querySelector('.container-netto').classList.add('hidden');
                 newRow.querySelector('.container-rendeman').classList.add('hidden');
 
                 // Tampilkan tombol hapus di baris baru

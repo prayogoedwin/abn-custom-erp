@@ -137,6 +137,28 @@ return [
         ],
     ],
     [
+        'title' => 'Titipan',
+        'icon' => 'fas-wallet',
+        'active' => ['titipsupplier*', 'ambilsupplier*'],
+        'permission' => ['view-titipsupplier', 'view-ambilsupplier'],
+        'children' => [
+            [
+                'title' => 'Titipan Supplier',
+                'icon' => 'fas-wallet',
+                'route' => 'titipsuppliers.index',
+                'active' => 'titipsuppliers*',
+                'permission' => 'view-titipsuppliers',
+            ],
+            [
+                'title' => 'Ambil Supplier',
+                'icon' => 'fas-exchange-alt',
+                'route' => 'ambilsuppliers.index',
+                'active' => 'ambilsuppliers*',
+                'permission' => 'view-ambilsuppliers',
+            ],
+        ],
+    ],
+    [
         'title' => 'Produk',
         'icon' => 'fas-boxes-packing',
         'active' => ['produks*', 'kategoris*', 'stoks*', 'history_harga_bases*'],
@@ -162,6 +184,13 @@ return [
                 'route' => 'stoks.index',
                 'active' => 'stoks*',
                 'permission' => 'view-stoks',
+            ],
+            [
+                'title' => 'Stok Titipan',
+                'icon' => 'fas-boxes-stacked',
+                'route' => 'stoktitipans.index',
+                'active' => 'stoktitipans*',
+                'permission' => 'view-stoktitipans',
             ],
             [
                 'title' => 'History Harga',

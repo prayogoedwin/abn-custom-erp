@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AmbilSupplierController;
 use App\Http\Controllers\BackupRestoreController;
 use App\Http\Controllers\CashbonKaryawanController;
 use App\Http\Controllers\CashbonKaryawanPembayaranController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Settings;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TitipSupplierController;
 use App\Http\Controllers\UserController;
 use App\Models\DinamisVariable;
 use App\Models\HistoryHargaBasis;
@@ -327,6 +329,27 @@ Route::middleware(['auth'])->group(function () {
     Route::put('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CashbonSupplierPembayaranController::class, 'update'])->name('cashbonsupplierpembayarans.update')->middleware('permission:edit-cashbonsupplierpembayarans');
     Route::delete('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CashbonSupplierPembayaranController::class, 'destroy'])->name('cashbonsupplierpembayarans.destroy')->middleware('permission:delete-cashbonsupplierpembayarans');
     //=============================================================================================================
+
+
+    //Titipan supplier==================================================================================================
+    Route::get('titipsuppliers', [TitipSupplierController::class, 'index'])->name('titipsuppliers.index')->middleware('permission:view-titipsuppliers');
+    Route::get('titipsuppliers/export', [TitipSupplierController::class, 'export'])->name('titipsuppliers.export')->middleware('permission:download-titipsuppliers');
+    Route::get('titipsuppliers/create', [TitipSupplierController::class, 'create'])->name('titipsuppliers.create')->middleware('permission:create-titipsuppliers');
+    Route::post('titipsuppliers', [TitipSupplierController::class, 'store'])->name('titipsuppliers.store')->middleware('permission:create-titipsuppliers');
+    Route::get('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'show'])->name('titipsuppliers.show')->middleware('permission:show-titipsuppliers');
+    Route::get('titipsuppliers/{titipsupplier}/edit', [TitipSupplierController::class, 'edit'])->name('titipsuppliers.edit')->middleware('permission:edit-titipsuppliers');
+    Route::put('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'update'])->name('titipsuppliers.update')->middleware('permission:edit-titipsuppliers');
+    Route::delete('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'destroy'])->name('titipsuppliers.destroy')->middleware('permission:delete-titipsuppliers');
+
+    //Ambil Supplier==================================================================================================
+    Route::get('ambilsuppliers', [AmbilSupplierController::class, 'index'])->name('ambilsuppliers.index')->middleware('permission:view-ambilsuppliers');
+    Route::get('ambilsuppliers/export', [AmbilSupplierController::class, 'export'])->name('ambilsuppliers.export')->middleware('permission:download-ambilsuppliers');
+    Route::get('ambilsuppliers/create', [AmbilSupplierController::class, 'create'])->name('ambilsuppliers.create')->middleware('permission:create-ambilsuppliers');
+    Route::post('ambilsuppliers', [AmbilSupplierController::class, 'store'])->name('ambilsuppliers.store')->middleware('permission:create-ambilsuppliers');
+    Route::get('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'show'])->name('ambilsuppliers.show')->middleware('permission:show-ambilsuppliers');
+    Route::get('ambilsuppliers/{ambilsupplier}/edit', [AmbilSupplierController::class, 'edit'])->name('ambilsuppliers.edit')->middleware('permission:edit-ambilsuppliers');
+    Route::put('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'update'])->name('ambilsuppliers.update')->middleware('permission:edit-ambilsuppliers');
+    Route::delete('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'destroy'])->name('ambilsuppliers.destroy')->middleware('permission:delete-ambilsuppliers');
 
 
 
