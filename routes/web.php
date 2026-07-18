@@ -27,6 +27,7 @@ use App\Http\Controllers\Settings;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TitipSupplierController;
+use App\Http\Controllers\StokTitipanController;
 use App\Http\Controllers\UserController;
 use App\Models\DinamisVariable;
 use App\Models\HistoryHargaBasis;
@@ -125,6 +126,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('suppliers/create', [SupplierController::class, 'create'])->name('suppliers.create')->middleware('permission:create-suppliers');
     Route::post('suppliers', [SupplierController::class, 'store'])->name('suppliers.store')->middleware('permission:create-suppliers');
     Route::get('suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show')->middleware('permission:show-suppliers');
+    Route::get('suppliers/{supplier}/table', [SupplierController::class, 'showTable'])->name('suppliers.showTable')->middleware('permission:show-suppliers');
     Route::get('suppliers/{supplier}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit')->middleware('permission:edit-suppliers');
     Route::put('suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update')->middleware('permission:edit-suppliers');
     Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('permission:delete-suppliers');
@@ -332,24 +334,37 @@ Route::middleware(['auth'])->group(function () {
 
 
     //Titipan supplier==================================================================================================
-    Route::get('titipsuppliers', [TitipSupplierController::class, 'index'])->name('titipsuppliers.index')->middleware('permission:view-titipsuppliers');
-    Route::get('titipsuppliers/export', [TitipSupplierController::class, 'export'])->name('titipsuppliers.export')->middleware('permission:download-titipsuppliers');
-    Route::get('titipsuppliers/create', [TitipSupplierController::class, 'create'])->name('titipsuppliers.create')->middleware('permission:create-titipsuppliers');
-    Route::post('titipsuppliers', [TitipSupplierController::class, 'store'])->name('titipsuppliers.store')->middleware('permission:create-titipsuppliers');
-    Route::get('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'show'])->name('titipsuppliers.show')->middleware('permission:show-titipsuppliers');
-    Route::get('titipsuppliers/{titipsupplier}/edit', [TitipSupplierController::class, 'edit'])->name('titipsuppliers.edit')->middleware('permission:edit-titipsuppliers');
-    Route::put('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'update'])->name('titipsuppliers.update')->middleware('permission:edit-titipsuppliers');
-    Route::delete('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'destroy'])->name('titipsuppliers.destroy')->middleware('permission:delete-titipsuppliers');
+    Route::get('titipsuppliers', [TitipSupplierController::class, 'index'])->name('titipsuppliers.index')->middleware('permission:view-titip-suppliers');
+    Route::get('titipsuppliers/table', [TitipSupplierController::class, 'indexTable'])->name('titipsuppliers.indexTable')->middleware('permission:view-titip-suppliers');
+    Route::get('titipsuppliers/export', [TitipSupplierController::class, 'export'])->name('titipsuppliers.export')->middleware('permission:download-titip-suppliers');
+    Route::get('titipsuppliers/create', [TitipSupplierController::class, 'create'])->name('titipsuppliers.create')->middleware('permission:create-titip-suppliers');
+    Route::post('titipsuppliers', [TitipSupplierController::class, 'store'])->name('titipsuppliers.store')->middleware('permission:create-titip-suppliers');
+    Route::get('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'show'])->name('titipsuppliers.show')->middleware('permission:show-titip-suppliers');
+    Route::get('titipsuppliers/{titipsupplier}/edit', [TitipSupplierController::class, 'edit'])->name('titipsuppliers.edit')->middleware('permission:edit-titip-suppliers');
+    Route::put('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'update'])->name('titipsuppliers.update')->middleware('permission:edit-titip-suppliers');
+    Route::delete('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'destroy'])->name('titipsuppliers.destroy')->middleware('permission:delete-titip-suppliers');
 
     //Ambil Supplier==================================================================================================
-    Route::get('ambilsuppliers', [AmbilSupplierController::class, 'index'])->name('ambilsuppliers.index')->middleware('permission:view-ambilsuppliers');
-    Route::get('ambilsuppliers/export', [AmbilSupplierController::class, 'export'])->name('ambilsuppliers.export')->middleware('permission:download-ambilsuppliers');
-    Route::get('ambilsuppliers/create', [AmbilSupplierController::class, 'create'])->name('ambilsuppliers.create')->middleware('permission:create-ambilsuppliers');
-    Route::post('ambilsuppliers', [AmbilSupplierController::class, 'store'])->name('ambilsuppliers.store')->middleware('permission:create-ambilsuppliers');
-    Route::get('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'show'])->name('ambilsuppliers.show')->middleware('permission:show-ambilsuppliers');
-    Route::get('ambilsuppliers/{ambilsupplier}/edit', [AmbilSupplierController::class, 'edit'])->name('ambilsuppliers.edit')->middleware('permission:edit-ambilsuppliers');
-    Route::put('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'update'])->name('ambilsuppliers.update')->middleware('permission:edit-ambilsuppliers');
-    Route::delete('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'destroy'])->name('ambilsuppliers.destroy')->middleware('permission:delete-ambilsuppliers');
+    Route::get('ambilsuppliers', [AmbilSupplierController::class, 'index'])->name('ambilsuppliers.index')->middleware('permission:view-ambil-suppliers');
+    Route::get('ambilsuppliers/table', [AmbilSupplierController::class, 'indexTable'])->name('ambilsuppliers.indexTable')->middleware('permission:view-ambil-suppliers');
+    Route::get('ambilsuppliers/export', [AmbilSupplierController::class, 'export'])->name('ambilsuppliers.export')->middleware('permission:download-ambil-suppliers');
+    Route::get('ambilsuppliers/create', [AmbilSupplierController::class, 'create'])->name('ambilsuppliers.create')->middleware('permission:create-ambil-suppliers');
+    Route::post('ambilsuppliers', [AmbilSupplierController::class, 'store'])->name('ambilsuppliers.store')->middleware('permission:create-ambil-suppliers');
+    Route::get('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'show'])->name('ambilsuppliers.show')->middleware('permission:show-ambil-suppliers');
+    Route::get('ambilsuppliers/{ambilsupplier}/edit', [AmbilSupplierController::class, 'edit'])->name('ambilsuppliers.edit')->middleware('permission:edit-ambil-suppliers');
+    Route::put('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'update'])->name('ambilsuppliers.update')->middleware('permission:edit-ambil-suppliers');
+    Route::delete('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'destroy'])->name('ambilsuppliers.destroy')->middleware('permission:delete-ambil-suppliers');
+
+    //Stok Titipan==================================================================================================================
+    Route::get('stoktitipans', [StokTitipanController::class, 'index'])->name('stoktitipans.index')->middleware('permission:view-stok-titipans');
+    Route::get('stoktitipans/table', [StokTitipanController::class, 'indexTable'])->name('stoktitipans.indexTable')->middleware('permission:view-stok-titipans');
+    Route::get('stoktitipans/export', [StokTitipanController::class, 'export'])->name('stoktitipans.export')->middleware('permission:download-stok-titipans');
+    Route::get('stoktitipans/create', [StokTitipanController::class, 'create'])->name('stoktitipans.create')->middleware('permission:create-stok-titipans');
+    Route::post('stoktitipans', [StokTitipanController::class, 'store'])->name('stoktitipans.store')->middleware('permission:create-stok-titipans');
+    Route::get('stoktitipans/{stoktitipan}', [StokTitipanController::class, 'show'])->name('stoktitipans.show')->middleware('permission:show-stok-titipans');
+    Route::get('stoktitipans/{stoktitipan}/edit', [StokTitipanController::class, 'edit'])->name('stoktitipans.edit')->middleware('permission:edit-stok-titipans');
+    Route::put('stoktitipans/{stoktitipan}', [StokTitipanController::class, 'update'])->name('stoktitipans.update')->middleware('permission:edit-stok-titipans');
+    Route::delete('stoktitipans/{stoktitipan}', [StokTitipanController::class, 'destroy'])->name('stoktitipans.destroy')->middleware('permission:delete-stok-titipans');
 
 
 

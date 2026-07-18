@@ -8,6 +8,7 @@ use App\Models\PembelianDetail;
 use App\Models\Produk;
 use App\Models\SimpanPinjamSupplier;
 use App\Models\Stok;
+use App\Models\StokTitipan;
 use Illuminate\Http\Request;
 
 use Illuminate\Http\RedirectResponse;
@@ -175,13 +176,28 @@ class PembelianDetailController extends Controller
         //     'harga_basis_pembelian',
         //     'harga_netto',
 
+        $harga = $request->harga ?? [];
+        $harga_basis = $request->harga_basis ?? [];
+        $harga_basis_pembelian = $request->harga_basis_pembelian ?? [];
+        $harga_netto = $request->harga_netto ?? [];
 
+
+        //karena ini create pastikan semua data dihapus dulu
+        PembelianDetail::where('pembelian_id', $request->pembelian_id)->delete();
 
         foreach ($request->produk_id as $index => $produk_id) {
             if ($produk_id) {
 
+                //if tipe_transaksi_pembelian = "titip" maka semua harga di set ke 0, karena titip tidak ada harga
+                if ($request->tipe_pembelian[$index] === 'titip') {
+                    $harga[$index] = 0;
+                    $harga_basis[$index] = 0;
+                    $harga_basis_pembelian[$index] = 0;
+                    $harga_netto[$index] = 0;
+                }
+                    
 
-                PembelianDetail::create([
+                $pembelianDetail = PembelianDetail::create([
                     'pembelian_id' => $request->pembelian_id,
                     'produk_id'    => $produk_id,
                     'tipe_transaksi_pembelian'         => $request->tipe_pembelian[$index],
@@ -190,11 +206,13 @@ class PembelianDetailController extends Controller
                     'satuan'       => 'kg', //sementara hardcode
                     'rendeman'     => $request->rendeman[$index] ?? null,
                     'bobot'     => $this->toIntMoney($request->bobot[$index] ?? 0),
-                    'harga'     => $this->toIntMoney($request->harga[$index] ?? 0),
-                    'harga_basis'     => $this->toIntMoney($request->harga_basis[$index] ?? 0),
-                    'harga_basis_pembelian'     => $this->toIntMoney($request->harga_basis_pembelian[$index] ?? ($request->harga_basis[$index] ?? 0)),
-                    'harga_netto'     => $this->toIntMoney($request->harga_netto[$index] ?? 0),
+                    'harga'     => $this->toIntMoney($harga[$index] ?? 0),
+                    'harga_basis'     => $this->toIntMoney($harga_basis[$index] ?? 0),
+                    'harga_basis_pembelian'     => $this->toIntMoney($harga_basis_pembelian[$index] ?? ($harga_basis[$index] ?? 0)),
+                    'harga_netto'     => $this->toIntMoney($harga_netto[$index] ?? 0),
                 ]);
+
+                
             }
         }
 
@@ -239,14 +257,26 @@ class PembelianDetailController extends Controller
         
 
         // dd($request->all());
+        $harga = $request->harga ?? [];
+        $harga_basis = $request->harga_basis ?? [];
+        $harga_basis_pembelian = $request->harga_basis_pembelian ?? [];
+        $harga_netto = $request->harga_netto ?? [];
 
         // Hapus semua dulu
         PembelianDetail::where('pembelian_id', $request->pembelian_id)->delete();
 
 
+
         foreach ($request->produk_id as $index => $produk_id) {
             if ($produk_id) {
 
+                //if tipe_transaksi_pembelian = "titip" maka semua harga di set ke 0, karena titip tidak ada harga
+                if ($request->tipe_pembelian[$index] === 'titip') {
+                    $harga[$index] = 0;
+                    $harga_basis[$index] = 0;
+                    $harga_basis_pembelian[$index] = 0;
+                    $harga_netto[$index] = 0;
+                }
 
                 PembelianDetail::create([
                     'pembelian_id' => $request->pembelian_id,
@@ -257,10 +287,10 @@ class PembelianDetailController extends Controller
                     'satuan'       => 'kg', //sementara hardcode
                     'rendeman'     => $request->rendeman[$index] ?? null,
                     'bobot'     => $this->toIntMoney($request->bobot[$index] ?? 0),
-                    'harga'     => $this->toIntMoney($request->harga[$index] ?? 0),
-                    'harga_basis'     => $this->toIntMoney($request->harga_basis[$index] ?? 0),
-                    'harga_basis_pembelian'     => $this->toIntMoney($request->harga_basis_pembelian[$index] ?? ($request->harga_basis[$index] ?? 0)),
-                    'harga_netto'     => $this->toIntMoney($request->harga_netto[$index] ?? 0),
+                    'harga'     => $this->toIntMoney($harga[$index] ?? 0),
+                    'harga_basis'     => $this->toIntMoney($harga_basis[$index] ?? 0),
+                    'harga_basis_pembelian'     => $this->toIntMoney($harga_basis_pembelian[$index] ?? ($harga_basis[$index] ?? 0)),
+                    'harga_netto'     => $this->toIntMoney($harga_netto[$index] ?? 0),
                 ]);
             }
         }

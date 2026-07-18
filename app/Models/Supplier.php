@@ -52,4 +52,18 @@ class Supplier extends Model
     {
         return $this->cashbons->sum('nominal_cashbon') - $this->cashbonspembayaran->sum('nominal_bayar');
     }
+
+    public function titipSuppliers(): HasMany
+    {
+        return $this->hasMany(TitipSupplier::class);
+    }
+    public function ambilSuppliers(): HasMany
+    {
+        return $this->hasMany(AmbilSupplier::class);
+    }
+
+    public function stokTitipans(): HasMany
+    {
+        return $this->hasMany(StokTitipan::class);
+    }
 }

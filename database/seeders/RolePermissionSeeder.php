@@ -212,6 +212,32 @@ class RolePermissionSeeder extends Seeder
             'view-laporanpenjualan',
             'view-laporanpembelian',
 
+
+            'view-titip-suppliers',
+            'show-titip-suppliers',
+            'create-titip-suppliers',
+            'edit-titip-suppliers',
+            'update-titip-suppliers',
+            'download-titip-suppliers',
+            'delete-titip-suppliers',
+
+            'view-ambil-suppliers',
+            'show-ambil-suppliers',
+            'create-ambil-suppliers',
+            'edit-ambil-suppliers',
+            'update-ambil-suppliers',
+            'download-ambil-suppliers',
+            'delete-ambil-suppliers',
+
+            //stoks permission
+            'view-stok-titipans',
+            'show-stok-titipans',
+            'create-stok-titipans',
+            'edit-stok-titipans',
+            'update-stok-titipans',
+            'download-stok-titipans',
+            'delete-stok-titipans',
+
         ];
 
         foreach ($permissions as $permissionName) {

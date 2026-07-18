@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('titip_suppliers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
+            $table->foreignId('pembelian_id')->nullable()->constrained('pembelians')->onDelete('cascade');
+            $table->integer('nominal_titip')->default(0);
+            $table->string('keterangan')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 

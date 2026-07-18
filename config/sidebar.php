@@ -140,21 +140,21 @@ return [
         'title' => 'Titipan',
         'icon' => 'fas-wallet',
         'active' => ['titipsupplier*', 'ambilsupplier*'],
-        'permission' => ['view-titipsupplier', 'view-ambilsupplier'],
+        'permission' => ['view-titip-suppliers', 'view-ambil-suppliers'],
         'children' => [
             [
                 'title' => 'Titipan Supplier',
                 'icon' => 'fas-wallet',
                 'route' => 'titipsuppliers.index',
                 'active' => 'titipsuppliers*',
-                'permission' => 'view-titipsuppliers',
+                'permission' => 'view-titip-suppliers',
             ],
             [
                 'title' => 'Ambil Supplier',
                 'icon' => 'fas-exchange-alt',
                 'route' => 'ambilsuppliers.index',
                 'active' => 'ambilsuppliers*',
-                'permission' => 'view-ambilsuppliers',
+                'permission' => 'view-ambil-suppliers',
             ],
         ],
     ],
@@ -190,7 +190,7 @@ return [
                 'icon' => 'fas-boxes-stacked',
                 'route' => 'stoktitipans.index',
                 'active' => 'stoktitipans*',
-                'permission' => 'view-stoktitipans',
+                'permission' => 'view-stok-titipans',
             ],
             [
                 'title' => 'History Harga',

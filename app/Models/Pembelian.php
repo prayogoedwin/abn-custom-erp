@@ -42,6 +42,7 @@ class Pembelian extends Model
         'status_pembayaran',
         'metode_pembayaran',
         'tipe_pembayaran',
+        'keterangan',
         'isactive',
         'created_by',
         'updated_by',
@@ -79,5 +80,10 @@ class Pembelian extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function titipSupplier()
+    {
+        return $this->hasOne(TitipSupplier::class);
     }
 }

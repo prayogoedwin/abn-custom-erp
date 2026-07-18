@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('ambil_suppliers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
+            $table->integer('nominal_ambil')->default(0);
+            $table->string('keterangan')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 

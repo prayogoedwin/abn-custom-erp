@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\SupplierExport;
+use App\Models\Pembelian;
 use App\Models\Supplier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -148,17 +149,54 @@ class SupplierController extends Controller
 
     public function show(Supplier $supplier): View
     {
+        // Eager load semua relasi yang dibutuhkan oleh view detail supplier
+        $supplier->load([
+            'cashbons', 
+            'cashbonspembayaran',
+            // Memuat riwayat stok titipan diurutkan dari yang terbaru, beserta data produknya
+            'titipSuppliers',
+            'ambilSuppliers',
+            'stokTitipans'
+        ]);
+
         
-        $data = $supplier;
+        /*
+        $supplier->load([
+            'titipSuppliers',
+            'ambilSuppliers'
+        ]);
+        */
+        $pembelians = Pembelian::where('supplier_id', $supplier->id)->get();
 
+        $title = 'Supplier';
+        $tablename = 'suppliers';
 
-        $pagedata = $this->getPagedata();
+        return view('suppliers.show', compact('supplier', 'title', 'tablename', 'pembelians'));
+    }
 
-        //TO DO: asdfasdfwe
+    public function showTable(Supplier $supplier)
+    {
+        if (request()->ajax()) {
+            // riwayat transaksi dengan supplier, 
+            $data = Pembelian::where('supplier_id', $supplier->id)
+                ->select('pembelians.*');
+                
+            return datatables()->of($data)
+                ->addColumn('no_transaksi', function ($pembelian) {
+                    return '<a href="' . route('pembelians.show', $pembelian->id) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">' . $pembelian->no_transaksi . '</a>';
+                })
+                ->addColumn('status', function ($row) {
+                    return $row->status_pembayaran;
+                })
+                ->addColumn('tanggal', function ($row) {
+                    return $row->created_at->format('d-m-Y');
+                })
+                
+                ->rawColumns(['no_transaksi'])
+                ->make(true);
+        }
 
-
-
-        return view('dynamiccrud.show', compact('data'), $pagedata);
+        return response()->json(['error' => 'Invalid request'], 400);
     }
 
     public function edit(Supplier $supplier): View

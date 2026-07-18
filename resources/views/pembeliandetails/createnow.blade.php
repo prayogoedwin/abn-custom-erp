@@ -69,11 +69,11 @@
                                 </div>
 
                                 <div class="container-rendeman hidden">
-                                    <x-forms.input label="Rendeman (%)" name="rendeman[]" type="number" class="input-rendeman" min="0" max="100" step="0.01" />
+                                    <x-forms.input label="Rendeman (%)" name="rendeman[]" type="number" class="input-rendeman" min="-100" max="100" step="0.01" />
                                 </div>
 
                                 <div class="container-bobot hidden">
-                                    <x-forms.input label="Bobot" name="bobot[]" type="number" class="input-bobot" min="0" max="100" step="0.01" />
+                                    <x-forms.input label="Bobot" name="bobot[]" type="number" class="input-bobot"  step="0.01" />
                                 </div>
                             </div>
 
@@ -82,22 +82,22 @@
                                     <x-forms.input label="Harga Basis Master" name="harga_basis_pembelian[]" type="number" class="input-harga-basis" />
                                 </div>
 
-                                <div class="container-harga_beli hidden">
-                                    <x-forms.input label="Harga Beli" name="harga_beli[]" type="number" class="input-harga-beli" />
-                                    <p class="text-xs text-gray-500 mt-1">*(harga basis + 5%) + bobot</p>
+                                <div class="container-harga hidden">
+                                    <x-forms.input label="Harga" name="harga[]" type="number" class="input-harga" readonly="true"/>
+                                    <p class="text-xs text-gray-500 mt-1">*(harga basis + % rendeman) + bobot</p>
 
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="container-harga hidden">
-                                    <x-forms.input label="Harga" name="harga[]" type="number" class="input-harga" />
-                                    <p class="text-xs text-gray-500 mt-1">*Harga Basis Master x rendeman %</p>
+                                <div class="container-harga_beli hidden">
+                                    <x-forms.input label="Harga Beli" name="harga_beli[]" type="number" class="input-harga-beli" />
+                                    <p class="text-xs text-gray-500 mt-1">*Harga tapi editable</p>
                                 </div>
 
                                 <div class="container-harga_netto hidden">
                                     <x-forms.input label="Jumlah Uang" name="harga_netto[]" type="number" class="input-harga-netto" />
-                                    <p class="text-xs text-gray-500 mt-1">*Harga x netto</p>
+                                    <p class="text-xs text-gray-500 mt-1">*Harga Beli x netto</p>
                                 </div>
                             </div>
 
@@ -148,8 +148,8 @@
                 const inputNetto = row.querySelector('input[name="netto[]"]');
                 const inputBobot = row.querySelector('input[name="bobot[]"]');
 
-                const inputHargaMaster = row.querySelector('input[name="harga[]"]');
-                const inputHargaBeli = row.querySelector('input[name="harga_beli[]"]');
+                const inputHargaEditable = row.querySelector('input[name="harga_beli[]"]');
+                const inputHargaBeli = row.querySelector('input[name="harga[]"]');
                 const inputHargaBasisPembelian = row.querySelector('input[name="harga_basis_pembelian[]"]');
                 const inputJumlahUang = row.querySelector('input[name="harga_netto[]"]');
                 const inputSatuan = row.querySelector('input[name="satuan[]"]');
@@ -209,7 +209,6 @@
 
 
                     inputBobot.value = 0;
-                    inputHargaMaster.value = 0;
                     inputNetto.value = 0;
                     inputJumlahUang.value = 0;
                     inputRendeman.value = 0;
@@ -226,28 +225,38 @@
 
                     if (productType === 'Kopi') {
                         const rendeman = parseFloat(inputRendeman.value) || 0;
-                        const hasilHarga = (hargaBasisMaster * (rendeman / 100));
-                        inputHargaMaster.value = Math.round(hasilHarga);
+                        const HargaBeli = hargaBasisMaster + (hargaBasisMaster * (rendeman / 100));
+                        inputHargaBeli.value = Math.round(HargaBeli);
+                        inputHargaEditable.value = Math.round(HargaBeli);
+
                         console.log('kopppi');
+
                     } else if (productType === 'Lada') {
                         console.log('laddddaa');
                         const rendeman = parseFloat(inputRendeman.value) || 0;
                         const bobot = parseFloat(inputBobot.value) || 0;
-                        const hasilHarga = (hargaBasisMaster * (rendeman / 100));
 
-                        //Harga Beli = (harga basis + 5% atau kurangi 5%) + bobot ATAU (harga basis + 5% atau kurangi 5%) - bobot 
-                        const hargaBeli = hargaBasisMaster + (hargaBasisMaster * (5 / 100)) + bobot;
+                        //Harga Beli = (harga basis + %rendeman atau - %rendeman) + bobot ATAU (harga basis + 5% atau kurangi 5%) - bobot 
+                        const hargaBeli = hargaBasisMaster + (hargaBasisMaster * (rendeman / 100)) + bobot;
                         inputHargaBeli.value = Math.round(hargaBeli);
-                        inputHargaMaster.value = Math.round(hasilHarga);
+                        inputHargaEditable.value = Math.round(hargaBeli);
+
                     } else {
-                        const hasilHarga = hargaBasisMaster;
-                        inputHargaMaster.value = Math.round(hasilHarga);
+                        const hargaBeli = hargaBasisMaster;
+                        inputHargaBeli.value = Math.round(hargaBeli);
+                        inputHargaEditable.value = Math.round(hargaBeli);
                     }
 
-                    inputJumlahUang.value = Math.round(inputHargaMaster.value * netto)
+                    inputJumlahUang.value = Math.round(inputHargaEditable.value * netto)
 
 
                 }
+
+                inputHargaEditable.addEventListener('input', function() {
+                    console.log('harga editable changed');
+                    const netto = parseFloat(inputNetto.value) || 0;
+                    inputJumlahUang.value = Math.round(inputHargaEditable.value * netto);
+                });
 
 
                 container.addEventListener('click', function(e) {

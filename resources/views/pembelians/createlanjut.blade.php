@@ -112,7 +112,12 @@
                                 <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Potong Cashbon</label>
                                 <input type="number" name="potong_bon" id="potong_bon" min="0" value="0"
                                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                                <span class="text-[11px] text-gray-500 mt-1 block">Sisa Bon: <strong id="sisa-bon-live">Rp {{ number_format($totalCashbonSupplier, 0, ',', '.') }}</strong></span>
+                                <span class="text-gray-500 mt-1 block">
+                                    Sisa Bon:
+                                    <strong id="sisa-bon-live" class="font-bold text-red-600 dark:text-red-400">
+                                        Rp {{ number_format($totalCashbonSupplier, 0, ',', '.') }}
+                                    </strong>
+                                </span>
                             </div>
 
                             <div>

@@ -7,7 +7,9 @@ use App\Models\CashbonSupplierPembayaran;
 use App\Models\Pembelian;
 use App\Models\PembelianDetail;
 use App\Models\SimpanPinjamSupplier;
+use App\Models\StokTitipan;
 use App\Models\Supplier;
+use App\Models\TitipSupplier;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -224,9 +226,20 @@ class PembelianController extends Controller
             'total_nominal_terbayar' => $store_data['ambil_transfer'] + $store_data['ambil_tunai'],
             'kekurangan' => $pembelian->total_nominal_pembelian - ($store_data['ambil_transfer'] + $store_data['ambil_tunai']),
             'status' => $store_data['status'],
+            'keterangan' => $store_data['keterangan'],
         ]);
 
-
+        
+        if ($store_data['titip'] > 0) {
+            TitipSupplier::create([
+                'supplier_id' => $pembelian->supplier_id,
+                'pembelian_id' => $pembelian->id,
+                // 'tipe' => 'Titip',
+                'nominal_titip' => $store_data['titip'] ?? 0,
+                'keterangan' => 'Lewat Pembelian' . $pembelian->no_transaksi,
+                'created_by' => auth()->id(),
+            ]);
+        }
 
         if ($store_data['potong_bon'] > 0) {
             CashbonSupplierPembayaran::create([
@@ -238,6 +251,24 @@ class PembelianController extends Controller
                 'created_by' => auth()->id(),
 
             ]);
+        }
+
+        foreach ($pembelian->details as $detail) {
+
+            if ($detail->tipe_transaksi_pembelian == 'titip') {
+                //jika tipe transaksi titip maka create stok titipan untuk produk - supplier tersebut
+                StokTitipan::create(
+                    [
+                        'produk_id' => $detail->produk_id,
+                        'supplier_id' => $detail->pembelian->supplier_id,
+                        'tipe_stok' => 'masuk', // karena ini pembelian titip maka masuk
+                        'satuan' => $detail->satuan,
+                        'jumlah' => $detail->netto,
+                        'keterangan' => 'Pembelian Titip - ' . $pembelian->no_transaksi . ' - ' . $detail->produk->nama_produk,
+                    ],
+
+                );
+            }
         }
 
 
