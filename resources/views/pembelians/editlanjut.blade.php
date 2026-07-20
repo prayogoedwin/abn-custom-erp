@@ -110,14 +110,15 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Potong Cashbon</label>
-                                <input type="number" name="potong_bon" id="potong_bon" min="0" value="0"
+                                <!-- disable input potong bon untuk edit -->
+                                <input type="number" name="potong_bon" disabled id="potong_bon" min="0" value="0"
                                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                                 <span class="text-[11px] text-gray-500 mt-1 block">Sisa Bon: <strong id="sisa-bon-live">Rp {{ number_format($totalCashbonSupplier, 0, ',', '.') }}</strong></span>
                             </div>
 
-                            <div>
+                            <div> 
                                 <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Titip Uang/Modal</label>
-                                <input type="number" name="titip" id="titip" min="0" value="0"
+                                <input type="number" name="titip" id="titip" min="0" value="{{ $titipSupplier ?? 0 }}"
                                     class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                             </div>
                         </div>
@@ -158,7 +159,7 @@
                 </div>
 
                 <div class="mb-5">
-                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="" />
+                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="{{$pembelian->keterangan}}" />
                 </div>
 
                 <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">

@@ -113,7 +113,7 @@
         <tbody>
             @foreach($pembelian->details as $detail)
             <!-- hanya yang tipe jual -->
-            @if($detail->tipe == 'jual')
+            @if($detail->tipe_transaksi_pembelian == 'jual')
             <tr>
                 <td>{{ $detail->produk->nama_produk }}</td>
                 <td class="text-right">{{ $detail->netto }} {{ $detail->produk->satuan }}</td>

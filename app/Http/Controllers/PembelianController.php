@@ -156,10 +156,10 @@ class PembelianController extends Controller
         // dd($pembelian);
 
         $supplier = Supplier::find($pembelian->supplier_id);
+        $titipSupplier = TitipSupplier::where("supplier_id", $supplier->id)->where("pembelian_id", $pembelian->id)->first()->nominal_titip ?? 0;
 
 
 
-        $simpanpinjamsupplier = SimpanPinjamSupplier::where("supplier_id", $supplier->id)->first();
 
         $pagedata = $this->getPagedata();
 
@@ -167,7 +167,7 @@ class PembelianController extends Controller
         $pembelian->load('details');
         // dd($pembelian);
 
-        return view('pembelians.createlanjut', compact('pembelian', 'supplier', 'simpanpinjamsupplier', 'data'), $pagedata,);
+        return view('pembelians.createlanjut', compact('pembelian', 'supplier', 'titipSupplier', 'data'), $pagedata,);
     }
 
     public function store(Request $request): RedirectResponse
@@ -229,16 +229,19 @@ class PembelianController extends Controller
             'keterangan' => $store_data['keterangan'],
         ]);
 
-        
+
         if ($store_data['titip'] > 0) {
-            TitipSupplier::create([
-                'supplier_id' => $pembelian->supplier_id,
-                'pembelian_id' => $pembelian->id,
-                // 'tipe' => 'Titip',
-                'nominal_titip' => $store_data['titip'] ?? 0,
-                'keterangan' => 'Lewat Pembelian' . $pembelian->no_transaksi,
-                'created_by' => auth()->id(),
-            ]);
+            TitipSupplier::updateOrCreate(
+                [
+                    'supplier_id' => $pembelian->supplier_id,
+                    'pembelian_id' => $pembelian->id,
+                ],
+                [
+                    'nominal_titip' => $store_data['titip'] ?? 0,
+                    'keterangan' => 'Lewat Pembelian' . $pembelian->no_transaksi,
+                    'created_by' => auth()->id(),
+                ]
+            );
         }
 
         if ($store_data['potong_bon'] > 0) {
@@ -257,26 +260,30 @@ class PembelianController extends Controller
 
             if ($detail->tipe_transaksi_pembelian == 'titip') {
                 //jika tipe transaksi titip maka create stok titipan untuk produk - supplier tersebut
-                StokTitipan::create(
+                StokTitipan::updateOrCreate(
                     [
                         'produk_id' => $detail->produk_id,
                         'supplier_id' => $detail->pembelian->supplier_id,
+                        'pembelian_id' => $detail->pembelian_id,
+                    ],
+                    [
                         'tipe_stok' => 'masuk', // karena ini pembelian titip maka masuk
                         'satuan' => $detail->satuan,
                         'jumlah' => $detail->netto,
                         'keterangan' => 'Pembelian Titip - ' . $pembelian->no_transaksi . ' - ' . $detail->produk->nama_produk,
-                    ],
-
+                    ]
                 );
             }
         }
 
 
         if ($request->input('action') === 'save_and_print') {
-            return redirect()->route('pembelians.cetaknota', $pembelian)->with('success', 'Data berhasil disimpan!');
+            return redirect()->route('pembelians.index')
+                ->with('success', 'Data berhasil disimpan!')
+                ->with('print_url', route('pembelians.cetaknota', $pembelian));
         }
 
-        return to_route('pembelians.index')->with('success', 'Data berhasil disimpan!');;
+        return to_route('pembelians.index')->with('success', 'Data berhasil disimpan!');
     }
 
 
@@ -319,11 +326,11 @@ class PembelianController extends Controller
         } elseif ($angka < 100) {
             $terbilang = $this->konversiTerbilang($angka / 10) . " Puluh " . $this->konversiTerbilang($angka % 10);
         } elseif ($angka < 200) {
-            $terbilang = " Seratus" . $this->konversiTerbilang($angka - 100);
+            $terbilang = " Seratus " . $this->konversiTerbilang($angka - 100);
         } elseif ($angka < 1000) {
             $terbilang = $this->konversiTerbilang($angka / 100) . " Ratus " . $this->konversiTerbilang($angka % 100);
         } elseif ($angka < 2000) {
-            $terbilang = " Seribu" . $this->konversiTerbilang($angka - 1000);
+            $terbilang = " Seribu " . $this->konversiTerbilang($angka - 1000);
         } elseif ($angka < 1000000) {
             $terbilang = $this->konversiTerbilang($angka / 1000) . " Ribu " . $this->konversiTerbilang($angka % 1000);
         } elseif ($angka < 1000000000) {
@@ -397,7 +404,12 @@ class PembelianController extends Controller
 
     public function editlanjut(Pembelian $pembelian)
     {
-        $supplier = $pembelian->supplier;
+        // dd($pembelian);
+
+        $supplier = Supplier::find($pembelian->supplier_id);
+        $titipSupplier = TitipSupplier::where("supplier_id", $supplier->id)->where("pembelian_id", $pembelian->id)->first()->nominal_titip ?? 0;
+
+
 
 
         $pagedata = $this->getPagedata();
@@ -406,7 +418,7 @@ class PembelianController extends Controller
         $pembelian->load('details');
         // dd($pembelian);
 
-        return view('pembelians.editlanjut', compact('pembelian', 'supplier', 'data'), $pagedata);
+        return view('pembelians.editlanjut', compact('pembelian', 'supplier', 'titipSupplier', 'data'), $pagedata,);
     }
 
     //soft delete

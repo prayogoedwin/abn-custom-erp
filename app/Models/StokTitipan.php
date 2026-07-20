@@ -27,6 +27,7 @@ class StokTitipan extends Model
     protected $fillable = [
         'produk_id',
         'supplier_id',
+        'pembelian_id',
         'tipe_stok',
         'satuan',
         'jumlah',
@@ -44,5 +45,10 @@ class StokTitipan extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
+
+    public function pembelian()
+    {
+        return $this->belongsTo(Pembelian::class, 'pembelian_id');
     }
 }

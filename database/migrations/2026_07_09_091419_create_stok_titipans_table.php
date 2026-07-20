@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('produk_id')->constrained()->cascadeOnDelete();
             $table->foreignId('supplier_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('pembelian_id')->nullable()->constrained()->nullOnDelete(); // referensi ke pembelian jika stok titipan berasal dari pembelian
             $table->string('tipe_stok'); // masuk / keluar
             $table->string('satuan');
             $table->float('jumlah')->default(0);
