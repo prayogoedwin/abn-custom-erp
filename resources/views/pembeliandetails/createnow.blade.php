@@ -65,7 +65,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="container-netto">
                                     <x-forms.input label="Netto" name="netto[]" type="number" class="input-netto" />
-                                    <span class="text-xs text-gray-500 label-satuan block mt-1"></span>
+                                    <span  class="text-xs text-gray-500 label-satuan block mt-1"></span>
                                 </div>
 
                                 <div class="container-rendeman hidden">
@@ -92,7 +92,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="container-harga_beli hidden">
                                     <x-forms.input label="Harga Beli" name="harga_beli[]" type="number" class="input-harga-beli" />
-                                    <p class="text-xs text-gray-500 mt-1">*Harga tapi editable</p>
+                                    <p class="text-xs text-gray-500 mt-1">*Harga Editable</p>
                                 </div>
 
                                 <div class="container-harga_netto hidden">
@@ -154,6 +154,8 @@
                 const inputJumlahUang = row.querySelector('input[name="harga_netto[]"]');
                 const inputSatuan = row.querySelector('input[name="satuan[]"]');
 
+                const labelSatuan = row.querySelector('.label-satuan');
+
                 tipe.addEventListener('change', function() {
                     if (hargaDiv) hargaDiv.classList.add('hidden');
                     if (rendemanDiv) rendemanDiv.classList.add('hidden');
@@ -174,6 +176,7 @@
 
                         const selectedOption = select.options[select.selectedIndex];
                         const productType = selectedOption.getAttribute('data-produk-tipe') || 'standar';
+                        
 
                         if (productType === "Lada") {
                             if (bobotDiv) bobotDiv.classList.remove('hidden');
@@ -190,6 +193,8 @@
                     const hargaBasisMaster = parseFloat(selectedOption.getAttribute('data-harga')) || 0;
 
                     const productType = selectedOption.getAttribute('data-produk-tipe');
+
+                    if (labelSatuan) labelSatuan.textContent = satuan;
 
 
                     if (bobotDiv) bobotDiv.classList.add('hidden');

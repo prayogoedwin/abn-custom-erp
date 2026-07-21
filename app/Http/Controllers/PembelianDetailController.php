@@ -270,6 +270,11 @@ class PembelianDetailController extends Controller
         foreach ($request->produk_id as $index => $produk_id) {
             if ($produk_id) {
 
+                $produk = Produk::find($produk_id);
+                if (!$produk) {
+                    return redirect()->back()->withErrors(['produk_id' => 'Produk tidak ditemukan.']);
+                }
+
                 //if tipe_transaksi_pembelian = "titip" maka semua harga di set ke 0, karena titip tidak ada harga
                 if ($request->tipe_pembelian[$index] === 'titip') {
                     $harga[$index] = 0;
@@ -284,7 +289,7 @@ class PembelianDetailController extends Controller
                     'tipe_transaksi_pembelian'         => $request->tipe_pembelian[$index],
                     'netto'        => $request->netto[$index],
                     //TODO:
-                    'satuan'       => 'kg', //sementara hardcode
+                    'satuan'       => $produk->satuan ?? 'kg', //gunakan satuan dari produk, jika tidak ada default ke kg
                     'rendeman'     => $request->rendeman[$index] ?? null,
                     'bobot'     => $this->toIntMoney($request->bobot[$index] ?? 0),
                     'harga'     => $this->toIntMoney($harga[$index] ?? 0),

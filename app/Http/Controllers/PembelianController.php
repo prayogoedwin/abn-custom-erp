@@ -205,14 +205,14 @@ class PembelianController extends Controller
 
     public function storelanjut(Pembelian $pembelian, Request $request): RedirectResponse
     {
-        // dd($request->all());
+        // dd($pembelian, $request->all());
 
         $store_data = [
             'potong_bon' => $this->toIntMoney($request->input('potong_bon')),
             'titip' => $this->toIntMoney($request->input('titip')),
             'ambil_tunai' => $this->toIntMoney($request->input('ambil_tunai')),
             'ambil_transfer' => $this->toIntMoney($request->input('ambil_transfer')),
-            'status' => $request->input('status'),
+            'status_pembayaran' => $request->input('status'),
             'keterangan' => $request->input('keterangan'),
 
             'created_by' => auth()->id(),
@@ -225,7 +225,7 @@ class PembelianController extends Controller
             'ambil_tunai' => $store_data['ambil_tunai'],
             'total_nominal_terbayar' => $store_data['ambil_transfer'] + $store_data['ambil_tunai'],
             'kekurangan' => $pembelian->total_nominal_pembelian - ($store_data['ambil_transfer'] + $store_data['ambil_tunai']),
-            'status' => $store_data['status'],
+            'status_pembayaran' => $store_data['status_pembayaran'],
             'keterangan' => $store_data['keterangan'],
         ]);
 

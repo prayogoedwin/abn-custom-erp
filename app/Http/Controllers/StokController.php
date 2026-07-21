@@ -36,7 +36,7 @@ class StokController extends Controller
             $stoks = Stok::join('produks', 'stoks.produk_id', '=', 'produks.id')
                 // Select everything from karyawan, and specific fields from users
                 ->select('stoks.*', 'produks.nama_produk')
-                ->get();
+                ->orderBy('stoks.id', 'desc');
 
 
             return DataTables::of($stoks)

@@ -101,13 +101,13 @@ return [
                 'permission' => 'view-cashbonkaryawans',
                 'children' => [ // Mendukung Level 3
                     [
-                        'title' => 'Cashbon',
+                        'title' => '-- Cashbon',
                         'route' => 'cashbonkaryawans.index',
                         'active' => 'cashbonkaryawans*',
                         'permission' => 'view-cashbonkaryawans',
                     ],
                     [
-                        'title' => 'Pembayaran Cashbon',
+                        'title' => '-- Pembayaran Cashbon',
                         'route' => 'cashbonkaryawanpembayarans.index',
                         'active' => 'cashbonkaryawanpembayarans*',
                         'permission' => 'view-cashbonkaryawans',
@@ -121,13 +121,13 @@ return [
                 'permission' => 'view-cashbonsuppliers',
                 'children' => [
                     [
-                        'title' => 'Cashbon',
+                        'title' => '-- Cashbon',
                         'route' => 'cashbonsuppliers.index',
                         'active' => 'cashbonsuppliers*',
                         'permission' => 'view-cashbonsuppliers',
                     ],
                     [
-                        'title' => 'Pembayaran Cashbon',
+                        'title' => '-- Pembayaran Cashbon',
                         'route' => 'cashbonsupplierpembayarans.index',
                         'active' => 'cashbonsupplierpembayarans*',
                         'permission' => 'view-cashbonsuppliers',
