@@ -219,12 +219,17 @@ class PembelianController extends Controller
         ];
 
 
+        $kekurangan = $pembelian->total_nominal_pembelian - ($store_data['ambil_transfer'] + $store_data['ambil_tunai']);
+        // kekurangan tidak boleh negatif, jika negatif maka set ke 0
+        if ($kekurangan < 0) {
+            $kekurangan = 0;
+        }
 
         $pembelian->update([
             'ambil_transfer' => $store_data['ambil_transfer'],
             'ambil_tunai' => $store_data['ambil_tunai'],
             'total_nominal_terbayar' => $store_data['ambil_transfer'] + $store_data['ambil_tunai'],
-            'kekurangan' => $pembelian->total_nominal_pembelian - ($store_data['ambil_transfer'] + $store_data['ambil_tunai']),
+            'kekurangan' => $kekurangan,
             'status_pembayaran' => $store_data['status_pembayaran'],
             'keterangan' => $store_data['keterangan'],
         ]);

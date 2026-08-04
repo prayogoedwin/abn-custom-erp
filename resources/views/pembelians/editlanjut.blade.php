@@ -8,12 +8,12 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">{{ $title ?? __('Create') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">{{ $title ?? __('Edit Lanjut') }}</span>
     </div>
 
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Create {{ $title }}</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Prosses Pembayaran') }}</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit Lanjut {{ $title }}</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Prosses Edit Lanjut') }}</p>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -107,21 +107,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Potong Cashbon</label>
-                                <!-- disable input potong bon untuk edit -->
-                                <input type="number" name="potong_bon" disabled id="potong_bon" min="0" value="0"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                                <span class="text-[11px] text-gray-500 mt-1 block">Sisa Bon: <strong id="sisa-bon-live">Rp {{ number_format($totalCashbonSupplier, 0, ',', '.') }}</strong></span>
-                            </div>
-
-                            <div> 
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Titip Uang/Modal</label>
-                                <input type="number" name="titip" id="titip" min="0" value="{{ $titipSupplier ?? 0 }}"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                            </div>
-                        </div>
+                        
 
                         <div class="flex justify-between text-xl border-t border-gray-200 dark:border-gray-700 pt-3 mt-2">
                             <span class="font-bold text-gray-700 dark:text-gray-300">Total Dibayarkan:</span>
@@ -132,20 +118,36 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <x-forms.input label="Ambil Tunai" name="ambil_tunai" class="ambil_tunai" type="number" value="{{$pembelian->ambil_tunai}}" />
+                        <x-forms.input label="Ambil Tunai" name="ambil_tunai" class="ambil_tunai" type="number" value="{{ $pembelian->ambil_tunai ?? 0 }}" />
                     </div>
                     <div>
-                        <x-forms.input label="Ambil Transfer" name="ambil_transfer" class="ambil_transfer" type="number" value="{{$pembelian->ambil_transfer}}" />
+                        <x-forms.input label="Ambil Transfer" name="ambil_transfer" class="ambil_transfer" type="number" value="{{ $pembelian->ambil_transfer ?? 0 }}" />
                     </div>
                 </div>
+                
 
                 <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-900/30 rounded-lg border border-gray-200 dark:border-gray-700">
                     <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Kekurangan: <span id="kekuranganspan" class="font-bold text-red-500">Rp 0</span>
+                        Kekurangan: <span id="kekuranganspan" class="font-bold text-red-500">Rp 0</span> 
+                        Sisa Bon: <span id="sisa-bon-live" class="font-bold text-gray-700 dark:text-gray-300">Rp 0</span>
                     </p>
                 </div>
 
-                <div class="mb-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <x-forms.input label="Titip Uang/Modal" disabled name="titip" class="titip" type="number" min="0" value="{{ $pembelian->titip ?? 0 }}" />
+                    </div>
+                    <div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 pt-4">
+                        Titip Uang Modal tidak dapat di edit karena sudah di proses, jika ingin mengubahnya lewat menu Titipan Supplier
+                    </p>
+                    </div>
+                </div>
+
+                <input type="hidden" name="status" id="status_hidden" value="Belum Lunas">
+                <input type="hidden" name="potong_bon" value="0">
+
+                <!-- <div class="mb-5">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Simpan Sebagai
                     </label>
@@ -156,10 +158,10 @@
                         <option value="Belum Lunas">Belum Lunas</option>
                         <option value="Lunas">Lunas</option>
                     </select>
-                </div>
+                </div> -->
 
                 <div class="mb-5">
-                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="{{$pembelian->keterangan}}" />
+                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="{{ $pembelian->keterangan ?? '' }}" />
                 </div>
 
                 <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
@@ -181,10 +183,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const inputPotongBon = document.getElementById('potong_bon');
             const inputTitip = document.getElementById('titip');
             const inputAmbilTunai = document.querySelector('input[name="ambil_tunai"]');
             const inputAmbilTransfer = document.querySelector('input[name="ambil_transfer"]');
+            const inputStatusHidden = document.getElementById('status_hidden');
+            const inputPotongBon = document.querySelector('input[name="potong_bon"]');
 
             console.log(inputAmbilTunai);
 
@@ -210,57 +213,67 @@
 
             function hitungOtomatis() {
                 console.log("hitung");
-                let nilaiPotongBon = parseFloat(inputPotongBon.value) || 0;
                 let nilaiAmbilTunai = parseFloat(inputAmbilTunai.value) || 0;
                 let nilaiAmbilTransfer = parseFloat(inputAmbilTransfer.value) || 0;
 
-                // Validasi agar input potong bon tidak melebihi bon yang ada
-                if (nilaiPotongBon > totalCashbonAwal) {
-                    nilaiPotongBon = totalCashbonAwal;
-                    inputPotongBon.value = totalCashbonAwal;
-                }
+                
 
-                // 1. Hitung Sisa Bon
-                const sisaBon = totalCashbonAwal - nilaiPotongBon;
-                labelSisaBonLive.textContent = formatRupiah(sisaBon);
+                
 
                 const tagihanAkhir = tagihanAwal
                 labelTotalTagihanAkhir.textContent = formatRupiah(tagihanAkhir);
 
+                labelSisaBonLive.textContent = formatRupiah(totalCashbonAwal);
                 // 3. Hitung Kekurangan Pembayaran
                 // Kekurangan = Total yang harus dibayar - (Tunai + Transfer yang diambil)
                 const totalDiambil = nilaiAmbilTunai + nilaiAmbilTransfer;
                 const kekurangan = tagihanAkhir - totalDiambil;
+                const kekuranganWithCashbon = (tagihanAkhir + totalCashbonAwal) - totalDiambil;
 
-                labelKekurangan.textContent = formatRupiah(kekurangan);
+                labelKekurangan.textContent = formatRupiah(kekuranganWithCashbon);
 
                 // Styling warna teks kekurangan berdasarkan statusnya
-                if (kekurangan > 0) {
-                    labelKekurangan.className = "font-bold text-red-500";
-                } else {
+                labelKekurangan.className = "font-bold text-red-500";
+                inputStatusHidden.value = "Belum Lunas";
+
+
+                if (kekurangan <= 0) {
+                    labelKekurangan.className = "font-bold text-yellow-500";
+                    inputStatusHidden.value = "Lunas";
+                }
+                if (kekuranganWithCashbon <= 0) {
                     labelKekurangan.className = "font-bold text-green-500";
                 }
 
-                // 4. Auto-set Dropdown Status (hanya jika user belum menyentuhnya secara manual)
-
-                if (kekurangan <= 0) {
-                    selectStatus.value = "Lunas";
-                } else {
-                    selectStatus.value = "Belum Lunas";
+                //jika uang yang diambil lebih besar dari total tagihan, maka sisa nya untuk potong bon
+                if (totalDiambil > tagihanAkhir) {
+                    const sisaUntukPotongBon = totalDiambil - tagihanAkhir;
+                    // console.log("sisa untuk potong bon: " + totalDiambil + " - " + tagihanAkhir + " = " + sisaUntukPotongBon);
+                    let sisaBon = totalCashbonAwal - sisaUntukPotongBon;
+                    labelSisaBonLive.textContent = formatRupiah(sisaBon);
+                    inputPotongBon.value = sisaUntukPotongBon;
                 }
+                
+                
+
+
+                // if (kekurangan <= 0) {
+                //     selectStatus.value = "Lunas";
+                // } else {
+                //     selectStatus.value = "Belum Lunas";
+                // }
 
             }
 
             // Pasang event listener ketik (input)
-            inputPotongBon.addEventListener('input', hitungOtomatis);
             inputTitip.addEventListener('input', hitungOtomatis);
             inputAmbilTunai.addEventListener('input', hitungOtomatis);
             inputAmbilTransfer.addEventListener('input', hitungOtomatis);
 
-            // Deteksi jika user merubah select status secara sengaja (manual override)
-            selectStatus.addEventListener('change', function() {
-                userInteractedWithStatus = true;
-            });
+            // // Deteksi jika user merubah select status secara sengaja (manual override)
+            // selectStatus.addEventListener('change', function() {
+            //     userInteractedWithStatus = true;
+            // });
 
             // Jalankan kalkulasi awal saat halaman dimuat
             hitungOtomatis();

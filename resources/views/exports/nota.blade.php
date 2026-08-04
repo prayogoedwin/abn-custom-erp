@@ -132,7 +132,7 @@
             <!-- BARIS DAFTAR PRODUK TITIPAN (BISA BANYAK) -->
             <tr>
                 <td class="text-right" style="vertical-align: top;">
-                    <strong>Produk Titipan:</strong>
+                    <strong>Titipan Barang:</strong>
                 </td>
                 <!-- Mengosongkan kolom kanan pada baris ini agar balance -->
                 <td class="text-right">
@@ -149,7 +149,7 @@
 
             <!-- BARIS KEDUA: SALDO & GRAND TOTAL -->
             <tr>
-                <td class="text-right"><strong>Saldo Titipan: Rp</strong></td>
+                <td class="text-right"><strong>Titipan Uang: Rp</strong></td>
                 <td class="text-right"><strong>{{ number_format($pembelian->titipSupplier->nominal_titip ?? 0, 0, ',', '.') }}</strong></td>
                 <td class="text-right"><strong>Grand Total: Rp</strong></td>
                 <td class="text-right"><strong>{{ number_format($pembelian->details->sum('harga_netto'), 0, ',', '.') }}</strong></td>

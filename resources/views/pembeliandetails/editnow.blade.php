@@ -20,9 +20,7 @@
             <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit {{ $title }}</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Lengkapi detail pembelian di bawah ini') }}</p>
         </div>
-        <div class="flex gap-2">
-            <x-button type="primary" form="pembelianForm">Simpan / Lanjut</x-button>
-        </div>
+        
     </div>
 
     <!-- Container Form -->
@@ -40,8 +38,10 @@
                     + Tambah Produk Lain
                 </button>
 
-                <div class="flex gap-3 mt-3 border-t pt-4">
+                <div class="flex gap-3 mt-3 border-t justify-between items-center pt-4">
                     <a href="{{ route('pembelians.index') }}"><x-button type="secondary">Batal</x-button></a>
+                    <x-button type="primary" form="pembelianForm">Lanjut</x-button>
+
                 </div>
             </form>
         </div>
@@ -59,12 +59,12 @@
                         <select name="produk_id[]" class="produk-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                             <option value="">Pilih Produk</option>
                             @foreach($produks as $produk)
-                                <option value="{{ $produk->id }}"
-                                    data-satuan="{{ $produk->satuan }}"
-                                    data-harga="{{ $produk->harga_basis_pembelian }}"
-                                    data-produk-tipe="{{ $produk->nama_produk }}">
-                                    {{ $produk->nama_produk }}
-                                </option>
+                            <option value="{{ $produk->id }}"
+                                data-satuan="{{ $produk->satuan }}"
+                                data-harga="{{ $produk->harga_basis_pembelian }}"
+                                data-produk-tipe="{{ $produk->nama_produk }}">
+                                {{ $produk->nama_produk }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -85,7 +85,7 @@
                         <span class="text-xs text-gray-500 label-satuan block mt-1"></span>
                     </div>
 
-                    <div class="container-rendeman hidden">
+                    <div class="container-rendeman">
                         <x-forms.input label="Rendeman (%)" name="rendeman[]" type="number" class="input-rendeman" min="-100" max="100" step="0.01" />
                     </div>
 
@@ -102,7 +102,7 @@
 
                     <div class="container-harga hidden">
                         <x-forms.input label="Harga" name="harga[]" type="number" class="input-harga" readonly="true" />
-                        <p class="text-xs text-gray-500 mt-1">*(harga basis + % rendeman) + bobot</p>
+                        <p class="harga_info text-xs text-gray-500 mt-1"></p>
                     </div>
                 </div>
 
@@ -130,13 +130,13 @@
     </template>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('produk-container');
             const template = document.getElementById('produk-row-template');
             const addButton = document.getElementById('add-produk');
 
             // Data detail dari controller Laravel
-            const existingDetails = @json($pembelian->details ?? []);
+            const existingDetails = @json($pembelian -> details ?? []);
 
             // -------------------------------------------------------------
             // FUNGSI UTAMA: populateDetails
@@ -172,6 +172,7 @@
                 const btnRemove = row.querySelector('.btn-remove');
                 const btnHitung = row.querySelector('.btn-hitung');
                 const labelSatuan = row.querySelector('.label-satuan');
+                const hargaInfo = row.querySelector('.harga_info');
 
                 // 1. Isikan Data Awal (jika ada)
                 if (data.produk_id) selectProduk.value = data.produk_id;
@@ -192,7 +193,6 @@
                     const productType = selectedOption ? selectedOption.getAttribute('data-produk-tipe') : '';
 
                     row.querySelector('.container-harga').classList.toggle('hidden', !isJual);
-                    row.querySelector('.container-rendeman').classList.toggle('hidden', !isJual);
                     row.querySelector('.container-harga_basis_master').classList.toggle('hidden', !isJual);
                     row.querySelector('.container-harga_beli').classList.toggle('hidden', !isJual);
                     row.querySelector('.container-harga_netto').classList.toggle('hidden', !isJual);
@@ -200,13 +200,24 @@
                     // Khusus Bobot hanya jika tipe "jual" dan produk "Lada"
                     const isLada = productType === 'Lada';
                     row.querySelector('.container-bobot').classList.toggle('hidden', !(isJual && isLada));
+
+                    // Update harga info
+                    if (hargaInfo) {
+                        if (productType === 'Kopi') {
+                            hargaInfo.textContent = "*(harga basis x % rendeman)";
+                        } else if (productType === 'Lada') {
+                            hargaInfo.textContent = "*harga basis + (harga basis x % rendeman) + bobot";
+                        } else {
+                            hargaInfo.textContent = "";
+                        }
+                    }
                 }
 
                 // 3. Kalkulasi Otomatis
                 function hitung() {
                     const selectedOption = selectProduk.options[selectProduk.selectedIndex];
                     const productType = selectedOption ? selectedOption.getAttribute('data-produk-tipe') : '';
-                    
+
                     const netto = parseFloat(inputNetto.value) || 0;
                     const hargaBasis = parseFloat(inputHargaBasis.value) || 0;
                     const rendeman = parseFloat(inputRendeman.value) || 0;
@@ -215,13 +226,13 @@
                     let hargaBeliKalkulasi = hargaBasis;
 
                     if (productType === 'Kopi') {
-                        hargaBeliKalkulasi = hargaBasis + (hargaBasis * (rendeman / 100));
+                        hargaBeliKalkulasi = (hargaBasis * (rendeman / 100));
                     } else if (productType === 'Lada') {
                         hargaBeliKalkulasi = hargaBasis + (hargaBasis * (rendeman / 100)) + bobot;
                     }
 
                     inputHarga.value = Math.round(hargaBeliKalkulasi);
-                    
+
                     // Jika harga_beli belum diisi manual, set otomatis dari kalkulasi
                     if (!inputHargaBeli.value || inputHargaBeli.value == 0) {
                         inputHargaBeli.value = Math.round(hargaBeliKalkulasi);
@@ -234,7 +245,7 @@
                 // 4. Event Listeners
                 selectTipe.addEventListener('change', updateVisibility);
 
-                selectProduk.addEventListener('change', function () {
+                selectProduk.addEventListener('change', function() {
                     const selectedOption = selectProduk.options[selectProduk.selectedIndex];
                     if (selectedOption && selectedOption.value) {
                         inputHargaBasis.value = parseFloat(selectedOption.getAttribute('data-harga')) || 0;
@@ -246,7 +257,7 @@
                     updateVisibility();
                 });
 
-                inputHargaBeli.addEventListener('input', function () {
+                inputHargaBeli.addEventListener('input', function() {
                     const netto = parseFloat(inputNetto.value) || 0;
                     const hargaBeli = parseFloat(inputHargaBeli.value) || 0;
                     inputHargaNetto.value = Math.round(hargaBeli * netto);
@@ -258,7 +269,7 @@
                 if (showRemoveButton) {
                     btnRemove.classList.remove('hidden');
                 }
-                btnRemove.addEventListener('click', function () {
+                btnRemove.addEventListener('click', function() {
                     row.remove();
                 });
 
@@ -275,7 +286,7 @@
             populateDetails(existingDetails);
 
             // Listener Tambah Baris Baru
-            addButton.addEventListener('click', function () {
+            addButton.addEventListener('click', function() {
                 addDetailRow({}, true);
             });
         });

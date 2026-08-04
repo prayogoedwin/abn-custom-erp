@@ -19,11 +19,7 @@
             <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Create {{ $title }}</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Fill in the details below') }}</p>
         </div>
-        <div class="flex gap-2">
 
-            <x-button type="primary" form="pembelianForm">Lanjut</x-button>
-
-        </div>
     </div>
 
 
@@ -65,15 +61,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="container-netto">
                                     <x-forms.input label="Netto" name="netto[]" type="number" class="input-netto" />
-                                    <span  class="text-xs text-gray-500 label-satuan block mt-1"></span>
+                                    <span class="text-xs text-gray-500 label-satuan block mt-1"></span>
                                 </div>
 
-                                <div class="container-rendeman hidden">
-                                    <x-forms.input label="Rendeman (%)" name="rendeman[]" type="number" class="input-rendeman" min="-100" max="100" step="0.01" />
+                                <div class="container-rendeman">
+                                    <x-forms.input label="Rendeman (%)" name="rendeman[]" type="number" class="input-rendeman" min="-100" max="100" />
                                 </div>
 
                                 <div class="container-bobot hidden">
-                                    <x-forms.input label="Bobot" name="bobot[]" type="number" class="input-bobot"  step="0.01" />
+                                    <x-forms.input label="Bobot" name="bobot[]" type="number" class="input-bobot" />
                                 </div>
                             </div>
 
@@ -83,8 +79,8 @@
                                 </div>
 
                                 <div class="container-harga hidden">
-                                    <x-forms.input label="Harga" name="harga[]" type="number" class="input-harga" readonly="true"/>
-                                    <p class="text-xs text-gray-500 mt-1">*(harga basis + % rendeman) + bobot</p>
+                                    <x-forms.input label="Harga" name="harga[]" type="number" class="input-harga" readonly="true" />
+                                    <p  class="harga_info text-xs text-gray-500 mt-1"></p>
 
                                 </div>
                             </div>
@@ -114,9 +110,13 @@
                     + Tambah Produk Lain
                 </button>
 
-                <div class="flex gap-3 mt-3 border-t pt-4">
+                <div class="flex gap-3 mt-3 border-t justify-between items-center pt-4">
 
                     <a href="{{ route('pembelians.index') }}"><x-button type="secondary">Batal</x-button></a>
+
+
+                    <x-button type="primary" form="pembelianForm">Lanjut</x-button>
+
                 </div>
             </form>
         </div>
@@ -155,10 +155,10 @@
                 const inputSatuan = row.querySelector('input[name="satuan[]"]');
 
                 const labelSatuan = row.querySelector('.label-satuan');
+                const hargaInfo = row.querySelector('.harga_info');
 
                 tipe.addEventListener('change', function() {
                     if (hargaDiv) hargaDiv.classList.add('hidden');
-                    if (rendemanDiv) rendemanDiv.classList.add('hidden');
                     if (bobotDiv) bobotDiv.classList.add('hidden');
                     if (hargaBasisDiv) hargaBasisDiv.classList.add('hidden');
                     if (hargaBeliDiv) hargaBeliDiv.classList.add('hidden');
@@ -174,9 +174,12 @@
                         if (hargaBeliDiv) hargaBeliDiv.classList.remove('hidden');
                         if (hargaNettoDiv) hargaNettoDiv.classList.remove('hidden');
 
+
                         const selectedOption = select.options[select.selectedIndex];
                         const productType = selectedOption.getAttribute('data-produk-tipe') || 'standar';
-                        
+
+
+
 
                         if (productType === "Lada") {
                             if (bobotDiv) bobotDiv.classList.remove('hidden');
@@ -199,12 +202,24 @@
 
                     if (bobotDiv) bobotDiv.classList.add('hidden');
 
+                    //default hide all harga info
+                    if (hargaInfo) hargaInfo.textContent = "";
+
+
                     if (productType === "Lada") {
+
+                        if (hargaInfo) hargaInfo.textContent = "*harga basis + (harga basis x % rendeman) + bobot";
+
+
                         const selectedTipe = tipe.options[tipe.selectedIndex];
                         console.log(selectedTipe.value);
                         if (selectedTipe.value == "jual") {
                             if (bobotDiv) bobotDiv.classList.remove('hidden');
                         }
+                    }
+
+                    if (productType === "Kopi") {
+                        if (hargaInfo) hargaInfo.textContent = "*(harga basis x % rendeman)";
                     }
 
 
@@ -230,7 +245,7 @@
 
                     if (productType === 'Kopi') {
                         const rendeman = parseFloat(inputRendeman.value) || 0;
-                        const HargaBeli = hargaBasisMaster + (hargaBasisMaster * (rendeman / 100));
+                        const HargaBeli = (hargaBasisMaster * (rendeman / 100));
                         inputHargaBeli.value = Math.round(HargaBeli);
                         inputHargaEditable.value = Math.round(HargaBeli);
 
@@ -296,7 +311,7 @@
                 newRow.querySelectorAll('input').forEach(input => input.value = '');
                 newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
                 // newRow.querySelector('.container-netto').classList.add('hidden');
-                newRow.querySelector('.container-rendeman').classList.add('hidden');
+                // newRow.querySelector('.container-rendeman').classList.add('hidden');
 
                 // Tampilkan tombol hapus di baris baru
                 const newRemoveBtn = newRow.querySelector('.btn-remove');

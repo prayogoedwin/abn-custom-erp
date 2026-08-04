@@ -107,25 +107,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Potong Cashbon</label>
-                                <input type="number" name="potong_bon" id="potong_bon" min="0" value="0"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                                <span class="text-gray-500 mt-1 block">
-                                    Sisa Bon:
-                                    <strong id="sisa-bon-live" class="font-bold text-red-600 dark:text-red-400">
-                                        Rp {{ number_format($totalCashbonSupplier, 0, ',', '.') }}
-                                    </strong>
-                                </span>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-1">Titip Uang/Modal</label>
-                                <input type="number" name="titip" id="titip" min="0" value="0"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                            </div>
-                        </div>
+                        
 
                         <div class="flex justify-between text-xl border-t border-gray-200 dark:border-gray-700 pt-3 mt-2">
                             <span class="font-bold text-gray-700 dark:text-gray-300">Total Dibayarkan:</span>
@@ -142,14 +124,26 @@
                         <x-forms.input label="Ambil Transfer" name="ambil_transfer" class="ambil_transfer" type="number" value="0" />
                     </div>
                 </div>
+                
 
                 <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-900/30 rounded-lg border border-gray-200 dark:border-gray-700">
                     <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Kekurangan: <span id="kekuranganspan" class="font-bold text-red-500">Rp 0</span>
+                        Kekurangan: <span id="kekuranganspan" class="font-bold text-red-500">Rp 0</span> 
+                        Sisa Bon: <span id="sisa-bon-live" class="font-bold text-gray-700 dark:text-gray-300">Rp 0</span>
                     </p>
                 </div>
 
-                <div class="mb-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <x-forms.input label="Titip Uang/Modal" name="titip" class="titip" type="number" min="0" value="0" />
+                    </div>
+                    
+                </div>
+
+                <input type="hidden" name="status" id="status_hidden" value="Belum Lunas">
+                <input type="hidden" name="potong_bon" value="0">
+
+                <!-- <div class="mb-5">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Simpan Sebagai
                     </label>
@@ -160,7 +154,7 @@
                         <option value="Belum Lunas">Belum Lunas</option>
                         <option value="Lunas">Lunas</option>
                     </select>
-                </div>
+                </div> -->
 
                 <div class="mb-5">
                     <x-forms.input label="Keterangan" name="keterangan" type="text" value="" />
@@ -185,10 +179,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const inputPotongBon = document.getElementById('potong_bon');
             const inputTitip = document.getElementById('titip');
             const inputAmbilTunai = document.querySelector('input[name="ambil_tunai"]');
             const inputAmbilTransfer = document.querySelector('input[name="ambil_transfer"]');
+            const inputStatusHidden = document.getElementById('status_hidden');
+            const inputPotongBon = document.querySelector('input[name="potong_bon"]');
 
             console.log(inputAmbilTunai);
 
@@ -214,57 +209,67 @@
 
             function hitungOtomatis() {
                 console.log("hitung");
-                let nilaiPotongBon = parseFloat(inputPotongBon.value) || 0;
                 let nilaiAmbilTunai = parseFloat(inputAmbilTunai.value) || 0;
                 let nilaiAmbilTransfer = parseFloat(inputAmbilTransfer.value) || 0;
 
-                // Validasi agar input potong bon tidak melebihi bon yang ada
-                if (nilaiPotongBon > totalCashbonAwal) {
-                    nilaiPotongBon = totalCashbonAwal;
-                    inputPotongBon.value = totalCashbonAwal;
-                }
+                
 
-                // 1. Hitung Sisa Bon
-                const sisaBon = totalCashbonAwal - nilaiPotongBon;
-                labelSisaBonLive.textContent = formatRupiah(sisaBon);
+                
 
                 const tagihanAkhir = tagihanAwal
                 labelTotalTagihanAkhir.textContent = formatRupiah(tagihanAkhir);
 
+                labelSisaBonLive.textContent = formatRupiah(totalCashbonAwal);
                 // 3. Hitung Kekurangan Pembayaran
                 // Kekurangan = Total yang harus dibayar - (Tunai + Transfer yang diambil)
                 const totalDiambil = nilaiAmbilTunai + nilaiAmbilTransfer;
                 const kekurangan = tagihanAkhir - totalDiambil;
+                const kekuranganWithCashbon = (tagihanAkhir + totalCashbonAwal) - totalDiambil;
 
-                labelKekurangan.textContent = formatRupiah(kekurangan);
+                labelKekurangan.textContent = formatRupiah(kekuranganWithCashbon);
 
                 // Styling warna teks kekurangan berdasarkan statusnya
-                if (kekurangan > 0) {
-                    labelKekurangan.className = "font-bold text-red-500";
-                } else {
+                labelKekurangan.className = "font-bold text-red-500";
+                inputStatusHidden.value = "Belum Lunas";
+
+
+                if (kekurangan <= 0) {
+                    labelKekurangan.className = "font-bold text-yellow-500";
+                    inputStatusHidden.value = "Lunas";
+                }
+                if (kekuranganWithCashbon <= 0) {
                     labelKekurangan.className = "font-bold text-green-500";
                 }
 
-                // 4. Auto-set Dropdown Status (hanya jika user belum menyentuhnya secara manual)
-
-                if (kekurangan <= 0) {
-                    selectStatus.value = "Lunas";
-                } else {
-                    selectStatus.value = "Belum Lunas";
+                //jika uang yang diambil lebih besar dari total tagihan, maka sisa nya untuk potong bon
+                if (totalDiambil > tagihanAkhir) {
+                    const sisaUntukPotongBon = totalDiambil - tagihanAkhir;
+                    // console.log("sisa untuk potong bon: " + totalDiambil + " - " + tagihanAkhir + " = " + sisaUntukPotongBon);
+                    let sisaBon = totalCashbonAwal - sisaUntukPotongBon;
+                    labelSisaBonLive.textContent = formatRupiah(sisaBon);
+                    inputPotongBon.value = sisaUntukPotongBon;
                 }
+                
+                
+
+
+                // if (kekurangan <= 0) {
+                //     selectStatus.value = "Lunas";
+                // } else {
+                //     selectStatus.value = "Belum Lunas";
+                // }
 
             }
 
             // Pasang event listener ketik (input)
-            inputPotongBon.addEventListener('input', hitungOtomatis);
             inputTitip.addEventListener('input', hitungOtomatis);
             inputAmbilTunai.addEventListener('input', hitungOtomatis);
             inputAmbilTransfer.addEventListener('input', hitungOtomatis);
 
-            // Deteksi jika user merubah select status secara sengaja (manual override)
-            selectStatus.addEventListener('change', function() {
-                userInteractedWithStatus = true;
-            });
+            // // Deteksi jika user merubah select status secara sengaja (manual override)
+            // selectStatus.addEventListener('change', function() {
+            //     userInteractedWithStatus = true;
+            // });
 
             // Jalankan kalkulasi awal saat halaman dimuat
             hitungOtomatis();
