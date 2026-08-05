@@ -258,6 +258,7 @@ Route::middleware(['auth'])->group(function () {
 
     // penjualans Management - dengan permission check---------------------------------------------------------
     Route::get('penjualans', [PenjualanController::class, 'index'])->name('penjualans.index')->middleware('permission:view-penjualans');
+    Route::get('penjualans/table', [PenjualanController::class, 'indexTable'])->name('penjualans.indexTable')->middleware('permission:view-penjualans');
     Route::get('penjualans/export', [PenjualanController::class, 'export'])->name('penjualans.export')->middleware('permission:download-penjualans');
     Route::get('penjualans/create', [PenjualanController::class, 'create'])->name('penjualans.create')->middleware('permission:create-penjualans');
 

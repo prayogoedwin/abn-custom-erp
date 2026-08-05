@@ -6,13 +6,13 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">Pengiriman</span>
+        <span class="text-gray-500 dark:text-gray-400">Penjualan</span>
     </div>
 
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Pengiriman</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-1">Manage System Pengiriman</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Penjualan</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">Manage System Penjualan</p>
         </div>
         <div class="flex gap-2">
             @if(auth()->user()->hasPermission('download-' . $tablename))
@@ -45,11 +45,10 @@
                     <tr>
 
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">No Transaksi</th>
-
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nopol</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Detail</th>
                         
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
+                        
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
@@ -68,7 +67,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route("pengirimans.indexTable") }}',
+                    url: '{{ route("penjualans.indexTable") }}',
                     
                 },
                 columns: [{
@@ -80,12 +79,8 @@
                         name: 'customer'
                     },
                     {
-                        data: 'nopol',
-                        name: 'nopol'
-                    },
-                    {
-                        data: 'tanggal',
-                        name: 'tanggal'
+                        data: 'detail',
+                        name: 'detail'
                     },
                     {
                         data: 'actions',
@@ -96,17 +91,17 @@
                     
                 ],
                 order: [
-                    [3, 'desc'] //sort by tanggal
+                    [0, 'desc'] //sort by no_transaksi
                 ],
                 language: {
                     search: "_INPUT_",
-                    searchPlaceholder: "Search Pengiriman...",
+                    searchPlaceholder: "Search Penjualan...",
                     lengthMenu: "Show _MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ Pengiriman",
-                    infoEmpty: "No Pengiriman found",
-                    infoFiltered: "(filtered from _MAX_ total Pengiriman)",
-                    zeroRecords: "No matching Pengiriman found",
-                    emptyTable: "No Pengiriman available"
+                    info: "Showing _START_ to _END_ of _TOTAL_ Penjualan",
+                    infoEmpty: "No Penjualan found",
+                    infoFiltered: "(filtered from _MAX_ total Penjualan)",
+                    zeroRecords: "No matching Penjualan found",
+                    emptyTable: "No Penjualan available"
                 },
                 dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"lf>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip>',
                 pageLength: 10,

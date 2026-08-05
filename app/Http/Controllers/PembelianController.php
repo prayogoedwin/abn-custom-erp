@@ -312,10 +312,10 @@ class PembelianController extends Controller
         $terbilang = $this->konversiTerbilang($pembelian->total_nominal_pembelian) . " Rupiah";
         // dd($pembelian, $pembayarancashbon, $cashbonsebelum);
 
-        $pdf = Pdf::loadView('exports.nota', compact('pembelian', 'pembayarancashbon', 'cashbonsebelum', 'terbilang'))
+        $pdf = Pdf::loadView('exports.pembelian-nota', compact('pembelian', 'pembayarancashbon', 'cashbonsebelum', 'terbilang'))
             ->setPaper('a4', 'portrait');
 
-        return $pdf->download('Nota-' . $pembelian->no_transaksi . '.pdf');
+        return $pdf->download('Nota-Pembelian-' . $pembelian->no_transaksi . '.pdf');
     }
 
     private function konversiTerbilang(int $angka)

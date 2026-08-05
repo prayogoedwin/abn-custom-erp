@@ -34,6 +34,8 @@ class PenjualanDetail extends Model
         'tipe',
         'netto_pengiriman',
         'netto',
+        'bobot',
+        'rendeman',
         'selisih',
         'basis_harga',
         'sub_total',

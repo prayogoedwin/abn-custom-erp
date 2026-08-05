@@ -87,45 +87,51 @@ class PenjualanController extends Controller
         return $pagedata;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        // dd($request->headers->all());
-        // $penjualans = Penjualan::join('customers', 'penjualans.customer_id', '=', 'customers.id')
-        //     ->join('pengirimans', 'penjualans.pengiriman_id', '=', 'pengirimans.id')
+        
 
-        //     // Select everything from pengiriman, and specific fields from users
-        //     ->select('penjualans.*', 'customers.nama as customer')
-        //     ->where('penjualans.deleted_at', null)
-        //     ->get();
-        // dd($penjualans);
+        $pagedata = $this->getPagedata();
+
+        return view('penjualans.index', $pagedata);
+    }
+
+    public function indexTable(Request $request)
+    {
         if ($request->ajax()) {
-            // dd('masuk ajax');
-            $penjualans = Penjualan::join('customers', 'penjualans.customer_id', '=', 'customers.id')
-                ->join('pengirimans', 'penjualans.pengiriman_id', '=', 'pengirimans.id')
-                // Select everything from pengiriman, and specific fields from users
-                ->select('penjualans.*', 'customers.nama as customer', 'pengirimans.no_transaksi as pengiriman')
-                ->where('penjualans.deleted_at', null)
-                ->get();
-            // dd($penjualans);
+            $penjualans = Penjualan::with('customer', 'details')
+                ->select('penjualans.*');
 
             return DataTables::of($penjualans)
+                ->addColumn('no_transaksi', function ($penjualan) {
+                    return $penjualan->no_transaksi_penjualan;
+                })
+                ->addColumn('customer', function ($penjualan) {
+                    return $penjualan->customer ? $penjualan->customer->nama : '';
+                })
+                ->addColumn('detail', function ($penjualan) {
+                    $produkNames = $penjualan->details->map(function ($detail) {
+                        return   '[' . $detail->tipe . '] ' . $detail->produk->nama_produk;
+                    })->toArray();
+                    $content = implode('<br>', $produkNames);
+                    return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
+                })
 
 
 
-
-                ->addColumn('actions', function ($pengiriman) {
+                ->addColumn('actions', function ($penjualan) {
                     $actions = '';
 
                     if (auth()->user()->hasPermission('show-penjualans')) {
-                        $actions .= '<a href="' . route('penjualans.show', $pengiriman) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
+                        $actions .= '<a href="' . route('penjualans.show', $penjualan) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
                     }
 
                     if (auth()->user()->hasPermission('edit-penjualans')) {
-                        $actions .= '<a href="' . route('penjualans.edit', $pengiriman) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
+                        $actions .= '<a href="' . route('penjualans.edit', $penjualan) . '" class="text-blue-600 dark:text-blue-400 hover:underline mr-3">Edit</a>';
                     }
 
                     if (auth()->user()->hasPermission('delete-penjualans')) {
-                        $actions .= '<form action="' . route('penjualans.destroy', $pengiriman) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
+                        $actions .= '<form action="' . route('penjualans.destroy', $penjualan) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">
                             ' . csrf_field() . method_field('DELETE') . '
                             <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
                         </form>';
@@ -133,13 +139,11 @@ class PenjualanController extends Controller
 
                     return $actions;
                 })
-                ->rawColumns(['actions'])
+                ->rawColumns(['actions', 'detail']) // Menandai kolom actions dan detail sebagai raw HTML
                 ->make(true);
         }
 
-        $pagedata = $this->getPagedata();
-
-        return view('dynamiccrud.index', $pagedata);
+        return response()->json(['message' => 'Invalid request'], 400);
     }
 
     public function export()
@@ -201,6 +205,8 @@ class PenjualanController extends Controller
                     'produk_id.' . $index => ['required', 'integer'],
                     'tipe.' . $index => ['required', 'string', 'max:255'],
                     'netto.' . $index => ['required', 'numeric'],
+                    'rendeman.' . $index => ['nullable', 'numeric'],
+                    'bobot.' . $index => ['nullable', 'integer'],
                     'selisih.' . $index => ['required', 'numeric'],
                     'basis_harga.' . $index => ['required', 'numeric'],
                     'sub_total.' . $index => ['required', 'numeric'],
@@ -230,6 +236,8 @@ class PenjualanController extends Controller
                         'pph' => $request->pph[$index],
                         'ppn' => $request->ppn[$index],
                         'nominal_akhir' => $request->nominal_akhir[$index],
+                        'bobot' => $request->bobot[$index],
+                        'rendeman' => $request->rendeman[$index],
 
                         'pengiriman_detail_id' => $pengiriman_detail_id,
                         'produk_id' => $request->produk_id[$index],
@@ -245,7 +253,7 @@ class PenjualanController extends Controller
                         $detail['nominal_akhir'] = 0;
                     }
 
-                    
+
 
                     PenjualanDetail::create([
                         'penjualan_id' => $penjualan->id,
@@ -254,6 +262,8 @@ class PenjualanController extends Controller
                         'tipe'    => $request->tipe[$index],
                         'netto_pengiriman'    => $pengirimandetail->netto,
                         'netto'    => $request->netto[$index],
+                        'bobot'    => $request->bobot[$index],
+                        'rendeman'    => $request->rendeman[$index],
                         'selisih'    => $detail['selisih'],
                         'basis_harga'    => $request->basis_harga[$index],
                         'sub_total'    => $detail['sub_total'],
@@ -289,6 +299,55 @@ class PenjualanController extends Controller
 
 
         return view('penjualans.show', compact('penjualan'), $pagedata);
+    }
+
+    public function cetakNota(Penjualan $penjualan)
+    {
+        $penjualan->load('details.produk', 'pengiriman.customer');
+        // dd($pengirimans->toArray());
+        $terbilang = $this->konversiTerbilang($penjualan->details->sum('nominal_akhir'));
+
+        $pagedata = $this->getPagedata();
+
+        // dd($penjualan);
+
+        //debug
+        return view('exports.penjualan-nota', compact('penjualan', 'terbilang'), $pagedata);
+
+        $pdf = Pdf::loadView('exports.penjualan-nota', compact('penjualan', 'terbilang'), $pagedata)
+            ->setPaper('a4', 'portrait');
+        return $pdf->download('Nota-Penjualan-' . $penjualan->no_transaksi_penjualan . '.pdf');
+    }
+
+    private function konversiTerbilang(int $angka)
+    {
+        $angka = abs((int)$angka);
+        $baca = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+        $terbilang = "";
+
+        if ($angka < 12) {
+            $terbilang = " " . $baca[$angka];
+        } elseif ($angka < 20) {
+            $terbilang = $this->konversiTerbilang($angka - 10) . " Belas ";
+        } elseif ($angka < 100) {
+            $terbilang = $this->konversiTerbilang($angka / 10) . " Puluh " . $this->konversiTerbilang($angka % 10);
+        } elseif ($angka < 200) {
+            $terbilang = " Seratus " . $this->konversiTerbilang($angka - 100);
+        } elseif ($angka < 1000) {
+            $terbilang = $this->konversiTerbilang($angka / 100) . " Ratus " . $this->konversiTerbilang($angka % 100);
+        } elseif ($angka < 2000) {
+            $terbilang = " Seribu " . $this->konversiTerbilang($angka - 1000);
+        } elseif ($angka < 1000000) {
+            $terbilang = $this->konversiTerbilang($angka / 1000) . " Ribu " . $this->konversiTerbilang($angka % 1000);
+        } elseif ($angka < 1000000000) {
+            $terbilang = $this->konversiTerbilang($angka / 1000000) . " Juta " . $this->konversiTerbilang($angka % 1000000);
+        } elseif ($angka < 1000000000000) {
+            $terbilang = $this->konversiTerbilang($angka / 1000000000) . " Milyar " . $this->konversiTerbilang(fmod($angka, 1000000000));
+        } elseif ($angka < 1000000000000000) {
+            $terbilang = $this->konversiTerbilang($angka / 1000000000000) . " Trilyun " . $this->konversiTerbilang(fmod($angka, 1000000000000));
+        }
+
+        return trim($terbilang);
     }
 
     public function edit(Penjualan $penjualan): View
