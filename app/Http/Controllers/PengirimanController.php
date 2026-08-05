@@ -81,20 +81,26 @@ class PengirimanController extends Controller
         //         ->where('pengirimans.deleted_at', null)
         //         ->get();
         // dd($pengirimans);
+        
+
+        $pagedata = $this->getPagedata();
+
+        return view('pengirimans.index', $pagedata);
+    }
+
+    public function indexTable(Request $request)
+    {
         if ($request->ajax()) {
-            // dd('masuk ajax');
-            $pengirimans = Pengiriman::join('customers', 'pengirimans.customer_id', '=', 'customers.id')
-                // Select everything from pengiriman, and specific fields from users
-                ->select('pengirimans.*', 'customers.nama as customer')
-                ->where('pengirimans.deleted_at', null)
-                ->get();
-            // dd($pengirimans);
+            $data = Pengiriman::where('deleted_at', null)->get();
 
-            return DataTables::of($pengirimans)
-
-
-
-
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('customer', function ($row) {
+                    return $row->customer ? $row->customer->nama : '';
+                })
+                ->addColumn('tanggal', function ($row) {
+                    return $row->created_at->format('Y-m-d H:i:s');
+                })
                 ->addColumn('actions', function ($pengiriman) {
                     $actions = '';
 
@@ -119,9 +125,7 @@ class PengirimanController extends Controller
                 ->make(true);
         }
 
-        $pagedata = $this->getPagedata();
-
-        return view('dynamiccrud.index', $pagedata);
+        return response()->json(['error' => 'Invalid request'], 400);
     }
 
     public function export()
@@ -155,7 +159,6 @@ class PengirimanController extends Controller
 
         $validate = Validator::make($store_data, [
             'nopol' => ['required', 'string', 'max:255'],
-            'customer_id' => ['required', 'integer', 'max:255'],
 
             'created_by' => ['required', 'integer']
         ]);

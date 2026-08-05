@@ -230,6 +230,7 @@ Route::middleware(['auth'])->group(function () {
 
     // pengirimans Management - dengan permission check---------------------------------------------------------
     Route::get('pengirimans', [PengirimanController::class, 'index'])->name('pengirimans.index')->middleware('permission:view-pengirimans');
+    Route::get('pengirimans/table', [PengirimanController::class, 'indexTable'])->name('pengirimans.indexTable')->middleware('permission:view-pengirimans');
     Route::get('pengirimans/export', [PengirimanController::class, 'export'])->name('pengirimans.export')->middleware('permission:download-pengirimans');
     Route::get('pengirimans/create', [PengirimanController::class, 'create'])->name('pengirimans.create')->middleware('permission:create-pengirimans');
 

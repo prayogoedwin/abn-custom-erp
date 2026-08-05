@@ -43,9 +43,10 @@
 
 
 
-                            <div class="container-jumlah_per_karung">
+                            <!-- <div class="container-jumlah_per_karung">
                                 <x-forms.input append="satuan" label="Jumlah per Karung" name="jumlah_per_karung[]" type="number" />
-                            </div>
+                            </div> -->
+                            <input type="hidden" class="jumlah_per_karung_hidden" name="jumlah_per_karung[]" value="0">
 
                             <div class="container-jumlah_karung ">
                                 <x-forms.input label="Jumlah Karung" name="jumlah_karung[]" type="decimal" />
@@ -53,7 +54,6 @@
 
                             <div class="container-bruto ">
                                 <x-forms.input label="Bruto" name="bruto[]" type="decimal" />
-                                <p class="text-xs text-gray-500 mt-1">*Jumlah per Karung x jumlah karung</p>
                             </div>
 
                             <div class="container-tara">
@@ -128,13 +128,7 @@
                     });
                 }
 
-                // Jumlah per karung input
-                const jumlahPerKarung = row.querySelector('input[name="jumlah_per_karung[]"]');
-                if (jumlahPerKarung) {
-                    jumlahPerKarung.addEventListener('input', function() {
-                        calculateRowValues(row);
-                    });
-                }
+                
 
                 // Jumlah karung input
                 const jumlahKarung = row.querySelector('input[name="jumlah_karung[]"]');
@@ -159,6 +153,7 @@
                 const brutoInput = row.querySelector('input[name="bruto[]"]');
                 if (brutoInput) {
                     brutoInput.addEventListener('input', function() {
+                        calculateJumlahPerKarung(row);
                         calculateNetto(row);
                     });
                 }
@@ -185,6 +180,25 @@
                     brutoInput.value = bruto.toFixed(2);
                 } else if (brutoInput) {
                     brutoInput.value = '';
+                }
+            }
+
+            // Calculate jumlah per karung based on selected product
+            function calculateJumlahPerKarung(row) {
+                const jumlahPerKarungInput = row.querySelector('.jumlah_per_karung_hidden');
+                const BrutoInput = row.querySelector('input[name="bruto[]"]');
+                const jumlahKarungInput = row.querySelector('input[name="jumlah_karung[]"]');
+
+                if (BrutoInput && jumlahKarungInput && jumlahPerKarungInput) {
+                    const bruto = parseFloat(BrutoInput.value) || 0;
+                    const jumlahKarung = parseFloat(jumlahKarungInput.value) || 0;
+
+                    if (jumlahKarung > 0) {
+                        const jumlahPerKarung = bruto / jumlahKarung;
+                        jumlahPerKarungInput.value = jumlahPerKarung.toFixed(2);
+                    } else {
+                        jumlahPerKarungInput.value = '';
+                    }
                 }
             }
 
@@ -226,18 +240,7 @@
                 const produkSelect = row.querySelector('.produk-select');
                 produkSelect.value = data.nama_barang;
 
-                //handle satuan -----------------------------------------------------------------
-                const foundProduk = produkOptions.find(p => p.value === data.nama_barang);
-                data.satuan = foundProduk ? foundProduk.satuan : "a";
-                console.log(data);
-                const jumlahPerKarungDiv = row.querySelector('.container-jumlah_per_karung');
-                const appendSpan = jumlahPerKarungDiv.querySelector('.text-gray-900');
-                // console.log(appendSpan);
-                if (appendSpan) {
-                    appendSpan.textContent = data.satuan;
-                }
-                //------------------------------------------------------------------------------------
-
+                
                 // Set jumlah per karung
                 const jumlahPerKarung = row.querySelector('input[name="jumlah_per_karung[]"]');
                 jumlahPerKarung.value = data.jumlah_per_karung;
@@ -257,6 +260,9 @@
                 // Set netto
                 const netto = row.querySelector('input[name="netto[]"]');
                 netto.value = data.netto;
+
+                console.log('Populating row with data:', data);
+                console.log('bruto:', bruto.value, 'tara:', tara.value, 'netto:', netto.value);
 
                 // Recalculate to ensure consistency
                 calculateRowValues(row);

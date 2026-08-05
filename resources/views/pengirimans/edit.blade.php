@@ -69,7 +69,7 @@
                         name="{{ $column['name'] }}"
                         class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/40 searchable-select">
 
-                        
+                        <option value="" >Tidak di isi</option>
                         @foreach($column['options'] as $option)
                         @if(old($column['value'], $data->{$column['name']}) == $option['value'])
                         <option value="{{ $option['value'] }}" selected>

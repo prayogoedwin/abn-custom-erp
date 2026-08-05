@@ -46,9 +46,11 @@
                                     name="satuan[]" />
                             </div>
 
-                            <div class="container-jumlah_per_karung hidden">
+                            <!-- <div class="container-jumlah_per_karung hidden">
                                 <x-forms.input append="satuan" label="Jumlah per Karung" name="jumlah_per_karung[]" type="number" />
-                            </div>
+                            </div> -->
+                            
+                            <input type="hidden" class="jumlah-per-karung-hidden" name="jumlah_per_karung[]" value="0" />
 
                             <div class="container-jumlah_karung hidden">
                                 <x-forms.input label="Jumlah Karung" name="jumlah_karung[]" type="decimal" />
@@ -56,7 +58,6 @@
 
                             <div class="container-bruto hidden">
                                 <x-forms.input label="Bruto" name="bruto[]" type="decimal" />
-                                <p class="text-xs text-gray-500 mt-1">*Jumlah per Karung x jumlah karung</p>
                             </div>
 
                             <div class="container-tara hidden">
@@ -112,6 +113,28 @@
                 }
             }
 
+            // Function to calculate Jumlah per Karung (Bruto ÷ Jumlah Karung)
+            function calculateJumlahPerKarung(row) {
+                const jumlahPerKarungHiddenInput = row.querySelector('.jumlah-per-karung-hidden');
+                const jumlahKarungInput = row.querySelector('.container-jumlah_karung input');
+                const brutoInput = row.querySelector('.container-bruto input');
+
+                if (jumlahPerKarungHiddenInput && jumlahKarungInput && brutoInput) {
+                    const bruto = parseFloat(brutoInput.value) || 0;
+                    const jumlahKarung = parseFloat(jumlahKarungInput.value) || 0;
+
+                    if (jumlahKarung > 0) {
+                        const jumlahPerKarung = bruto / jumlahKarung;
+                        jumlahPerKarungHiddenInput.value = jumlahPerKarung.toFixed(2);
+                    } else {
+                        jumlahPerKarungHiddenInput.value = '';
+                    }
+
+                    calculateTara(row); // Recalculate tara after jumlah per karung changes
+                }
+            }
+
+
             // Function to calculate Tara (Jumlah Karung × 0.3 KG)
             function calculateTara(row) {
                 const jumlahKarungInput = row.querySelector('.container-jumlah_karung input');
@@ -151,18 +174,19 @@
 
             // Function to setup event listeners for inputs in a row
             function setupInputListeners(row) {
-                const jumlahPerKarungInput = row.querySelector('.container-jumlah_per_karung input');
+                const brutoInput = row.querySelector('.container-bruto input');
                 const jumlahKarungInput = row.querySelector('.container-jumlah_karung input');
 
-                if (jumlahPerKarungInput) {
-                    jumlahPerKarungInput.addEventListener('input', function() {
-                        calculateBruto(row);
+                if (brutoInput) {
+                    brutoInput.addEventListener('input', function() {
+                        console.log('Bruto input changed');
+                        calculateJumlahPerKarung(row);
                     });
                 }
 
                 if (jumlahKarungInput) {
                     jumlahKarungInput.addEventListener('input', function() {
-                        calculateBruto(row); // This will trigger bruto, then tara, then netto
+                        calculateJumlahPerKarung(row); 
                     });
                 }
             }
@@ -222,10 +246,7 @@
                         const taraInput = taraDiv.querySelector('input');
                         const nettoInput = nettoDiv.querySelector('input');
 
-                        if (brutoInput) {
-                            brutoInput.readOnly = true;
-                            brutoInput.classList.add('bg-gray-100', 'dark:bg-gray-700', 'cursor-not-allowed');
-                        }
+                        
                         if (taraInput) {
                             taraInput.readOnly = true;
                             taraInput.classList.add('bg-gray-100', 'dark:bg-gray-700', 'cursor-not-allowed');
