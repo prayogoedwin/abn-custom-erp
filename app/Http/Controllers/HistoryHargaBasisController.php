@@ -18,10 +18,11 @@ class HistoryHargaBasisController extends Controller
             'tablename' => 'history_harga_bases',
             'tableaction' => false,
             'columns' => [
+                ['name' => 'tanggal', 'value' => 'tanggal', 'title' => 'Tanggal', 'type' => 'number', 'inform' => false, 'intable' => true],
                 ['name' => 'nama_produk', 'value' => 'nama_produk', 'title' => 'Produk', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'satuan', 'value' => 'satuan', 'title' => 'Satuan', 'type' => 'text', 'inform' => false, 'intable' => true],
                 ['name' => 'harga_basis', 'value' => 'harga_basis', 'title' => 'Harga', 'type' => 'text', 'inform' => false, 'intable' => true],
-                ['name' => 'tanggal', 'value' => 'tanggal', 'title' => 'Tanggal', 'type' => 'number', 'inform' => false, 'intable' => true],
+                
             ],
         ];
 
@@ -34,8 +35,8 @@ class HistoryHargaBasisController extends Controller
         if ($request->ajax()) {
             $history_harga_bases = HistoryHargaBasis::join('produks', 'history_harga_bases.produk_id', '=', 'produks.id')
                 // Select everything from karyawan, and specific fields from users
-                ->select('history_harga_bases.*', 'produks.nama_produk')
-                ->get();
+                ->select('history_harga_bases.*', 'produks.nama_produk');
+                
 
 
             return DataTables::of($history_harga_bases)
