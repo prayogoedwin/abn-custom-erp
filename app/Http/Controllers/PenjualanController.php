@@ -194,6 +194,23 @@ class PenjualanController extends Controller
             'created_by' => ['required', 'integer']
         ]);
 
+        if ($request->pengiriman_detail_id != null) {
+            foreach ($request->pengiriman_detail_id as $index => $pengiriman_detail_id) {
+                $validate = Validator::make($request->all(), [
+                    'pengiriman_detail_id.' . $index => ['required', 'integer'],
+                    'produk_id.' . $index => ['required', 'integer'],
+                    'tipe.' . $index => ['required', 'string', 'max:255'],
+                    'netto.' . $index => ['required', 'numeric'],
+                    'selisih.' . $index => ['required', 'numeric'],
+                    'basis_harga.' . $index => ['required', 'numeric'],
+                    'sub_total.' . $index => ['required', 'numeric'],
+                    'pph.' . $index => ['nullable', 'numeric'],
+                    'ppn.' . $index => ['nullable', 'numeric'],
+                    'nominal_akhir.' . $index => ['required', 'numeric'],
+                ]);
+            }
+        }
+
 
         if ($validate->fails()) {
             return back()->withErrors($validate)->withInput();
@@ -213,6 +230,12 @@ class PenjualanController extends Controller
                         'pph' => $request->pph[$index],
                         'ppn' => $request->ppn[$index],
                         'nominal_akhir' => $request->nominal_akhir[$index],
+
+                        'pengiriman_detail_id' => $pengiriman_detail_id,
+                        'produk_id' => $request->produk_id[$index],
+                        'tipe'    => $request->tipe[$index],
+                        'netto_pengiriman'    => $pengirimandetail->netto,
+                        'netto'    => $request->netto[$index],
                     ];
 
                     if ($request->tipe[$index] == "Titip") {
@@ -221,6 +244,8 @@ class PenjualanController extends Controller
                         $detail['ppn'] = 0;
                         $detail['nominal_akhir'] = 0;
                     }
+
+                    
 
                     PenjualanDetail::create([
                         'penjualan_id' => $penjualan->id,
@@ -273,16 +298,14 @@ class PenjualanController extends Controller
 
         $customers = Customer::where('deleted_at', null)->get();
 
-        $pengirimandetails = PengirimanDetail::where('deleted_at', null)->get();
-        $produks = Produk::where('deleted_at', null)->get();
+        $produks = Produk::get();
 
-        $pengirimans = Pengiriman::where('deleted_at', null)->get();
-
+        $data->load('pengiriman.detail.produk', 'pengiriman.customer');
         // dd($pengirimans->toArray());
 
         $pagedata = $this->getPagedata();
 
-        return view('penjualans.edit', compact('data', 'customers', 'pengirimans', 'pengirimandetails', 'produks'), $pagedata);
+        return view('penjualans.edit', compact('data', 'customers', 'produks'), $pagedata);
     }
 
     public function update(Request $request, Penjualan $penjualan): RedirectResponse

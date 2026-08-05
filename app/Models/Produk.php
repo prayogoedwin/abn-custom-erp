@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Produk extends Model
 {
@@ -17,6 +18,9 @@ class Produk extends Model
 
     //         $table->timestampscustom();
     //     });
+
+    use SoftDeletes;
+
     protected $fillable = [
         'kategori_produk_id',
         'nama_produk',

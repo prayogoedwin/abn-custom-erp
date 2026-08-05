@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PengirimanDetail extends Model
 {
-    //
+    use SoftDeletes;
     // Schema::create('pengiriman_details', function (Blueprint $table) {
     //     $table->id();
     //     $table->foreignId('pengiriman_id')->constrained('pengirimans');

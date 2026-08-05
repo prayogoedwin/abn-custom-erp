@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Penjualan extends Model
 {
-    //
+    use SoftDeletes;
     // Schema::create('penjualans', function (Blueprint $table) {
     //         $table->id();
     //         $table->string('no_transaksi_penjualan');

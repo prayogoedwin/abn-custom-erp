@@ -134,32 +134,48 @@
 
 
                             <div class="container-netto">
-                                <x-forms.input label="Netto" name="netto[]" type="decimal" />
+                                <x-forms.input label="Netto" name="netto[]" type="decimal" required />
                             </div>
 
                             <div class="container-selisih">
-                                <x-forms.input label="Selisih" name="selisih[]" type="number" step="any" readonly=true />
+                                <x-forms.input label="Selisih" name="selisih[]" type="number" step="any" readonly=true required/>
                             </div>
 
                             <div class="container-basis_harga">
                                 <x-forms.input label="Basis Harga" name="basis_harga[]" type="number" step="any" />
                             </div>
 
+                            <div class="container-rendeman">
+                                <x-forms.input label="% Rendeman" name="rendeman[]" type="number" min="0" max="100" step="any" />
+                            </div>
+
+                            <div class="container-bobot hidden">
+                                <x-forms.input label="Bobot" name="bobot[]" type="number" step="any" />
+                            </div>
+
+                            <div class="container-harga_jadi">
+                                <x-forms.input label="Harga Jadi" name="harga_jadi[]" type="number" step="any" />
+                            </div>
+
                             <div class="container-sub_total">
                                 <x-forms.input label="Sub Total" name="sub_total[]" type="number" step="any" readonly="true" />
-                                <p class="text-xs text-gray-500 mt-1">netto * basis harga</p>
+                                <p class="text-xs text-gray-500 mt-1">netto * Harga jadi</p>
                             </div>
-                            <div class="container-pph">
+
+                            <div class="container-pph hidden">
                                 <x-forms.input label="PPH" name="pph[]" type="number" step="any" />
                             </div>
+
                             <div class="container-ppn">
                                 <x-forms.input label="PPN" name="ppn[]" type="number" step="any" />
                                 <p class="text-xs text-gray-500 mt-1">sub total * 12 %</p>
-
                             </div>
+
+                            <input type="hidden" name="pph[]" class="pph-input" value="0" />
+
                             <div class="container-nominal_akhir">
                                 <x-forms.input label="Nominal Akhir" name="nominal_akhir[]" type="number" step="any" readonly=true />
-                                <p class="text-xs text-gray-500 mt-1">sub total - ppn - pph</p>
+                                <p class="text-xs text-gray-500 mt-1">sub total + ppn</p>
 
                             </div>
 
@@ -201,8 +217,14 @@
             function calculateRow(row) {
                 const nettoDiv = row.querySelector('.container-netto');
                 const nettoInput = nettoDiv.querySelector('input');
+                const rendemanDiv = row.querySelector('.container-rendeman');
+                const rendemanInput = rendemanDiv.querySelector('input');
+                const bobotDiv = row.querySelector('.container-bobot');
+                const bobotInput = bobotDiv.querySelector('input');
                 const basisHargaDiv = row.querySelector('.container-basis_harga');
                 const basisHargaInput = basisHargaDiv.querySelector('input');
+                const hargaJadiDiv = row.querySelector('.container-harga_jadi');
+                const hargaJadiInput = hargaJadiDiv.querySelector('input');
                 const subTotalDiv = row.querySelector('.container-sub_total');
                 const subTotalInput = subTotalDiv.querySelector('input');
                 const pphDiv = row.querySelector('.container-pph');
@@ -217,11 +239,35 @@
                 const tipeSelect = row.querySelector('.tipe-select');
 
                 const netto = parseFloat(nettoInput.value) || 0;
-                const basisHarga = parseFloat(basisHargaInput.value) || 0;
+                const rendeman = parseFloat(rendemanInput.value) || 0;
+                const bobot = parseFloat(bobotInput.value) || 0;
                 const pph = parseFloat(pphInput.value) || 0;
 
+                const produkNama = row.querySelector('.produk-nama').textContent;
+
+                console.log('produkNama:', produkNama);
+                let hargaJadi = 0;
+
+                if (produkNama === 'Kopi') {
+                    
+                    hargaJadi = parseFloat(basisHargaInput.value) * (rendeman / 100);
+                    hargaJadiInput.value = hargaJadi;
+                }
+                if (produkNama === 'Lada') {
+                    
+                    // hargaBasisMaster + (hargaBasisMaster * (rendeman / 100)) + bobot;
+                    hargaJadi = parseFloat(basisHargaInput.value) + (parseFloat(basisHargaInput.value) * (rendeman / 100)) + bobot;
+                    hargaJadiInput.value = hargaJadi;
+                }
+
+
+                // calculate harga jadi based on basis harga and rendeman
+                // harga jadi => default baiknya basis * rendeman 
+                console.log('hargaJadi:', hargaJadi);
+                
+
                 // Calculate sub total
-                const subTotal = netto * basisHarga;
+                const subTotal = netto * hargaJadi;
                 subTotalInput.value = subTotal.toFixed(2);
 
                 const ppn = parseFloat(ppnInput.value) || subTotal * 0.12; //ppn = 12%
@@ -229,8 +275,8 @@
 
 
 
-                // Calculate nominal akhir (sub total + ppn - pph)
-                const nominalAkhir = subTotal + ppn - pph;
+                // Calculate nominal akhir (sub total + ppn)
+                const nominalAkhir = subTotal + ppn;
                 nominalAkhirInput.value = nominalAkhir.toFixed(2);
 
                 const nettoPengirimanval = row.querySelector('.netto-pengiriman').value
@@ -252,7 +298,7 @@
                 const tipeSelect = row.querySelector('.tipe-select');
                 const basisHargaDiv = row.querySelector('.container-basis_harga');
                 const subTotalDiv = row.querySelector('.container-sub_total');
-                const pphDiv = row.querySelector('.container-pph');
+                // const pphDiv = row.querySelector('.container-pph');
                 const ppnDiv = row.querySelector('.container-ppn');
                 const nominalAkhirDiv = row.querySelector('.container-nominal_akhir');
                 const selisihDiv = row.querySelector('.container-selisih');
@@ -261,14 +307,14 @@
                     if (this.value === 'Titip') {
                         basisHargaDiv.classList.add('hidden');
                         subTotalDiv.classList.add('hidden');
-                        pphDiv.classList.add('hidden');
+                        // pphDiv.classList.add('hidden');
                         ppnDiv.classList.add('hidden');
                         nominalAkhirDiv.classList.add('hidden');
                         selisihDiv.classList.add('hidden');
                     } else {
                         basisHargaDiv.classList.remove('hidden');
                         subTotalDiv.classList.remove('hidden');
-                        pphDiv.classList.remove('hidden');
+                        // pphDiv.classList.remove('hidden');
                         ppnDiv.classList.remove('hidden');
                         nominalAkhirDiv.classList.remove('hidden');
                         selisihDiv.classList.remove('hidden');
@@ -314,6 +360,9 @@
                     rowDiv.querySelector('.produk-netto').textContent = detail.netto || '-';
                     rowDiv.querySelector('.produk-satuan').textContent = produkTerpilih.satuan || '-';
 
+                    if(detail.nama_barang == 'Lada') {
+                        rowDiv.querySelector('.container-bobot').classList.remove('hidden');
+                    }
                     // Set initial input value
                     const nettoDiv = rowDiv.querySelector('.container-netto');
                     const nettoInput = nettoDiv.querySelector('input');
