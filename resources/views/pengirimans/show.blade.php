@@ -137,6 +137,14 @@
             </div>
 
             <div class="mt-8 flex gap-3">
+                <a href="{{ route('pengirimans.suratjalan', $pengiriman->id) }}" target="_blank">
+                    <x-button type="secondary" class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18"></path>
+                        </svg>
+                        Surat Jalan
+                    </x-button>
+                </a>
                 <a href="{{ route($tablename . '.index') }}">
                     <x-button type="primary">Kembali ke Daftar</x-button>
                 </a>

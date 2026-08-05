@@ -248,6 +248,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('pengirimans/{pengiriman}', [PengirimanController::class, 'destroy'])->name('pengirimans.destroy')->middleware('permission:delete-pengirimans');
 
     Route::get('pengirimans/{pengiriman}/cetaknota', [PengirimanController::class, 'cetakNota'])->name('pengirimans.cetaknota')->middleware('permission:show-pengirimans');
+    Route::get('pengirimans/{pengiriman}/suratjalan', [PengirimanController::class, 'suratJalan'])->name('pengirimans.suratjalan')->middleware('permission:show-pengirimans');
 
     Route::get('pengirimandetails/create/{pengiriman}', [PengirimanDetailController::class, 'create'])->name('pengirimandetails.create')->middleware('permission:create-pengirimandetails');
     Route::Post('pengirimandetails/store', [PengirimanDetailController::class, 'store'])->name('pengirimandetails.store')->middleware('permission:create-pengirimandetails');
