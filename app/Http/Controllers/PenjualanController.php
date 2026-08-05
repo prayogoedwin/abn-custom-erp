@@ -89,7 +89,7 @@ class PenjualanController extends Controller
 
     public function index()
     {
-        
+
 
         $pagedata = $this->getPagedata();
 
@@ -99,15 +99,23 @@ class PenjualanController extends Controller
     public function indexTable(Request $request)
     {
         if ($request->ajax()) {
-            $penjualans = Penjualan::with('customer', 'details')
+            $penjualans = Penjualan::with('customer', 'details.produk')
                 ->select('penjualans.*');
 
             return DataTables::of($penjualans)
                 ->addColumn('no_transaksi', function ($penjualan) {
                     return $penjualan->no_transaksi_penjualan;
                 })
+                ->filterColumn('no_transaksi', function ($query, $keyword) {
+                    $query->where('no_transaksi_penjualan', 'like', "%{$keyword}%");
+                })
                 ->addColumn('customer', function ($penjualan) {
                     return $penjualan->customer ? $penjualan->customer->nama : '';
+                })
+                ->filterColumn('customer', function ($query, $keyword) {
+                    $query->whereHas('customer', function ($q) use ($keyword) {
+                        $q->where('nama', 'like', "%{$keyword}%");
+                    });
                 })
                 ->addColumn('detail', function ($penjualan) {
                     $produkNames = $penjualan->details->map(function ($detail) {
@@ -115,6 +123,11 @@ class PenjualanController extends Controller
                     })->toArray();
                     $content = implode('<br>', $produkNames);
                     return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
+                })
+                ->filterColumn('detail', function ($query, $keyword) {
+                    $query->whereHas('details.produk', function ($q) use ($keyword) {
+                        $q->where('nama_produk', 'like', "%{$keyword}%");
+                    });
                 })
 
 

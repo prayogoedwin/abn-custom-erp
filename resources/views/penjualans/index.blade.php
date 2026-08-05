@@ -81,6 +81,7 @@
                     {
                         data: 'detail',
                         name: 'detail'
+                        
                     },
                     {
                         data: 'actions',
