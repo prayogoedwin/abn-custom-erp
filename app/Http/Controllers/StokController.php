@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Produk;
 use App\Exports\StokExport;
 use App\Models\Stok;
 use Illuminate\Http\RedirectResponse;
@@ -30,16 +30,73 @@ class StokController extends Controller
         return $pagedata;
     }
 
-    public function index(Request $request)
+    public function index()
+    {
+        $produks = Produk::all();
+
+        $pagedata = $this->getPagedata();
+
+        return view('stoks.index', $pagedata, compact('produks'));
+    }
+
+    public function indexTable(Request $request)
     {
         if ($request->ajax()) {
-            $stoks = Stok::join('produks', 'stoks.produk_id', '=', 'produks.id')
-                // Select everything from karyawan, and specific fields from users
-                ->select('stoks.*', 'produks.nama_produk')
+            $stoks = Stok::with(['produk', 'pembelianDetail.pembelian.supplier', 'penjualanDetail.penjualan.customer', 'pengirimanDetail.pengiriman.customer'])
                 ->orderBy('stoks.id', 'desc');
 
+            // Apply filters based on request parameters
+            if ($request->has('filterproduk') && !empty($request->filterproduk)) {
+                $stoks->where('produk_id', $request->filterproduk);
+            }
 
             return DataTables::of($stoks)
+                ->filterColumn('produk.nama_produk', function ($query, $keyword) {
+                        $query->whereHas('produk', function ($q) use ($keyword) {
+                            $q->where('nama_produk', 'like', "%{$keyword}%");
+                        });
+                    })
+                ->addColumn('jenis_stok', function ($stok) {
+                    if ($stok->pembelian_detail_id) {
+                        return $stok->pembelianDetail->tipe_transaksi_pembelian;
+                    } elseif ($stok->penjualan_detail_id) {
+                        return $stok->penjualanDetail->tipe;
+                    } else {
+                        return '-';
+                    }
+                })
+                ->addColumn('relasi', function ($stok) {
+                    //referensi ke supplier jika beli. customer jika jual dan kirim
+                    if ($stok->pembelian_detail_id) {
+                        $pembelian = $stok->pembelianDetail->pembelian;
+                        return $pembelian->supplier->nama;
+                    } elseif ($stok->penjualan_detail_id) {
+                        $penjualan = $stok->penjualanDetail->penjualan;
+                        return $penjualan->customer->nama;
+                    } elseif ($stok->pengiriman_detail_id) {
+                        $pengiriman = $stok->pengirimanDetail->pengiriman;
+                        return $pengiriman->customer->nama;
+                    } else {
+                        return '-';
+                    }
+                })
+                ->addColumn('jumlah', function ($stok) {
+                    return $stok->stok;
+                })
+                ->addColumn('harga', function ($stok) {
+                    if ($stok->pembelian_detail_id) {
+                        return $stok->pembelianDetail->harga_netto;
+                    } elseif ($stok->penjualan_detail_id) {
+                        return $stok->penjualanDetail->sub_total;
+                    } elseif ($stok->pengiriman_detail_id) {
+                        return '-'; // Assuming pengiriman doesn't have a price associated
+                    } else {
+                        return '-';
+                    }
+                })
+                ->addColumn('tanggal', function ($row) {
+                    return $row->created_at->format('d-m-Y'); // Format tanggal sesuai kebutuhan
+                })
                 ->addColumn('actions', function ($stok) {
                     $actions = '';
 
@@ -47,18 +104,13 @@ class StokController extends Controller
                         $actions .= '<a href="' . route('stoks.show', $stok) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">Detail</a>';
                     }
 
-                    
-
                     return $actions;
                 })
                 ->rawColumns(['actions'])
-
                 ->make(true);
         }
 
-        $pagedata = $this->getPagedata();
-
-        return view('dynamiccrud.index', $pagedata);
+        return response()->json(['message' => 'Invalid request'], 400);
     }
 
     public function export()

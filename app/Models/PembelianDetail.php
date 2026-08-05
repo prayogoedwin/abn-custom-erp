@@ -47,14 +47,17 @@ class PembelianDetail extends Model
     protected static function booted()
     {
         static::created(function ($pembelianDetail) {
-            Stok::create([
-                'produk_id' => $pembelianDetail->produk_id,
-                'tipe_stok' =>  'Masuk',
-                'satuan' => $pembelianDetail->satuan,
-                'stok' => $pembelianDetail->netto,
-            ]);
-            // dd($pembelianDetail);
-
+            // hanya mencata stok yang tipe_trans 'jual'
+            if ($pembelianDetail->tipe_transaksi_pembelian == 'jual') {
+                Stok::create([
+                    'produk_id' => $pembelianDetail->produk_id,
+                    'tipe_stok' =>  'Masuk',
+                    'satuan' => $pembelianDetail->satuan,
+                    'stok' => $pembelianDetail->netto,
+                    'pembelian_detail_id' => $pembelianDetail->id,
+                    'created_by' => auth()->id(),
+                ]);
+            }
 
         });
 

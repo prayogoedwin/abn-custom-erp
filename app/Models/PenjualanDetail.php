@@ -51,14 +51,16 @@ class PenjualanDetail extends Model
     {
         static::created(function ($detail) {
             // Otomatis tambah data ke table Stok dengan tipe 'OUT' saat detail penjualan dibuat
-
-            Stok::create([
-                'produk_id'  => $detail->produk_id,
-                'tipe_stok'       => 'Keluar',
-                'satuan' => $detail->produk->satuan,
-                'stok'     => $detail->netto,
-                'created_by' => auth()->id(),
-            ]);
+            if ($detail->tipe == 'jual') {
+                Stok::create([
+                    'produk_id'  => $detail->produk_id,
+                    'tipe_stok'       => 'Keluar',
+                    'satuan' => $detail->produk->satuan,
+                    'stok'     => $detail->netto,
+                    'penjualan_detail_id' => $detail->id,
+                    'created_by' => auth()->id(),
+                ]);
+            }
         });
 
         static::updated(function ($detail) {

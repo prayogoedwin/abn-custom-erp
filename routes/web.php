@@ -102,6 +102,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Stoks Produk Management - dengan permission check
     Route::get('stoks', [StokController::class, 'index'])->name('stoks.index')->middleware('permission:view-stoks');
+    Route::get('stoks/table', [StokController::class, 'indexTable'])->name('stoks.indexTable')->middleware('permission:view-stoks');
     Route::get('stoks/export', [StokController::class, 'export'])->name('stoks.export')->middleware('permission:download-stoks');
     Route::get('stoks/create', [StokController::class, 'create'])->name('stoks.create')->middleware('permission:create-stoks');
     Route::post('stoks', [StokController::class, 'store'])->name('stoks.store')->middleware('permission:create-stoks');
