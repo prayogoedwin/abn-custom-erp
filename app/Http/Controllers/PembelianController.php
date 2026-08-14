@@ -275,6 +275,7 @@ class PembelianController extends Controller
                         'tipe_stok' => 'masuk', // karena ini pembelian titip maka masuk
                         'satuan' => $detail->satuan,
                         'jumlah' => $detail->netto,
+                        'rendeman' => $detail->rendeman,
                         'keterangan' => 'Pembelian Titip - ' . $pembelian->no_transaksi . ' - ' . $detail->produk->nama_produk,
                     ]
                 );
@@ -313,6 +314,24 @@ class PembelianController extends Controller
         // dd($pembelian, $pembayarancashbon, $cashbonsebelum);
 
         $pdf = Pdf::loadView('exports.pembelian-nota', compact('pembelian', 'pembayarancashbon', 'cashbonsebelum', 'terbilang'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Nota-Pembelian-' . $pembelian->no_transaksi . '.pdf');
+    }
+
+    // cetak nota khusus untuk pembelian titipan
+    public function cetakNotaTitipan(Pembelian $pembelian)
+    {
+        // 1. Load relasi yang dibutuhkan
+        $pembelian->load('details.produk', 'supplier');
+
+        
+        $totalNettoTitipan = $pembelian->details->where('tipe_transaksi_pembelian', 'titip')->sum('netto');
+
+
+        // dd($pembelian, $pembayarancashbon, $cashbonsebelum);
+
+        $pdf = Pdf::loadView('exports.pembelian-titipan-nota', compact('pembelian'))
             ->setPaper('a4', 'portrait');
 
         return $pdf->download('Nota-Pembelian-' . $pembelian->no_transaksi . '.pdf');

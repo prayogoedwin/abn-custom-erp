@@ -193,6 +193,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('pembelians/{pembelian}', [PembelianController::class, 'destroy'])->name('pembelians.destroy')->middleware('permission:delete-pembelians');
 
     Route::get('pembelians/{pembelian}/cetaknota', [PembelianController::class, 'cetakNota'])->name('pembelians.cetaknota')->middleware('permission:show-pembelians');
+    Route::get('pembelians/{pembelian}/cetaknotatitipan', [PembelianController::class, 'cetakNotaTitipan'])->name('pembelians.cetaknotatitipan')->middleware('permission:show-pembelians');
 
 
     // PembeliansDetails Management - dengan permission check
@@ -365,10 +366,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('stoktitipans/export', [StokTitipanController::class, 'export'])->name('stoktitipans.export')->middleware('permission:download-stok-titipans');
     Route::get('stoktitipans/create', [StokTitipanController::class, 'create'])->name('stoktitipans.create')->middleware('permission:create-stok-titipans');
     Route::post('stoktitipans', [StokTitipanController::class, 'store'])->name('stoktitipans.store')->middleware('permission:create-stok-titipans');
-    Route::get('stoktitipans/{stoktitipan}', [StokTitipanController::class, 'show'])->name('stoktitipans.show')->middleware('permission:show-stok-titipans');
+    // Route::get('stoktitipans/{stoktitipan}', [StokTitipanController::class, 'show'])->name('stoktitipans.show')->middleware('permission:show-stok-titipans');
     Route::get('stoktitipans/{stoktitipan}/edit', [StokTitipanController::class, 'edit'])->name('stoktitipans.edit')->middleware('permission:edit-stok-titipans');
     Route::put('stoktitipans/{stoktitipan}', [StokTitipanController::class, 'update'])->name('stoktitipans.update')->middleware('permission:edit-stok-titipans');
     Route::delete('stoktitipans/{stoktitipan}', [StokTitipanController::class, 'destroy'])->name('stoktitipans.destroy')->middleware('permission:delete-stok-titipans');
+    // ---- jual stok titipan---- //
+    Route::get('stoktitipans/jual/{stoktitipan}', [StokTitipanController::class, 'jual'])->name('stoktitipans.jual')->middleware('permission:create-stok-titipans');
+    Route::post('stoktitipans/jualstore', [StokTitipanController::class, 'jualStore'])->name('stoktitipans.jualstore')->middleware('permission:create-stok-titipans');
+    Route::get('stoktitipans/jualnow/{pembelian}/{detail}', [StokTitipanController::class, 'jualnow'])->name('stoktitipans.jualnow')->middleware('permission:create-stok-titipans');
+    Route::post('stoktitipans/jualnowstore', [StokTitipanController::class, 'jualNowStore'])->name('stoktitipans.jualNowStore')->middleware('permission:create-stok-titipans');
 
 
 

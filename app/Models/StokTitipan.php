@@ -31,6 +31,7 @@ class StokTitipan extends Model
         'tipe_stok',
         'satuan',
         'jumlah',
+        'rendeman',
         'keterangan',
         'created_by',
         'updated_by',

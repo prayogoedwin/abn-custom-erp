@@ -66,7 +66,7 @@
 
     <!-- Main Content Tabular Area -->
     <div class="space-y-6">
-        
+
         <!-- TABLE 1: Daftar Stok Barang Titipan (Menggunakan Blade) -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5">
             <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
@@ -75,6 +75,64 @@
                 </svg>
                 Daftar Mutasi Stok Titipan Barang
             </h3>
+            @php
+            $stokTitipanPerProduk = $supplier->stokTitipans
+            ->groupBy('produk_id')
+            ->map(function ($stokProduk) {
+            $masuk = $stokProduk
+            ->filter(fn ($stok) => strtolower($stok->tipe_stok) === 'masuk')
+            ->sum('jumlah');
+
+            $keluar = $stokProduk
+            ->filter(fn ($stok) => strtolower($stok->tipe_stok) === 'keluar')
+            ->sum('jumlah');
+
+            return [
+            'produk' => $stokProduk->first()->produk,
+            'jumlah' => $masuk - $keluar,
+            'satuan' => $stokProduk->first()->satuan,
+            ];
+            })
+            ->filter(fn ($stok) => $stok['jumlah'] > 0);
+            @endphp
+
+            <div class="mb-4">
+                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Jumlah Titipan di Gudang Saat Ini
+                </p>
+
+                @if($stokTitipanPerProduk->isNotEmpty())
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    @foreach($stokTitipanPerProduk as $stok)
+                    <div class="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
+                                    {{ $stok['produk']->nama_produk ?? '-' }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Stok titipan
+                                </p>
+                            </div>
+
+                            <div class="text-right shrink-0">
+                                <p class="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                                    {{ number_format($stok['jumlah'], 2) }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ $stok['satuan'] }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @else
+                <div class="p-4 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    Tidak ada stok titipan yang tersisa di gudang saat ini.
+                </div>
+                @endif
+            </div>
             <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -84,6 +142,7 @@
                             <th class="px-4 py-3 text-right">Jumlah Volume</th>
                             <th class="px-4 py-3">Keterangan</th>
                             <th class="px-4 py-3 text-center">Tanggal Log</th>
+                            <th class="px-4 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -94,9 +153,9 @@
                             </td>
                             <td class="px-4 py-3 text-center">
                                 @if(strtolower($stok->tipe_stok) === 'masuk')
-                                    <span class="px-2.5 py-0.5 text-xs font-semibold text-green-800 bg-green-100 rounded-full dark:bg-green-900/30 dark:text-green-400">Masuk</span>
+                                <span class="px-2.5 py-0.5 text-xs font-semibold text-green-800 bg-green-100 rounded-full dark:bg-green-900/30 dark:text-green-400">Masuk</span>
                                 @else
-                                    <span class="px-2.5 py-0.5 text-xs font-semibold text-red-800 bg-red-100 rounded-full dark:bg-red-900/30 dark:text-red-400">Keluar</span>
+                                <span class="px-2.5 py-0.5 text-xs font-semibold text-red-800 bg-red-100 rounded-full dark:bg-red-900/30 dark:text-red-400">Keluar</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">
@@ -107,6 +166,11 @@
                             </td>
                             <td class="px-4 py-3 text-center text-xs">
                                 {{ $stok->created_at->format('d M Y H:i') }}
+                            </td>
+                            <td class="px-4 py-3 text-center text-xs">
+                                @if(strtolower($stok->tipe_stok) === 'masuk')
+                                <a href="{{ route('stoktitipans.jual', ['stoktitipan' => $stok->id]) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">Jual</a>
+                                @endif
                             </td>
                         </tr>
                         @empty
@@ -123,25 +187,25 @@
 
         <!-- TABLE 2: Riwayat Transaksi Pembelian (Menggunakan JQuery DataTable) -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div class="p-4">
-            <table id="dynamic-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
+            <div class="p-4">
+                <table id="dynamic-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr>
 
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">No Transaksi</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grand Total</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">No Transaksi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grand Total</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
 
 
 
-                        
-                    </tr>
-                </thead>
-            </table>
+
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
-    </div>
 
 
     </div>
@@ -155,16 +219,30 @@
     <script>
         $(document).ready(function() {
             $('#dynamic-table').DataTable({
-                
+
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route("suppliers.showTable", $supplier->id) }}',
-                columns: [
-                    { data: 'no_transaksi', name: 'no_transaksi' },
-                    { data: 'total_nominal_pembelian', name: 'total_nominal_pembelian' },
-                    { data: 'keterangan', name: 'keterangan' },
-                    { data: 'tanggal', name: 'tanggal' },
-                    { data: 'status', name: 'status' },
+                columns: [{
+                        data: 'no_transaksi',
+                        name: 'no_transaksi'
+                    },
+                    {
+                        data: 'total_nominal_pembelian',
+                        name: 'total_nominal_pembelian'
+                    },
+                    {
+                        data: 'keterangan',
+                        name: 'keterangan'
+                    },
+                    {
+                        data: 'tanggal',
+                        name: 'tanggal'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
+                    },
                 ],
                 language: {
                     search: "Cari Transaksi:",
@@ -190,12 +268,14 @@
             padding: 0.375rem 0.75rem;
             background-color: #fff;
         }
+
         .dark .dataTables_wrapper .dataTables_length select,
         .dark .dataTables_wrapper .dataTables_filter input {
             border-color: #4b5563;
             background-color: #374151;
             color: #f9fafb;
         }
+
         .dataTables_wrapper .dataTables_paginate .paginate_button.current {
             background: #2563eb !important;
             color: white !important;

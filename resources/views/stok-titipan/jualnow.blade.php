@@ -6,17 +6,17 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <a href="{{ route('pembelians.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $title ?? __('Pembelian') }}</a>
+        <a href="{{ route('stoktitipans.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">Jual Stok Titipan</a>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">{{ $title ?? __('Create') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">Jual Stok Titipan</span>
     </div>
 
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Create {{ $title }}</h1>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Jual Stok Titipan</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $subheading ?? __('Fill in the details below') }}</p>
         </div>
 
@@ -25,9 +25,10 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-5">
-            <form action="{{ route($tablename . '.store') }}" method="POST" id="pembelianForm">
+            <form action="{{ route('stoktitipans.jualNowStore') }}" method="POST" id="pembelianForm">
                 @csrf
-                <input type="hidden" name="pembelian_id" value="{{ $pembelian_id }}">
+                <input type="hidden" name="pembelian_id" value="{{ $pembelian->id }}">
+                <input type="hidden" name="detail_id" value="{{ $detail->id }}">
 
                 <div id="produk-container">
                     <div class="produk-row border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
@@ -37,22 +38,21 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Produk</label>
                                     <select name="produk_id[]" class="produk-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                        <option value="">Pilih Produk</option>
-                                        @foreach($produks as $produk)
-                                        <option value="{{ $produk->id }}"
-                                            data-satuan="{{ $produk->satuan }}"
-                                            data-harga="{{ $produk->harga_basis_pembelian }}"
-                                            data-produk-tipe="{{ $produk->nama_produk }}">
-                                            {{ $produk->nama_produk }}
+                                        
+                                        
+                                        <option value="{{ $detail->produk->id }}"
+                                            data-satuan="{{ $detail->produk->satuan }}"
+                                            data-harga="{{ $detail->produk->harga_basis_pembelian }}"
+                                            data-produk-tipe="{{ $detail->produk->nama_produk }}">
+                                            {{ $detail->produk->nama_produk }}
                                         </option>
-                                        @endforeach
+                                        
                                     </select>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipe Pembelian</label>
-                                    <select name="tipe_pembelian[]" class="tipe-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                        <option value="titip">Titip</option>
+                                    <select name="tipe_pembelian[]" class="tipe-select block w-full border-gray-300 p-2 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm disabled">
                                         <option value="jual">Jual</option>
                                     </select>
                                 </div>
@@ -60,25 +60,27 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="container-netto">
-                                    <x-forms.input label="Netto" name="netto[]" type="number" class="input-netto" />
+                                    <x-forms.input label="Netto" name="netto[]" value="{{ $detail->jumlah }}" type="number" class="input-netto"  />
                                     <span class="text-xs text-gray-500 label-satuan block mt-1"></span>
                                 </div>
 
                                 <div class="container-rendeman">
-                                    <x-forms.input label="Rendeman (%)" name="rendeman[]" type="number" class="input-rendeman" min="-100" max="100" />
+                                    <x-forms.input label="Rendeman (%)" name="rendeman[]" value="{{ $detail->rendeman }}" type="number" class="input-rendeman" min="-100" max="100" />
                                 </div>
 
-                                <div class="container-bobot hidden">
+                                @if($detail->produk->nama_produk === "Lada")
+                                <div class="container-bobot">
                                     <x-forms.input label="Bobot" name="bobot[]" type="number" class="input-bobot" />
                                 </div>
+                                @endif
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="container-harga_basis_master hidden">
-                                    <x-forms.input label="Harga Basis Master" name="harga_basis_pembelian[]" type="number" class="input-harga-basis" />
+                                <div class="container-harga_basis_master">
+                                    <x-forms.input label="Harga Basis Master" name="harga_basis_pembelian[]" value="{{ $detail->produk->harga_basis_pembelian }}" type="number" class="input-harga-basis" />
                                 </div>
 
-                                <div class="container-harga hidden">
+                                <div class="container-harga">
                                     <x-forms.input label="Harga" name="harga[]" type="number" class="input-harga" readonly="true" />
                                     <p  class="harga_info text-xs text-gray-500 mt-1"></p>
 
@@ -86,12 +88,12 @@
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="container-harga_beli hidden">
+                                <div class="container-harga_beli">
                                     <x-forms.input label="Harga Beli" name="harga_beli[]" type="number" class="input-harga-beli" />
                                     <p class="text-xs text-gray-500 mt-1">*Harga Editable</p>
                                 </div>
 
-                                <div class="container-harga_netto hidden">
+                                <div class="container-harga_netto">
                                     <x-forms.input label="Jumlah Uang" name="harga_netto[]" type="number" class="input-harga-netto" />
                                     <p class="text-xs text-gray-500 mt-1">*Harga Beli x netto</p>
                                 </div>
@@ -106,13 +108,11 @@
                     </div>
                 </div>
 
-                <button type="button" id="add-produk" class="mb-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow transition-colors">
-                    + Tambah Produk Lain
-                </button>
+                
 
                 <div class="flex gap-3 mt-3 border-t justify-between items-center pt-4">
 
-                    <a href="{{ route('pembelians.index') }}">
+                    <a href="{{ route('stoktitipans.index') }}">
                         <button type="button" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center justify-center cursor-pointer dark:bg-gray-500 dark:hover:bg-gray-600 focus:ring-gray-500">
                             {{ __('Batal') }}
                         </button>

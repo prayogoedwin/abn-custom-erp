@@ -10,6 +10,7 @@
 'append' => null,
 'disabled' => null,
 'readonly' => null,
+'value' => null,
 ])
 
 @if ($label)
@@ -26,7 +27,7 @@
     @endif
 
     @if($disabled)
-    <input type="{{ $type }}" id="{{ $name }}" placeholder="{{ $placeholder }}" name="{{ $name }}" disabled 
+    <input type="{{ $type }}" id="{{ $name }}" placeholder="{{ $placeholder }}" name="{{ $name }}" disabled value="{{ $value }}"
     
 
 
@@ -38,7 +39,7 @@
 
 
     @elseif($readonly)
-    <input type="{{ $type }}" id="{{ $name }}" placeholder="{{ $placeholder }}" name="{{ $name }}" readonly
+    <input type="{{ $type }}" id="{{ $name }}" placeholder="{{ $placeholder }}" name="{{ $name }}" readonly value="{{ $value }}"
 
         {{ $attributes->merge([
             'class' => 'w-full px-4 py-1.5 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ' . 
@@ -49,7 +50,7 @@
     @else
 
 
-    <input type="{{ $type }}" id="{{ $name }}" placeholder="{{ $placeholder }}" name="{{ $name }}" 
+    <input type="{{ $type }}" id="{{ $name }}" placeholder="{{ $placeholder }}" name="{{ $name }}" value="{{ $value }}"
     
 
 
