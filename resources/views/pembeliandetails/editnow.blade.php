@@ -91,6 +91,7 @@
 
                     <div class="container-bobot hidden">
                         <x-forms.input label="Bobot" name="bobot[]" type="number" class="input-bobot" step="0.01" />
+                        <p class="text-xs text-gray-500 mt-1">*Masuk rumus Lada: basis + (basis × % rendeman) + bobot</p>
                     </div>
                 </div>
 
@@ -137,6 +138,17 @@
 
             // Data detail dari controller Laravel
             const existingDetails = @json($pembelian -> details ?? []);
+
+            function jenisProduk(nama) {
+                const n = (nama || '').toLowerCase().trim();
+                if (n.includes('lada')) {
+                    return 'lada';
+                }
+                if (n.includes('kopi')) {
+                    return 'kopi';
+                }
+                return 'lain';
+            }
 
             // -------------------------------------------------------------
             // FUNGSI UTAMA: populateDetails
@@ -190,22 +202,19 @@
                 function updateVisibility() {
                     const isJual = selectTipe.value === 'jual';
                     const selectedOption = selectProduk.options[selectProduk.selectedIndex];
-                    const productType = selectedOption ? selectedOption.getAttribute('data-produk-tipe') : '';
+                    const jenis = jenisProduk(selectedOption ? selectedOption.getAttribute('data-produk-tipe') : '');
 
                     row.querySelector('.container-harga').classList.toggle('hidden', !isJual);
                     row.querySelector('.container-harga_basis_master').classList.toggle('hidden', !isJual);
                     row.querySelector('.container-harga_beli').classList.toggle('hidden', !isJual);
                     row.querySelector('.container-harga_netto').classList.toggle('hidden', !isJual);
 
-                    // Khusus Bobot hanya jika tipe "jual" dan produk "Lada"
-                    const isLada = productType === 'Lada';
-                    row.querySelector('.container-bobot').classList.toggle('hidden', !(isJual && isLada));
+                    row.querySelector('.container-bobot').classList.toggle('hidden', !(isJual && jenis === 'lada'));
 
-                    // Update harga info
                     if (hargaInfo) {
-                        if (productType === 'Kopi') {
+                        if (jenis === 'kopi') {
                             hargaInfo.textContent = "*(harga basis x % rendeman)";
-                        } else if (productType === 'Lada') {
+                        } else if (jenis === 'lada') {
                             hargaInfo.textContent = "*harga basis + (harga basis x % rendeman) + bobot";
                         } else {
                             hargaInfo.textContent = "";
@@ -216,7 +225,7 @@
                 // 3. Kalkulasi Otomatis
                 function hitung() {
                     const selectedOption = selectProduk.options[selectProduk.selectedIndex];
-                    const productType = selectedOption ? selectedOption.getAttribute('data-produk-tipe') : '';
+                    const jenis = jenisProduk(selectedOption ? selectedOption.getAttribute('data-produk-tipe') : '');
 
                     const netto = parseFloat(inputNetto.value) || 0;
                     const hargaBasis = parseFloat(inputHargaBasis.value) || 0;
@@ -225,9 +234,9 @@
 
                     let hargaBeliKalkulasi = hargaBasis;
 
-                    if (productType === 'Kopi') {
+                    if (jenis === 'kopi') {
                         hargaBeliKalkulasi = (hargaBasis * (rendeman / 100));
-                    } else if (productType === 'Lada') {
+                    } else if (jenis === 'lada') {
                         hargaBeliKalkulasi = hargaBasis + (hargaBasis * (rendeman / 100)) + bobot;
                     }
 
@@ -272,7 +281,11 @@
                     inputHarga.value = satuan;
                 });
 
-                btnHitung.addEventListener('click', hitung);
+                btnHitung.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    hitung();
+                });
 
                 // Tombol Hapus Baris
                 if (showRemoveButton) {

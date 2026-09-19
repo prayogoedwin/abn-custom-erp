@@ -68,9 +68,10 @@
                                     <x-forms.input label="Rendeman (%)" name="rendeman[]" value="{{ $detail->rendeman }}" type="number" class="input-rendeman" min="-100" max="100" step="0.01" />
                                 </div>
 
-                                @if($detail->produk->nama_produk === "Lada")
+                                @if(str_contains(strtolower($detail->produk->nama_produk ?? ''), 'lada'))
                                 <div class="container-bobot">
-                                    <x-forms.input label="Bobot" name="bobot[]" type="number" class="input-bobot" />
+                                    <x-forms.input label="Bobot" name="bobot[]" type="number" class="input-bobot" step="0.01" />
+                                    <p class="text-xs text-gray-500 mt-1">*Masuk rumus Lada: basis + (basis × % rendeman) + bobot</p>
                                 </div>
                                 @endif
                             </div>
@@ -131,6 +132,17 @@
             const container = document.getElementById('produk-container');
             const addButton = document.getElementById('add-produk');
 
+            function jenisProduk(nama) {
+                const n = (nama || '').toLowerCase().trim();
+                if (n.includes('lada')) {
+                    return 'lada';
+                }
+                if (n.includes('kopi')) {
+                    return 'kopi';
+                }
+                return 'lain';
+            }
+
             // 1. Fungsi Update Visibility untuk baris tertentu
             function handleRowLogic(row) {
                 const select = row.querySelector('.produk-select');
@@ -160,120 +172,80 @@
 
                 const labelSatuan = row.querySelector('.label-satuan');
                 const hargaInfo = row.querySelector('.harga_info');
+                const btnHitung = row.querySelector('.btn-hitung');
+
+                function productTypeOfRow() {
+                    const selectedOption = select.options[select.selectedIndex];
+                    return jenisProduk(selectedOption ? selectedOption.getAttribute('data-produk-tipe') : '');
+                }
+
+                function updateBobotDanInfo() {
+                    const jenis = productTypeOfRow();
+                    const isJual = tipe.value === 'jual';
+
+                    if (bobotDiv) {
+                        bobotDiv.classList.toggle('hidden', !(isJual && jenis === 'lada'));
+                    }
+                    if (hargaInfo) {
+                        if (jenis === 'lada') {
+                            hargaInfo.textContent = '*harga basis + (harga basis x % rendeman) + bobot';
+                        } else if (jenis === 'kopi') {
+                            hargaInfo.textContent = '*(harga basis x % rendeman)';
+                        } else {
+                            hargaInfo.textContent = '';
+                        }
+                    }
+                }
+
+                updateBobotDanInfo();
 
                 tipe.addEventListener('change', function() {
-                    if (hargaDiv) hargaDiv.classList.add('hidden');
-                    if (bobotDiv) bobotDiv.classList.add('hidden');
-                    if (hargaBasisDiv) hargaBasisDiv.classList.add('hidden');
-                    if (hargaBeliDiv) hargaBeliDiv.classList.add('hidden');
-                    if (hargaNettoDiv) hargaNettoDiv.classList.add('hidden');
-
-
-                    const selectedTipe = tipe.options[tipe.selectedIndex];
-                    console.log(selectedTipe.value);
-                    if (selectedTipe.value == "jual") {
-                        if (hargaDiv) hargaDiv.classList.remove('hidden');
-                        if (rendemanDiv) rendemanDiv.classList.remove('hidden');
-                        if (hargaBasisDiv) hargaBasisDiv.classList.remove('hidden');
-                        if (hargaBeliDiv) hargaBeliDiv.classList.remove('hidden');
-                        if (hargaNettoDiv) hargaNettoDiv.classList.remove('hidden');
-
-
-                        const selectedOption = select.options[select.selectedIndex];
-                        const productType = selectedOption.getAttribute('data-produk-tipe') || 'standar';
-
-
-
-
-                        if (productType === "Lada") {
-                            if (bobotDiv) bobotDiv.classList.remove('hidden');
-                        }
-
-                    }
-
+                    const isJual = this.value === 'jual';
+                    if (hargaDiv) hargaDiv.classList.toggle('hidden', !isJual);
+                    if (rendemanDiv) rendemanDiv.classList.toggle('hidden', !isJual);
+                    if (hargaBasisDiv) hargaBasisDiv.classList.toggle('hidden', !isJual);
+                    if (hargaBeliDiv) hargaBeliDiv.classList.toggle('hidden', !isJual);
+                    if (hargaNettoDiv) hargaNettoDiv.classList.toggle('hidden', !isJual);
+                    updateBobotDanInfo();
                 });
 
                 select.addEventListener('change', function() {
                     const selectedOption = select.options[select.selectedIndex];
-                    const val = selectedOption.value;
                     const satuan = selectedOption.getAttribute('data-satuan');
                     const hargaBasisMaster = parseFloat(selectedOption.getAttribute('data-harga')) || 0;
 
-                    const productType = selectedOption.getAttribute('data-produk-tipe');
-
-                    if (labelSatuan) labelSatuan.textContent = satuan;
-
-
-                    if (bobotDiv) bobotDiv.classList.add('hidden');
-
-                    //default hide all harga info
-                    if (hargaInfo) hargaInfo.textContent = "";
-
-
-                    if (productType === "Lada") {
-
-                        if (hargaInfo) hargaInfo.textContent = "*harga basis + (harga basis x % rendeman) + bobot";
-
-
-                        const selectedTipe = tipe.options[tipe.selectedIndex];
-                        console.log(selectedTipe.value);
-                        if (selectedTipe.value == "jual") {
-                            if (bobotDiv) bobotDiv.classList.remove('hidden');
-                        }
+                    if (labelSatuan) {
+                        labelSatuan.textContent = satuan;
                     }
-
-                    if (productType === "Kopi") {
-                        if (hargaInfo) hargaInfo.textContent = "*(harga basis x % rendeman)";
-                    }
-
-
                     inputHargaBasisPembelian.value = hargaBasisMaster;
-
-                    console.log(satuan, hargaBasisMaster, productType);
-
-
-                    inputBobot.value = 0;
+                    if (inputBobot) {
+                        inputBobot.value = 0;
+                    }
                     inputNetto.value = 0;
                     inputJumlahUang.value = 0;
                     inputRendeman.value = 0;
                     inputHargaBeli.value = 0;
+                    inputHargaEditable.value = 0;
+                    updateBobotDanInfo();
                 });
 
                 function eksekusiKalkulasi() {
-                    const selectedOption = select.options[select.selectedIndex];
-                    const productType = selectedOption.getAttribute('data-produk-tipe') || 'standar';
+                    const jenis = productTypeOfRow();
                     const netto = parseFloat(inputNetto.value) || 0;
+                    const hargaBasisMaster = parseFloat(inputHargaBasisPembelian.value) || 0;
+                    const rendeman = parseFloat(inputRendeman.value) || 0;
+                    const bobot = parseFloat(inputBobot ? inputBobot.value : 0) || 0;
+                    let hargaBeli = hargaBasisMaster;
 
-
-                    let hargaBasisMaster = parseFloat(inputHargaBasisPembelian.value) || 0;;
-
-                    if (productType === 'Kopi') {
-                        const rendeman = parseFloat(inputRendeman.value) || 0;
-                        const HargaBeli = (hargaBasisMaster * (rendeman / 100));
-                        inputHargaBeli.value = Math.round(HargaBeli);
-                        inputHargaEditable.value = Math.round(HargaBeli);
-
-                        console.log('kopppi');
-
-                    } else if (productType === 'Lada') {
-                        console.log('laddddaa');
-                        const rendeman = parseFloat(inputRendeman.value) || 0;
-                        const bobot = parseFloat(inputBobot.value) || 0;
-
-                        //Harga Beli = (harga basis + %rendeman atau - %rendeman) + bobot ATAU (harga basis + 5% atau kurangi 5%) - bobot 
-                        const hargaBeli = hargaBasisMaster + (hargaBasisMaster * (rendeman / 100)) + bobot;
-                        inputHargaBeli.value = Math.round(hargaBeli);
-                        inputHargaEditable.value = Math.round(hargaBeli);
-
-                    } else {
-                        const hargaBeli = hargaBasisMaster;
-                        inputHargaBeli.value = Math.round(hargaBeli);
-                        inputHargaEditable.value = Math.round(hargaBeli);
+                    if (jenis === 'kopi') {
+                        hargaBeli = hargaBasisMaster * (rendeman / 100);
+                    } else if (jenis === 'lada') {
+                        hargaBeli = hargaBasisMaster + (hargaBasisMaster * (rendeman / 100)) + bobot;
                     }
 
-                    inputJumlahUang.value = Math.round(inputHargaEditable.value * netto)
-
-
+                    inputHargaBeli.value = Math.round(hargaBeli);
+                    inputHargaEditable.value = Math.round(hargaBeli);
+                    inputJumlahUang.value = Math.round(inputHargaEditable.value * netto);
                 }
 
                 inputHargaEditable.addEventListener('input', function() {
@@ -294,18 +266,13 @@
                 });
 
 
-                container.addEventListener('click', function(e) {
-                    const target = e.target;
-                    const row = target.closest('.produk-row');
-                    if (!row) return;
-
-                    // Tombol Hitung ditekan
-                    if (target.classList.contains('btn-hitung')) {
+                if (btnHitung) {
+                    btnHitung.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
                         eksekusiKalkulasi();
-                    }
-
-
-                });
+                    });
+                }
             }
 
 
@@ -318,6 +285,7 @@
 
 
             // 3. Logika Tambah Baris (Clone)
+            if (addButton) {
             addButton.addEventListener('click', function() {
                 const rows = container.querySelectorAll('.produk-row');
                 const newRow = rows[0].cloneNode(true); // Clone baris pertama
@@ -338,6 +306,7 @@
 
                 container.appendChild(newRow);
             });
+            }
         });
     </script>
 

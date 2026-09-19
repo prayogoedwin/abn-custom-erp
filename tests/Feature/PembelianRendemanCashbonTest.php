@@ -27,7 +27,32 @@ class PembelianRendemanCashbonTest extends TestCase
             ->get(route('pembeliandetails.createnow', $pembelian))
             ->assertOk()
             ->assertSee('name="rendeman[]"', false)
-            ->assertSee('step="0.01"', false);
+            ->assertSee('step="0.01"', false)
+            ->assertSee("n.includes('lada')", false)
+            ->assertSee("n.includes('kopi')", false)
+            ->assertSee('btnHitung.addEventListener', false)
+            ->assertSee('*Masuk rumus Lada', false)
+            ->assertDontSee("container.addEventListener('click'", false);
+    }
+
+    public function test_form_editnow_mengenali_lada_tanpa_nama_persis(): void
+    {
+        [$user, $pembelian] = $this->buatPembelianDenganCashbon();
+
+        $permission = Permission::firstOrCreate(['name' => 'edit-pembeliandetails']);
+        $user->roles->first()->permissions()->syncWithoutDetaching([
+            $permission->id => [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('pembeliandetails.editnow', $pembelian))
+            ->assertOk()
+            ->assertSee("n.includes('lada')", false)
+            ->assertSee('btnHitung.addEventListener', false)
+            ->assertSee('*Masuk rumus Lada', false);
     }
 
     public function test_halaman_lanjut_punya_input_pengurangan_cashbon(): void
