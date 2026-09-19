@@ -70,6 +70,18 @@
                                 <span class="text-gray-500">Ambil Transfer:</span>
                                 <span class="font-semibold text-gray-900 dark:text-gray-100">Rp {{ number_format($pembelian->ambil_transfer ?? 0, 0, ',', '.') }}</span>
                             </div>
+                            @php
+                                $potongBon = \App\Models\CashbonSupplierPembayaran::query()
+                                    ->where('supplier_id', $pembelian->supplier_id)
+                                    ->where('keterangan', 'Lewat Pembelian' . $pembelian->no_transaksi)
+                                    ->sum('nominal_bayar');
+                            @endphp
+                            @if($potongBon > 0)
+                            <div class="flex justify-between text-red-500">
+                                <span>Pengurangan Cashbon:</span>
+                                <span class="font-semibold">Rp {{ number_format($potongBon, 0, ',', '.') }}</span>
+                            </div>
+                            @endif
                             @if(($pembelian->kekurangan ?? 0) > 0)
                             <div class="flex justify-between text-red-500">
                                 <span>Sisa Kekurangan:</span>

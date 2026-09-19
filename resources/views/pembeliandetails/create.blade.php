@@ -51,7 +51,7 @@
                 </div>
 
                 <div id="container-rendeman" class="mb-4 hidden">
-                    <x-forms.input append="%" label="Rendeman" name="rendeman" type="number" value="{{ old('rendeman') }}" />
+                    <x-forms.input append="%" label="Rendeman" name="rendeman" type="number" step="0.01" value="{{ old('rendeman') }}" />
                 </div>
 
                 <div id="container-bobot" class="mb-4 hidden">

@@ -65,7 +65,7 @@
                                 </div>
 
                                 <div class="container-rendeman">
-                                    <x-forms.input label="Rendeman (%)" name="rendeman[]" value="{{ $detail->rendeman }}" type="number" class="input-rendeman" min="-100" max="100" />
+                                    <x-forms.input label="Rendeman (%)" name="rendeman[]" value="{{ $detail->rendeman }}" type="number" class="input-rendeman" min="-100" max="100" step="0.01" />
                                 </div>
 
                                 @if($detail->produk->nama_produk === "Lada")

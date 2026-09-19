@@ -1,191 +1,178 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Surat Jalan</title>
     <style>
         body {
-            font-family: 'Courier', sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             font-size: 12px;
-            line-height: 1.4;
+            line-height: 1.35;
             font-weight: bold;
+            color: #000;
         }
 
-        .header {
+        .center { text-align: center; }
+        .right { text-align: right; }
+        .nowrap { white-space: nowrap; }
+
+        .company {
             text-align: center;
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 10px;
+            margin-bottom: 14px;
         }
 
-        .table {
+        .line {
+            border: 0;
+            border-top: 1px dashed #000;
+            margin: 6px 0;
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
         }
 
-        .table th {
-            border-bottom: 1px solid #000;
-            padding: 5px;
-            text-align: left;
-        }
-
-        .table td {
-            padding: 5px;
+        .meta td {
+            padding: 0 0 2px 0;
             vertical-align: top;
         }
 
-        .text-right {
+        .items th {
+            text-align: left;
+            border-bottom: 1px solid #000;
+            padding: 4px 0;
+        }
+
+        .items th.right,
+        .items td.right {
             text-align: right;
         }
 
-        .footer {
-            margin-top: 20px;
-            border-top: 1px dashed #000;
-            padding-top: 10px;
+        .items td {
+            padding: 6px 0 4px 0;
+            vertical-align: top;
         }
 
-        .signature-container {
-            width: 100%;
-            margin-top: 40px;
+        .weights {
+            width: 280px;
+            margin-left: auto;
+            margin-top: 8px;
         }
 
-        .signature-table {
-            width: 100%;
-            border-collapse: collapse;
+        .weights td {
+            padding: 1px 0;
         }
 
-        .signature-table td {
-            width: 33%;
+        .weights .rule td {
+            border-top: 1px solid #000;
+            padding-top: 3px;
+        }
+
+        .footer-date {
+            text-align: right;
+            margin-top: 12px;
+        }
+
+        .ttd {
+            margin-top: 28px;
+        }
+
+        .ttd td {
+            width: 50%;
+            vertical-align: top;
+        }
+
+        .ttd .right {
             text-align: center;
-            vertical-align: bottom;
-        }
-
-        .signature-space {
-            height: 70px;
         }
     </style>
 </head>
-
 <body>
+    @php
+        $namaPerusahaan = (isset($setting) && ! empty($setting->nama)) ? $setting->nama : 'CV ASIWA BUMI NIAGA';
+        $alamatPerusahaan = (isset($setting) && ! empty($setting->alamat)) ? $setting->alamat : "Jl. Kol. Wahab Uzir No.930\nBaturaja Timur";
+        $kota = (isset($setting) && ! empty($setting->kota)) ? $setting->kota : 'Baturaja';
+        $customer = $pengiriman->customer;
+        $totalBruto = (float) $pengiriman->detail->sum('bruto');
+        $totalTara = (float) $pengiriman->detail->sum('tara');
+        $totalNetto = (float) $pengiriman->detail->sum('netto');
+        $fmtKg = fn ($nilai) => number_format((float) $nilai, 2, ',', '.');
+        $fmtKarung = function ($nilai) {
+            $angka = (float) $nilai;
+            $desimal = fmod($angka, 1.0) == 0.0 ? 0 : 2;
 
-    <div class="header">
-        <h2>Asiwa Bumi Niaga</h2>
-        <p>
-            {{ $setting->alamat ?? 'Alamat Perusahaan' }}<br>
-            Telp : {{ $setting->telepon ?? '-' }}
-        </p>
+            return number_format($angka, $desimal, ',', '.');
+        };
+    @endphp
 
-        <h3>SURAT JALAN</h3>
+    <div class="company">
+        {{ $namaPerusahaan }}<br>
+        {!! nl2br(e($alamatPerusahaan)) !!}
     </div>
 
-    <table style="width:100%;">
+    <div>
+        Kepada Yth.<br>
+        {{ $customer->nama ?? '-' }}<br>
+        @if($customer && $customer->alamat)
+            {!! nl2br(e($customer->alamat)) !!}
+        @endif
+    </div>
+
+    <table class="meta" style="margin-top: 10px;">
         <tr>
-            <td>No. Surat Jalan</td>
-            <td>: {{ $pengiriman->no_transaksi }}</td>
-
-            <td class="text-right">Tanggal</td>
-            <td>: {{ $pengiriman->created_at->format('d/m/Y') }}</td>
-        </tr>
-
-        <tr>
-            <td>Customer</td>
-            <td>: {{ $pengiriman->customer->nama }}</td>
-
-            <td class="text-right">No. Polisi</td>
-            <td>: {{ $pengiriman->nopol }}</td>
-        </tr>
-
-        <tr>
-            <td>Supir</td>
-            <td>: {{ $pengiriman->supir ?? '-' }}</td>
-
-            <td class="text-right">Tujuan</td>
-            <td>: {{ $pengiriman->tujuan ?? '-' }}</td>
+            <td>Surat Jalan No. {{ $pengiriman->no_transaksi }}</td>
+            <td class="right">Mobil {{ $pengiriman->nopol }}</td>
         </tr>
     </table>
+    <hr class="line">
 
-    <table class="table">
+    <table class="items">
         <thead>
             <tr>
-                <th width="5%">No</th>
-                <th>Nama Barang</th>
-                <th width="20%" class="text-right">Qty</th>
-                <th width="20%">Satuan</th>
+                <th style="width: 6%;"></th>
+                <th style="width: 42%;">NAMA BARANG</th>
+                <th style="width: 22%;">BANYAKNYA</th>
+                <th class="right" style="width: 30%;">KETERANGAN</th>
             </tr>
         </thead>
-
         <tbody>
-
-            @php $no = 1; @endphp
-
-            @foreach($pengiriman->detail as $detail)
-
+            @foreach($pengiriman->detail as $index => $detail)
             <tr>
-                <td>{{ $no++ }}</td>
-                <td>{{ $detail->produk->nama_produk }}</td>
-                <td class="text-right">
-                    {{ number_format($detail->netto,2,',','.') }}
-                </td>
-                <td>{{ $detail->produk->satuan }}</td>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ strtoupper($detail->nama_barang ?: ($detail->produk->nama_produk ?? '-')) }}</td>
+                <td>{{ $fmtKarung($detail->jumlah_karung) }} KARUNG</td>
+                <td class="right nowrap">{{ $fmtKg($detail->bruto) }} KG</td>
             </tr>
-
             @endforeach
-
         </tbody>
     </table>
 
-    <div class="footer">
+    <table class="weights">
+        <tr>
+            <td>BRUTO..</td>
+            <td class="right">{{ $fmtKg($totalBruto) }} KG</td>
+        </tr>
+        <tr>
+            <td>TARA...(</td>
+            <td class="right">{{ $fmtKg($totalTara) }}) KG</td>
+        </tr>
+        <tr class="rule">
+            <td>NETTO..</td>
+            <td class="right">{{ $fmtKg($totalNetto) }} KG</td>
+        </tr>
+    </table>
 
-        <table style="width:100%;">
-            <tr>
-                <td>
-                    <strong>Total Item :</strong>
-                    {{ $pengiriman->detail->count() }}
-                </td>
-
-                <td class="text-right">
-                    <strong>Total Berat :</strong>
-                    {{ number_format($pengiriman->detail->sum('netto'),2,',','.') }}
-                    Kg
-                </td>
-            </tr>
-        </table>
-
-        
-
+    <div class="footer-date">
+        {{ $kota }}, {{ $pengiriman->created_at->format('d/m/Y') }}
     </div>
 
-    <div class="signature-container">
-
-        <table class="signature-table">
-
-            <tr>
-
-                <td>
-                    Dibuat Oleh
-                    <div class="signature-space"></div>
-                    (...........................)
-                </td>
-
-                <td>
-                    Pengemudi
-                    <div class="signature-space"></div>
-                    (...........................)
-                </td>
-
-                <td>
-                    Penerima
-                    <div class="signature-space"></div>
-                    (...........................)
-                </td>
-
-            </tr>
-
-        </table>
-
-    </div>
-
+    <table class="ttd">
+        <tr>
+            <td>TANDA TERIMA,</td>
+            <td class="right">
+                PENGIRIM,<br>
+                {{ $namaPerusahaan }}
+            </td>
+        </tr>
+    </table>
 </body>
-
 </html>

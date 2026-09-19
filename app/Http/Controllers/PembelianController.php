@@ -38,6 +38,26 @@ class PembelianController extends Controller
         return $cleaned === '' || $cleaned === '-' ? 0 : (int) $cleaned;
     }
 
+    private function keteranganPotongBon(Pembelian $pembelian): string
+    {
+        return 'Lewat Pembelian' . $pembelian->no_transaksi;
+    }
+
+    private function nominalPotongBon(Pembelian $pembelian): int
+    {
+        return (int) CashbonSupplierPembayaran::query()
+            ->where('supplier_id', $pembelian->supplier_id)
+            ->where('keterangan', $this->keteranganPotongBon($pembelian))
+            ->sum('nominal_bayar');
+    }
+
+    private function saldoCashbonTersedia(Pembelian $pembelian): int
+    {
+        $saldo = $pembelian->supplier ? (int) $pembelian->supplier->totalCashbon() : 0;
+
+        return $saldo + $this->nominalPotongBon($pembelian);
+    }
+
     private function getPagedata()
     {
         // 'no_transaksi',
@@ -165,9 +185,15 @@ class PembelianController extends Controller
 
         $data = $pembelian;
         $pembelian->load('details');
+        $saldoCashbon = $this->saldoCashbonTersedia($pembelian);
+        $potongTersimpan = $this->nominalPotongBon($pembelian);
+        $tagihan = (int) $pembelian->details->sum('harga_netto');
+        $potongBon = $potongTersimpan > 0
+            ? $potongTersimpan
+            : max(0, min($saldoCashbon, $tagihan));
         // dd($pembelian);
 
-        return view('pembelians.createlanjut', compact('pembelian', 'supplier', 'titipSupplier', 'data'), $pagedata,);
+        return view('pembelians.createlanjut', compact('pembelian', 'supplier', 'titipSupplier', 'data', 'potongBon', 'saldoCashbon'), $pagedata,);
     }
 
     public function store(Request $request): RedirectResponse
@@ -218,8 +244,22 @@ class PembelianController extends Controller
             'created_by' => auth()->id(),
         ];
 
+        $saldoCashbon = $this->saldoCashbonTersedia($pembelian);
+        $tagihan = (int) $pembelian->total_nominal_pembelian;
 
-        $kekurangan = $pembelian->total_nominal_pembelian - ($store_data['ambil_transfer'] + $store_data['ambil_tunai']);
+        if ($store_data['potong_bon'] > $saldoCashbon) {
+            return back()
+                ->withErrors(['potong_bon' => 'Pengurangan cashbon tidak boleh melebihi sisa cashbon supplier (Rp '.number_format($saldoCashbon, 0, ',', '.').').'])
+                ->withInput();
+        }
+
+        if ($store_data['potong_bon'] > $tagihan) {
+            return back()
+                ->withErrors(['potong_bon' => 'Pengurangan cashbon tidak boleh melebihi total tagihan.'])
+                ->withInput();
+        }
+
+        $kekurangan = $tagihan - ($store_data['ambil_transfer'] + $store_data['ambil_tunai'] + $store_data['potong_bon']);
         // kekurangan tidak boleh negatif, jika negatif maka set ke 0
         if ($kekurangan < 0) {
             $kekurangan = 0;
@@ -228,7 +268,7 @@ class PembelianController extends Controller
         $pembelian->update([
             'ambil_transfer' => $store_data['ambil_transfer'],
             'ambil_tunai' => $store_data['ambil_tunai'],
-            'total_nominal_terbayar' => $store_data['ambil_transfer'] + $store_data['ambil_tunai'],
+            'total_nominal_terbayar' => $store_data['ambil_transfer'] + $store_data['ambil_tunai'] + $store_data['potong_bon'],
             'kekurangan' => $kekurangan,
             'status_pembayaran' => $store_data['status_pembayaran'],
             'keterangan' => $store_data['keterangan'],
@@ -249,16 +289,25 @@ class PembelianController extends Controller
             );
         }
 
+        $keteranganPotongBon = $this->keteranganPotongBon($pembelian);
+
         if ($store_data['potong_bon'] > 0) {
-            CashbonSupplierPembayaran::create([
-
-                'supplier_id' => $pembelian->supplier_id,
-                'tipe' => 'Lewat Pembelian',
-                'nominal_bayar' => $store_data['potong_bon'] ?? 0,
-                'keterangan' => 'Lewat Pembelian' . $pembelian->no_transaksi,
-                'created_by' => auth()->id(),
-
-            ]);
+            CashbonSupplierPembayaran::updateOrCreate(
+                [
+                    'supplier_id' => $pembelian->supplier_id,
+                    'keterangan' => $keteranganPotongBon,
+                ],
+                [
+                    'tipe' => 'Lewat Pembelian',
+                    'nominal_bayar' => $store_data['potong_bon'],
+                    'created_by' => auth()->id(),
+                ]
+            );
+        } else {
+            CashbonSupplierPembayaran::query()
+                ->where('supplier_id', $pembelian->supplier_id)
+                ->where('keterangan', $keteranganPotongBon)
+                ->delete();
         }
 
         foreach ($pembelian->details as $detail) {
@@ -440,9 +489,11 @@ class PembelianController extends Controller
 
         $data = $pembelian;
         $pembelian->load('details');
+        $potongBon = $this->nominalPotongBon($pembelian);
+        $saldoCashbon = $this->saldoCashbonTersedia($pembelian);
         // dd($pembelian);
 
-        return view('pembelians.editlanjut', compact('pembelian', 'supplier', 'titipSupplier', 'data'), $pagedata,);
+        return view('pembelians.editlanjut', compact('pembelian', 'supplier', 'titipSupplier', 'data', 'potongBon', 'saldoCashbon'), $pagedata,);
     }
 
     //soft delete

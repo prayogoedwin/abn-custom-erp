@@ -15,7 +15,7 @@
 
 @if ($label)
 <label for="{{ $name }}"
-    {{ $attributes->merge(['class' => 'block ml-1 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ' . $labelClass]) }}>
+    class="block ml-1 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 {{ $labelClass }}">
     {{ $label }}
 </label>
 @endif

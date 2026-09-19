@@ -32,7 +32,8 @@
                                     <th class="px-4 py-3">Tipe</th>
                                     <th class="px-4 py-3 text-center">Rendeman</th>
                                     <th class="px-4 py-3 text-center">Netto</th>
-                                    <th class="px-4 py-3">Harga Basis</th>
+                                    <th class="px-4 py-3 text-right">Harga Basis</th>
+                                    <th class="px-4 py-3 text-right">Harga Jual</th>
                                     <th class="px-4 py-3 text-right">Subtotal</th>
                                 </tr>
                             </thead>
@@ -51,8 +52,11 @@
                                     <td class="px-4 py-3 text-center">
                                         {{ number_format($detail->netto, 2) }} <span class="text-xs text-gray-400">{{ $detail->satuan }}</span>
                                     </td>
-                                    <td class="px-4 py-3">
+                                    <td class="px-4 py-3 text-right">
                                         Rp {{ number_format($detail->harga_basis_pembelian, 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        Rp {{ number_format($detail->harga, 0, ',', '.') }}
                                     </td>
                                     <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
                                         Rp {{ number_format($detail->harga_netto, 0, ',', '.') }}
@@ -86,7 +90,8 @@
 
                     @php
                     $totalTagihan = $pembelian->details->sum('harga_netto');
-                    $totalCashbonSupplier = $pembelian->supplier ? $pembelian->supplier->totalCashbon() : 0;
+                    $totalCashbonSupplier = $saldoCashbon ?? ($pembelian->supplier ? $pembelian->supplier->totalCashbon() : 0);
+                    $potongBon = (int) old('potong_bon', $potongBon ?? 0);
                     @endphp
 
                     <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700 space-y-4">
@@ -107,11 +112,22 @@
                             </div>
                         </div>
 
-                        
+                        <div>
+                            <x-forms.input
+                                label="Pengurangan Cashbon"
+                                name="potong_bon"
+                                type="number"
+                                min="0"
+                                step="1"
+                                max="{{ $totalCashbonSupplier }}"
+                                value="{{ old('potong_bon', $potongBon ?? 0) }}"
+                            />
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Terisi otomatis dari sisa cashbon (tidak melebihi tagihan). Bisa diubah.</p>
+                        </div>
 
                         <div class="flex justify-between text-xl border-t border-gray-200 dark:border-gray-700 pt-3 mt-2">
                             <span class="font-bold text-gray-700 dark:text-gray-300">Total Dibayarkan:</span>
-                            <span class="font-black text-indigo-600 dark:text-indigo-400" id="total-tagihan-akhir" data-awal="{{ $totalTagihan }}">Rp {{ number_format($totalTagihan, 0, ',', '.') }}</span>
+                            <span class="font-black text-indigo-600 dark:text-indigo-400" id="total-tagihan-akhir" data-awal="{{ $totalTagihan }}">Rp {{ number_format(max($totalTagihan - $potongBon, 0), 0, ',', '.') }}</span>
                         </div>
                     </div>
                 </div>
@@ -141,7 +157,6 @@
                 </div>
 
                 <input type="hidden" name="status" id="status_hidden" value="Belum Lunas">
-                <input type="hidden" name="potong_bon" value="0">
 
                 <!-- <div class="mb-5">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -185,8 +200,6 @@
             const inputStatusHidden = document.getElementById('status_hidden');
             const inputPotongBon = document.querySelector('input[name="potong_bon"]');
 
-            console.log(inputAmbilTunai);
-
             const labelSisaBonLive = document.getElementById('sisa-bon-live');
             const labelTotalTagihanAkhir = document.getElementById('total-tagihan-akhir');
             const labelKekurangan = document.getElementById('kekuranganspan');
@@ -208,63 +221,32 @@
             }
 
             function hitungOtomatis() {
-                console.log("hitung");
                 let nilaiAmbilTunai = parseFloat(inputAmbilTunai.value) || 0;
                 let nilaiAmbilTransfer = parseFloat(inputAmbilTransfer.value) || 0;
+                let nilaiPotongBon = parseFloat(inputPotongBon.value) || 0;
 
-                
-
-                
-
-                const tagihanAkhir = tagihanAwal
+                const tagihanAkhir = Math.max(tagihanAwal - nilaiPotongBon, 0);
                 labelTotalTagihanAkhir.textContent = formatRupiah(tagihanAkhir);
+                labelSisaBonLive.textContent = formatRupiah(totalCashbonAwal - nilaiPotongBon);
 
-                labelSisaBonLive.textContent = formatRupiah(totalCashbonAwal);
-                // 3. Hitung Kekurangan Pembayaran
-                // Kekurangan = Total yang harus dibayar - (Tunai + Transfer yang diambil)
                 const totalDiambil = nilaiAmbilTunai + nilaiAmbilTransfer;
                 const kekurangan = tagihanAkhir - totalDiambil;
-                const kekuranganWithCashbon = (tagihanAkhir + totalCashbonAwal) - totalDiambil;
 
-                labelKekurangan.textContent = formatRupiah(kekuranganWithCashbon);
-
-                // Styling warna teks kekurangan berdasarkan statusnya
+                labelKekurangan.textContent = formatRupiah(kekurangan);
                 labelKekurangan.className = "font-bold text-red-500";
                 inputStatusHidden.value = "Belum Lunas";
 
-
                 if (kekurangan <= 0) {
-                    labelKekurangan.className = "font-bold text-yellow-500";
+                    labelKekurangan.className = "font-bold text-green-500";
                     inputStatusHidden.value = "Lunas";
                 }
-                if (kekuranganWithCashbon <= 0) {
-                    labelKekurangan.className = "font-bold text-green-500";
-                }
-
-                //jika uang yang diambil lebih besar dari total tagihan, maka sisa nya untuk potong bon
-                if (totalDiambil > tagihanAkhir) {
-                    const sisaUntukPotongBon = totalDiambil - tagihanAkhir;
-                    // console.log("sisa untuk potong bon: " + totalDiambil + " - " + tagihanAkhir + " = " + sisaUntukPotongBon);
-                    let sisaBon = totalCashbonAwal - sisaUntukPotongBon;
-                    labelSisaBonLive.textContent = formatRupiah(sisaBon);
-                    inputPotongBon.value = sisaUntukPotongBon;
-                }
-                
-                
-
-
-                // if (kekurangan <= 0) {
-                //     selectStatus.value = "Lunas";
-                // } else {
-                //     selectStatus.value = "Belum Lunas";
-                // }
-
             }
 
-            // Pasang event listener ketik (input)
-            inputTitip.addEventListener('input', hitungOtomatis);
-            inputAmbilTunai.addEventListener('input', hitungOtomatis);
-            inputAmbilTransfer.addEventListener('input', hitungOtomatis);
+            // Hitung setelah pindah input, bukan saat mengetik
+            if (inputTitip) inputTitip.addEventListener('blur', hitungOtomatis);
+            if (inputAmbilTunai) inputAmbilTunai.addEventListener('blur', hitungOtomatis);
+            if (inputAmbilTransfer) inputAmbilTransfer.addEventListener('blur', hitungOtomatis);
+            if (inputPotongBon) inputPotongBon.addEventListener('blur', hitungOtomatis);
 
             // // Deteksi jika user merubah select status secara sengaja (manual override)
             // selectStatus.addEventListener('change', function() {

@@ -192,9 +192,10 @@ class PengirimanController extends Controller
 
     public function suratJalan(Pengiriman $pengiriman)
     {
-        $pengiriman->load('customer', 'detail.produk'); // Load the customer and details relationships
-        // dd($pengiriman);
-        $pdf = Pdf::loadView('exports.pengiriman-surat_jalan', compact('pengiriman'));
+        $pengiriman->load('customer', 'detail.produk');
+        $pdf = Pdf::loadView('exports.pengiriman-surat_jalan', compact('pengiriman'))
+            ->setPaper('a4', 'portrait');
+
         return $pdf->download('surat_jalan_' . $pengiriman->no_transaksi . '.pdf');
     }
 
