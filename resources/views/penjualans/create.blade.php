@@ -155,6 +155,7 @@
 
                             <div class="container-harga_jadi">
                                 <x-forms.input label="Harga Jadi" name="harga_jadi[]" type="number" step="any" />
+                                <p class="text-xs text-gray-500 mt-1">Bisa diedit. Kosongkan lalu Hitung untuk isi dari rendeman.</p>
                             </div>
 
                             <div class="container-sub_total">
@@ -245,28 +246,21 @@
 
                 const produkNama = row.querySelector('.produk-nama').textContent;
 
-                console.log('produkNama:', produkNama);
-                let hargaJadi = 0;
+                const namaProduk = (produkNama || '').toLowerCase();
+                let hargaJadi = parseFloat(hargaJadiInput.value);
 
-                if (produkNama === 'Kopi') {
-                    
-                    hargaJadi = parseFloat(basisHargaInput.value) * (rendeman / 100);
+                if (hargaJadiInput.value === '' || Number.isNaN(hargaJadi)) {
+                    if (namaProduk.includes('kopi')) {
+                        hargaJadi = (parseFloat(basisHargaInput.value) || 0) * (rendeman / 100);
+                    } else if (namaProduk.includes('lada')) {
+                        const basis = parseFloat(basisHargaInput.value) || 0;
+                        hargaJadi = basis + (basis * (rendeman / 100)) + bobot;
+                    } else {
+                        hargaJadi = 0;
+                    }
                     hargaJadiInput.value = hargaJadi;
                 }
-                if (produkNama === 'Lada') {
-                    
-                    // hargaBasisMaster + (hargaBasisMaster * (rendeman / 100)) + bobot;
-                    hargaJadi = parseFloat(basisHargaInput.value) + (parseFloat(basisHargaInput.value) * (rendeman / 100)) + bobot;
-                    hargaJadiInput.value = hargaJadi;
-                }
 
-
-                // calculate harga jadi based on basis harga and rendeman
-                // harga jadi => default baiknya basis * rendeman 
-                console.log('hargaJadi:', hargaJadi);
-                
-
-                // Calculate sub total
                 const subTotal = netto * hargaJadi;
                 subTotalInput.value = subTotal.toFixed(2);
 
@@ -292,6 +286,10 @@
                 const calculateBtn = row.querySelector('.btn-calculate');
                 if (calculateBtn) {
                     calculateBtn.addEventListener('click', () => calculateRow(row));
+                }
+                const hargaJadiInput = row.querySelector('.container-harga_jadi input');
+                if (hargaJadiInput) {
+                    hargaJadiInput.addEventListener('blur', () => calculateRow(row));
                 }
 
                 // Handle tipe change (show/hide)
