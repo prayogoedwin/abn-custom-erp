@@ -39,7 +39,7 @@ class PembelianRendemanCashbonTest extends TestCase
             ->assertOk()
             ->assertSee('Pengurangan Cashbon')
             ->assertSee('Harga Jual')
-            ->assertSee('Rp 55.625')
+            ->assertSee('Rp 87.086')
             ->assertSee('name="potong_bon"', false)
             ->assertSee('value="10010000"', false)
             ->assertSee('Rp 77.075.963')

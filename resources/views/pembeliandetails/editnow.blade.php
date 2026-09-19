@@ -231,14 +231,12 @@
                         hargaBeliKalkulasi = hargaBasis + (hargaBasis * (rendeman / 100)) + bobot;
                     }
 
-                    inputHarga.value = Math.round(hargaBeliKalkulasi);
-
-                    // Jika harga_beli belum diisi manual, set otomatis dari kalkulasi
-                    if (!inputHargaBeli.value || inputHargaBeli.value == 0) {
+                    if (!inputHargaBeli.value || parseFloat(inputHargaBeli.value) === 0) {
                         inputHargaBeli.value = Math.round(hargaBeliKalkulasi);
                     }
 
-                    const hargaBeli = parseFloat(inputHargaBeli.value) || 0;
+                    const hargaBeli = Math.round(parseFloat(inputHargaBeli.value) || 0);
+                    inputHarga.value = hargaBeli;
                     inputHargaNetto.value = Math.round(hargaBeli * netto);
                 }
 
@@ -259,8 +257,19 @@
 
                 inputHargaBeli.addEventListener('input', function() {
                     const netto = parseFloat(inputNetto.value) || 0;
-                    const hargaBeli = parseFloat(inputHargaBeli.value) || 0;
+                    const hargaBeli = Math.round(parseFloat(this.value) || 0);
+                    inputHarga.value = hargaBeli;
                     inputHargaNetto.value = Math.round(hargaBeli * netto);
+                });
+
+                inputHargaNetto.addEventListener('input', function() {
+                    const netto = parseFloat(inputNetto.value) || 0;
+                    if (netto <= 0) {
+                        return;
+                    }
+                    const satuan = Math.round((parseFloat(this.value) || 0) / netto);
+                    inputHargaBeli.value = satuan;
+                    inputHarga.value = satuan;
                 });
 
                 btnHitung.addEventListener('click', hitung);

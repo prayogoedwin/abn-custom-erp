@@ -277,9 +277,20 @@
                 }
 
                 inputHargaEditable.addEventListener('input', function() {
-                    console.log('harga editable changed');
                     const netto = parseFloat(inputNetto.value) || 0;
-                    inputJumlahUang.value = Math.round(inputHargaEditable.value * netto);
+                    const hargaBeli = Math.round(parseFloat(this.value) || 0);
+                    inputHargaBeli.value = hargaBeli;
+                    inputJumlahUang.value = Math.round(hargaBeli * netto);
+                });
+
+                inputJumlahUang.addEventListener('input', function() {
+                    const netto = parseFloat(inputNetto.value) || 0;
+                    if (netto <= 0) {
+                        return;
+                    }
+                    const satuan = Math.round((parseFloat(this.value) || 0) / netto);
+                    inputHargaEditable.value = satuan;
+                    inputHargaBeli.value = satuan;
                 });
 
 

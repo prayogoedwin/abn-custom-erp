@@ -44,8 +44,35 @@ class PembelianDetail extends Model
         'deleted_by',
     ];
 
+    public function hargaUntukNota(): int
+    {
+        $netto = (float) $this->netto;
+        $hargaNetto = (int) $this->harga_netto;
+
+        if ($netto > 0 && $hargaNetto > 0) {
+            return (int) round($hargaNetto / $netto);
+        }
+
+        return (int) $this->harga;
+    }
+
     protected static function booted()
     {
+        static::saving(function (self $pembelianDetail) {
+            if ($pembelianDetail->tipe_transaksi_pembelian === 'titip') {
+                $pembelianDetail->harga = 0;
+                $pembelianDetail->harga_netto = 0;
+
+                return;
+            }
+
+            $netto = (float) $pembelianDetail->netto;
+            $hargaNetto = (int) $pembelianDetail->harga_netto;
+            if ($netto > 0 && $hargaNetto > 0) {
+                $pembelianDetail->harga = (int) round($hargaNetto / $netto);
+            }
+        });
+
         static::created(function ($pembelianDetail) {
             // hanya mencata stok yang tipe_trans 'jual'
             if ($pembelianDetail->tipe_transaksi_pembelian == 'jual') {

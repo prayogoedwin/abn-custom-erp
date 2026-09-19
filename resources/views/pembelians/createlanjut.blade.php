@@ -56,7 +56,7 @@
                                         Rp {{ number_format($detail->harga_basis_pembelian, 0, ',', '.') }}
                                     </td>
                                     <td class="px-4 py-3 text-right">
-                                        Rp {{ number_format($detail->harga, 0, ',', '.') }}
+                                        Rp {{ number_format($detail->hargaUntukNota(), 0, ',', '.') }}
                                     </td>
                                     <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
                                         Rp {{ number_format($detail->harga_netto, 0, ',', '.') }}

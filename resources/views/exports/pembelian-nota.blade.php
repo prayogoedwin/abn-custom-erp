@@ -119,7 +119,7 @@
                 <td class="text-right">{{ $detail->netto }} {{ $detail->produk->satuan }}</td>
                 <td class="text-right">{{ number_format($detail->harga_basis_pembelian, 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($detail->rendeman, 2, ',', '.') }} %</td>
-                <td class="text-right">{{ number_format($detail->harga, 0, ',', '.') }}</td>
+                <td class="text-right">{{ number_format($detail->hargaUntukNota(), 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($detail->harga_netto, 0, ',', '.') }}</td>
             </tr>
             @endif
