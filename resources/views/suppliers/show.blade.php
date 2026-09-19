@@ -168,7 +168,7 @@
                                 {{ $stok->created_at->format('d M Y H:i') }}
                             </td>
                             <td class="px-4 py-3 text-center text-xs">
-                                @if(strtolower($stok->tipe_stok) === 'masuk')
+                                @if(strtolower($stok->tipe_stok) === 'masuk' && $stokTitipanPerProduk->has($stok->produk_id))
                                 <a href="{{ route('stoktitipans.jual', ['stoktitipan' => $stok->id]) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">Jual</a>
                                 @endif
                             </td>

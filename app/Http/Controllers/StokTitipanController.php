@@ -63,7 +63,8 @@ class StokTitipanController extends Controller
     {
         if (request()->ajax()) {
             // Pastikan relasi 'produk' dan 'supplier' sudah terdefinisi di model StokTitipan
-            $data = StokTitipan::with(['produk', 'supplier'])->select('stok_titipans.*'); // Sesuaikan dengan nama tabel Anda
+            $data = StokTitipan::with(['produk', 'supplier'])->select('stok_titipans.*');
+            $sisaMap = StokTitipan::petaSisa();
 
             return datatables()->of($data)
                 // Fix Fitur Pencarian untuk kolom Relasi Produk
@@ -82,14 +83,13 @@ class StokTitipanController extends Controller
                     return $row->created_at->format('d-m-Y'); // Format tanggal sesuai kebutuhan
                 })
 
-                ->addColumn('action', function ($row) {
-                    if (strtolower($row->tipe_stok) === 'masuk') {
-                        $btn = '<a href="' . route('stoktitipans.jual', ['stoktitipan' => $row->id]) . '" class="text-indigo-600 dark:text-indigo-400 hover:underline">Jual</a>';
-                    } else {
-                        $btn = ''; // Tidak ada tombol jika tipe_stok bukan "masuk"
+                ->addColumn('action', function ($row) use ($sisaMap) {
+                    $sisa = $sisaMap[$row->supplier_id.'-'.$row->produk_id] ?? 0;
+                    if (strtolower((string) $row->tipe_stok) === 'masuk' && $sisa > 0) {
+                        return '<a href="' . route('stoktitipans.jual', ['stoktitipan' => $row->id]) . '" class="text-indigo-600 dark:text-indigo-400 hover:underline">Jual</a>';
                     }
-                    return $btn;
-                    
+
+                    return '';
                 })
                
                 ->rawColumns(['action'])
@@ -101,7 +101,14 @@ class StokTitipanController extends Controller
 
     public function jual(StokTitipan $stoktitipan)
     {
-        $supplier = $stoktitipan->pembelian->supplier;
+        $sisa = StokTitipan::sisaUntuk((int) $stoktitipan->supplier_id, (int) $stoktitipan->produk_id);
+        if ($sisa <= 0) {
+            return redirect()
+                ->route('stoktitipans.index')
+                ->withErrors(['stok_titipan' => 'Stok titipan ini sudah habis dijual.']);
+        }
+
+        $supplier = $stoktitipan->supplier ?? $stoktitipan->pembelian?->supplier;
 
         return view('stok-titipan.jualcreate', compact('stoktitipan', 'supplier'));
     }
@@ -131,9 +138,12 @@ class StokTitipanController extends Controller
         }
 
         $detail = StokTitipan::findOrFail($request->input('stok_titipan_id'));
+        $sisa = StokTitipan::sisaUntuk((int) $detail->supplier_id, (int) $detail->produk_id);
+        if ($sisa <= 0) {
+            return back()->withErrors(['stok_titipan' => 'Stok titipan ini sudah habis dijual.'])->withInput();
+        }
 
         $pembelian = Pembelian::create($store_data);
-        $produk = $detail->produk;
 
         return to_route('stoktitipans.jualnow', ['pembelian' => $pembelian->id, 'detail' => $detail->id])->with('success', 'Data berhasil disimpan. Silakan lanjutkan ke halaman berikutnya.');
     }
@@ -141,22 +151,47 @@ class StokTitipanController extends Controller
     public function jualnow(Pembelian $pembelian, StokTitipan $detail)
     {
         $produk = $detail->produk;
+        $sisa = StokTitipan::sisaUntuk(
+            (int) $detail->supplier_id,
+            (int) $detail->produk_id,
+            (int) $pembelian->id
+        );
 
-        // dd($pembelian, $detail, $produk);
+        if ($sisa <= 0) {
+            return redirect()
+                ->route('stoktitipans.index')
+                ->withErrors(['stok_titipan' => 'Stok titipan ini sudah habis dijual.']);
+        }
 
-        return view('stok-titipan.jualnow', compact('pembelian', 'detail', 'produk'));
+        return view('stok-titipan.jualnow', compact('pembelian', 'detail', 'produk', 'sisa'));
     }
 
     public function jualNowStore(Request $request)
     {
-        // dd($request->all());
         $harga = $request->harga ?? [];
         $harga_basis = $request->harga_basis ?? [];
         $harga_basis_pembelian = $request->harga_basis_pembelian ?? [];
         $harga_netto = $request->harga_netto ?? [];
 
+        $pembelian = Pembelian::findOrFail($request->pembelian_id);
+        $produkId = (int) ($request->produk_id[0] ?? 0);
+        $netto = (float) ($request->netto[0] ?? 0);
+        $asal = $request->filled('detail_id')
+            ? StokTitipan::find($request->input('detail_id'))
+            : null;
+        $supplierId = (int) ($asal?->supplier_id ?? $pembelian->supplier_id);
+        $sisa = StokTitipan::sisaUntuk($supplierId, $produkId, (int) $pembelian->id);
 
-        //karena ini create pastikan semua data dihapus dulu
+        if ($netto <= 0) {
+            return back()->withErrors(['netto' => 'Netto harus lebih dari 0.'])->withInput();
+        }
+
+        if ($netto - $sisa > 0.0001) {
+            return back()
+                ->withErrors(['netto' => 'Netto melebihi sisa titipan ('.rtrim(rtrim(number_format($sisa, 2, '.', ''), '0'), '.').').'])
+                ->withInput();
+        }
+
         PembelianDetail::where('pembelian_id', $request->pembelian_id)->delete();
 
         foreach ($request->produk_id as $index => $produk_id) {
@@ -191,20 +226,20 @@ class StokTitipanController extends Controller
         }
         $this->syncPembelianTotals((int) $request->pembelian_id);
 
-        
-
-        //update stok titipan yang tadinya titip sekarang jual. maka tambah stok titipan keluar dengan jumlah yang sama dengan pembelian detail yang baru dibuat. maka stok titipan keluar akan berkurang
-        $supplierId = Pembelian::find($request->pembelian_id)->supplier_id;
-        StokTitipan::create([
-            'produk_id' => $request->produk_id[0], //ambil produk pertama
-            'supplier_id' => $supplierId,
-            'pembelian_id' => $request->pembelian_id,
-            'satuan' => 'kg', //sementara hardcode
-            'tipe_stok' => 'keluar',
-            'jumlah' => $request->netto[0], //ambil netto pertama
-            'keterangan' => 'Stok Titipan ke Jual',
-            'created_by' => auth()->id(),
-        ]);
+        StokTitipan::updateOrCreate(
+            [
+                'pembelian_id' => $pembelian->id,
+                'produk_id' => $produkId,
+                'tipe_stok' => 'keluar',
+            ],
+            [
+                'supplier_id' => $supplierId,
+                'satuan' => 'kg',
+                'jumlah' => $netto,
+                'keterangan' => 'Stok Titipan ke Jual',
+                'created_by' => auth()->id(),
+            ]
+        );
 
         Pembelian::where('id', $request->pembelian_id)->update([
             'keterangan' => $request->input('keterangan', 'TITIPAN'),

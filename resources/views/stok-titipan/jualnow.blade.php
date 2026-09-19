@@ -60,8 +60,11 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="container-netto">
-                                    <x-forms.input label="Netto" name="netto[]" value="{{ $detail->jumlah }}" type="number" class="input-netto"  />
-                                    <span class="text-xs text-gray-500 label-satuan block mt-1"></span>
+                                    <x-forms.input label="Netto" name="netto[]" value="{{ old('netto.0', min($detail->jumlah, $sisa)) }}" type="number" class="input-netto" max="{{ $sisa }}" step="0.01" />
+                                    <span class="text-xs text-gray-500 label-sisa-titipan block mt-1">Sisa titipan: {{ rtrim(rtrim(number_format($sisa, 2, ',', '.'), '0'), ',') }}</span>
+                                    @error('netto')
+                                    <span class="text-red-500 text-xs block mt-1">{{ $message }}</span>
+                                    @enderror
                                 </div>
 
                                 <div class="container-rendeman">

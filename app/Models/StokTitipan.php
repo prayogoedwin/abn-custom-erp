@@ -52,4 +52,42 @@ class StokTitipan extends Model
     {
         return $this->belongsTo(Pembelian::class, 'pembelian_id');
     }
+
+    public static function sisaUntuk(int $supplierId, int $produkId, ?int $kecualiPembelianId = null): float
+    {
+        $masuk = (float) static::query()
+            ->where('supplier_id', $supplierId)
+            ->where('produk_id', $produkId)
+            ->whereRaw('LOWER(tipe_stok) = ?', ['masuk'])
+            ->sum('jumlah');
+
+        $keluarQuery = static::query()
+            ->where('supplier_id', $supplierId)
+            ->where('produk_id', $produkId)
+            ->whereRaw('LOWER(tipe_stok) = ?', ['keluar']);
+
+        if ($kecualiPembelianId) {
+            $keluarQuery->where(function ($inner) use ($kecualiPembelianId) {
+                $inner->whereNull('pembelian_id')
+                    ->orWhere('pembelian_id', '!=', $kecualiPembelianId);
+            });
+        }
+
+        $keluar = (float) $keluarQuery->sum('jumlah');
+
+        return $masuk - $keluar;
+    }
+
+    /**
+     * @return array<string, float>
+     */
+    public static function petaSisa(): array
+    {
+        return static::query()
+            ->selectRaw("supplier_id, produk_id, SUM(CASE WHEN LOWER(tipe_stok) = 'masuk' THEN jumlah WHEN LOWER(tipe_stok) = 'keluar' THEN -jumlah ELSE 0 END) as sisa")
+            ->groupBy('supplier_id', 'produk_id')
+            ->get()
+            ->mapWithKeys(fn ($row) => [$row->supplier_id.'-'.$row->produk_id => (float) $row->sisa])
+            ->all();
+    }
 }
