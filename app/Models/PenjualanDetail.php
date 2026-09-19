@@ -111,4 +111,19 @@ class PenjualanDetail extends Model
     {
         return $this->belongsTo(Penjualan::class);
     }
+
+    public function isJual(): bool
+    {
+        return strtolower((string) $this->tipe) === 'jual';
+    }
+
+    public function hargaUntukNota(): int
+    {
+        $netto = (float) $this->netto;
+        if ($netto <= 0) {
+            return (int) $this->basis_harga;
+        }
+
+        return (int) round(((int) $this->sub_total) / $netto);
+    }
 }

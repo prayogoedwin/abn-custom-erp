@@ -43,4 +43,29 @@ class Penjualan extends Model
     {
         return $this->hasMany(PenjualanDetail::class);
     }
+
+    public function detailsJual()
+    {
+        return $this->details->filter(fn (PenjualanDetail $detail) => $detail->isJual());
+    }
+
+    public function invoiceJumlah(): int
+    {
+        return (int) $this->detailsJual()->sum('sub_total');
+    }
+
+    public function invoicePpn(): int
+    {
+        return (int) round($this->invoiceJumlah() * 0.011);
+    }
+
+    public function invoicePph22(): int
+    {
+        return (int) round($this->invoiceJumlah() * 0.0025);
+    }
+
+    public function invoiceTotalDibayar(): int
+    {
+        return $this->invoiceJumlah() + $this->invoicePpn() - $this->invoicePph22();
+    }
 }

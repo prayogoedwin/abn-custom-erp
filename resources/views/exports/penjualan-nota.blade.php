@@ -1,187 +1,213 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Nota Penjualan</title>
+    <title>Invoice Penjualan</title>
     <style>
         body {
-            font-family: 'Courier', sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             font-size: 12px;
-            line-height: 1.4;
+            line-height: 1.35;
             font-weight: bold;
+            color: #000;
+            margin: 18px;
         }
 
-        .header {
+        .center { text-align: center; }
+        .right { text-align: right; }
+        .nowrap { white-space: nowrap; }
+
+        .company {
             text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 10px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
         }
 
-        .table {
+        .company-name {
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .title {
+            text-align: center;
+            letter-spacing: 8px;
+            font-size: 16px;
+            margin: 12px 0 16px;
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
         }
 
-        .table th {
-            border-bottom: 1px solid #000;
-            padding: 5px;
+        .meta td {
+            vertical-align: top;
+            padding: 0;
         }
 
-        .table td {
-            padding: 5px;
+        .items th {
+            border-top: 1px dashed #000;
+            border-bottom: 1px dashed #000;
+            padding: 4px 2px;
+            text-align: left;
+        }
+
+        .items td {
+            padding: 6px 2px;
             vertical-align: top;
         }
 
-        .text-right {
+        .items th.right,
+        .items td.right {
             text-align: right;
         }
 
-        .total-section {
-            margin-top: 20px;
-            border-top: 1px dashed #000;
-            border-bottom: 1px solid #000;
-            padding-top: 10px;
-            padding-bottom: 10px;
+        .totals {
+            width: 420px;
+            margin-left: auto;
+            margin-top: 14px;
         }
 
-        .footer {
-            margin-top: 15px;
+        .totals td {
+            padding: 2px 0;
         }
 
-        .terbilang-box {
-            border: 1px solid #000;
-            padding: 8px;
-            margin-top: 10px;
-            margin-bottom: 25px;
-            font-style: italic;
+        .bank {
+            width: 420px;
+            margin-left: auto;
+            margin-top: 12px;
         }
 
-        /* Style Tambahan untuk Tanda Tangan */
-        .signature-container {
-            width: 100%;
-            margin-top: 30px;
+        .bank td {
+            padding: 1px 0;
+            vertical-align: top;
         }
 
-        .signature-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .signature-table td {
-            width: 50%;
+        .ttd {
+            width: 280px;
+            margin-left: auto;
+            margin-top: 18px;
             text-align: center;
-            vertical-align: bottom;
         }
 
-        .signature-space {
-            height: 70px;
-            /* Jarak untuk tanda tangan manual */
+        .ttd-space {
+            height: 56px;
         }
     </style>
 </head>
-
 <body>
-    <div class="header">
-        <h2>Asiwa Bumi Niaga</h2>
-        <p>Alamat Lengkap Toko <br> Telp: -</p>
+    @php
+        $namaPerusahaan = (isset($setting) && ! empty($setting->nama)) ? $setting->nama : 'CV. ASIWA BUMI NIAGA';
+        $alamatPerusahaan = (isset($setting) && ! empty($setting->alamat))
+            ? $setting->alamat
+            : "Jalan Kolonel Wahab Uzir NO.930, Kelurahan Sukajadi\nKecamatan Baturaja Timur, Sumatera Selatan";
+        $npwp = (isset($setting) && ! empty($setting->npwp)) ? $setting->npwp : '53.695.315.1-302.000';
+        $kota = (isset($setting) && ! empty($setting->kota)) ? $setting->kota : 'Baturaja';
+        $bank = (isset($setting) && ! empty($setting->bank)) ? $setting->bank : 'BANK CENTRAL ASIA';
+        $rekening = (isset($setting) && ! empty($setting->rekening)) ? $setting->rekening : '2570799269';
+        $atasNama = (isset($setting) && ! empty($setting->atas_nama)) ? $setting->atas_nama : 'ASIWA BUMI NIAGA CV';
+        $penandatangan = (isset($setting) && ! empty($setting->direktur)) ? $setting->direktur : 'IWAN SAPUTRA';
+        $customer = $penjualan->customer ?? $penjualan->pengiriman?->customer;
+        $detailsJual = $penjualan->detailsJual();
+        $jumlah = $penjualan->invoiceJumlah();
+        $ppn = $penjualan->invoicePpn();
+        $pph = $penjualan->invoicePph22();
+        $totalDibayar = $penjualan->invoiceTotalDibayar();
+        $uang = fn ($nilai) => 'Rp. '.number_format((int) $nilai, 0, ',', '.');
+        $fmtKg = fn ($nilai) => number_format((float) $nilai, 2, ',', '.');
+        $fmtHarga = fn ($nilai) => 'Rp. '.number_format((float) $nilai, 3, ',', '.');
+        $noSuratJalan = $penjualan->pengiriman?->no_transaksi ?? '-';
+    @endphp
+
+    <div class="company">
+        <div class="company-name">{{ $namaPerusahaan }}</div>
+        {!! nl2br(e($alamatPerusahaan)) !!}<br>
+        NPwP : {{ $npwp }}
     </div>
 
-    <table style="width: 100%">
+    <div class="title">I N V O I C E</div>
+
+    <table class="meta">
         <tr>
-            <td>No. Nota: {{ $penjualan->no_transaksi_penjualan }}</td>
-            <td class="text-right">Tgl: {{ $penjualan->created_at->format('d/m/Y H:i') }}</td>
-        </tr>
-        <tr>
-            <td>Customer: {{ $penjualan->pengiriman?->customer?->nama ?? '-' }}</td>
-            <td class="text-right">Mobil: {{ $penjualan->pengiriman?->nopol }}</td>
+            <td style="width: 70%;">
+                Kepada Yth.<br>
+                {{ $customer->nama ?? '-' }}<br>
+                @if($customer && $customer->alamat)
+                    {!! nl2br(e($customer->alamat)) !!}
+                @endif
+            </td>
+            <td class="right nowrap">
+                Nomor : {{ $penjualan->no_transaksi_penjualan }}
+            </td>
         </tr>
     </table>
 
-    <table class="table">
+    <table class="items" style="margin-top: 14px;">
         <thead>
             <tr>
-                <th style="text-align: left;">BARANG</th>
-                <th class="text-right">QTTY</th>
-                <th class="text-right">BASIS</th>
-                <th class="text-right">RENDEMEN</th>
-                <th class="text-right">BASIS HARGA</th>
-                <th class="text-right">Subtotal</th>
+                <th style="width: 22%;">No. Srt Jalan</th>
+                <th style="width: 18%;">BARANG</th>
+                <th class="right" style="width: 20%;">QTTY</th>
+                <th class="right" style="width: 20%;">HARGA</th>
+                <th class="right" style="width: 20%;">JUMLAH</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($penjualan->details as $detail)
-            <!-- hanya yang tipe jual -->
-            @if($detail->tipe == 'Jual')
+            @foreach($detailsJual as $index => $detail)
             <tr>
-                <td>{{ $detail->produk->nama_produk }}</td>
-                <td class="text-right">{{ $detail->netto }} {{ $detail->produk->satuan }}</td>
-                <td class="text-right">{{ number_format($detail->basis_harga, 0, ',', '.') }}</td>
-                <td class="text-right">{{ number_format($detail->rendeman, 2, ',', '.') }} %</td>
-                <td class="text-right">{{ number_format($detail->basis_harga, 0, ',', '.') }}</td>
-                <td class="text-right">{{ number_format($detail->nominal_akhir, 0, ',', '.') }}</td>
+                <td>{{ $index + 1 }} {{ $noSuratJalan }}</td>
+                <td>{{ strtoupper($detail->produk->nama_produk ?? '-') }}</td>
+                <td class="right nowrap">{{ $fmtKg($detail->netto) }} {{ strtoupper($detail->produk->satuan ?? 'KG') }}</td>
+                <td class="right nowrap">{{ $fmtHarga($detail->hargaUntukNota()) }}</td>
+                <td class="right nowrap">{{ $uang($detail->sub_total) }}</td>
             </tr>
-            @endif
             @endforeach
         </tbody>
     </table>
 
-    <div class="total-section">
-        <table style="width: 100%">
-            <!-- BARIS DAFTAR PRODUK TITIPAN (BISA BANYAK) -->
-            <tr>
-                <td class="text-right" style="vertical-align: top;">
-                    <strong>Titipan Barang:</strong>
-                </td>
-                <!-- Mengosongkan kolom kanan pada baris ini agar balance -->
-                <td class="text-right">
-                    <ul style="margin: 0; padding-left: 20px; font-size: 0.9em;">
-                        @forelse($penjualan->details->where('tipe', 'Titip') as $detailTitip)
-                        <li>{{ $detailTitip->produk->nama_produk }} {{ number_format($detailTitip->netto, 2) }} kg</li>
-                        @empty
-                        <li class="text-gray-400">Tidak ada produk titipan</li>
-                        @endforelse
-                    </ul>
-                </td>
-                <td class="text-right"></td>
-            </tr>
+    <table class="totals">
+        <tr>
+            <td>JUMLAH</td>
+            <td class="right">{{ $uang($jumlah) }}</td>
+        </tr>
+        <tr>
+            <td>PPN &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.1%</td>
+            <td class="right">{{ $uang($ppn) }}</td>
+        </tr>
+        <tr>
+            <td>PPH 22 &nbsp;&nbsp;&nbsp;&nbsp;0,25%</td>
+            <td class="right">{{ $uang($pph) }}</td>
+        </tr>
+        <tr>
+            <td>TOTAL YANG DIBAYARKAN</td>
+            <td class="right">{{ $uang($totalDibayar) }}</td>
+        </tr>
+    </table>
 
-            <!-- BARIS KEDUA: SALDO & GRAND TOTAL -->
-            <tr>
-                
-                <td class="text-right col-6"><strong>Grand Total: Rp</strong></td>
-                <td class="text-right"><strong>{{ number_format($penjualan->details->where('tipe', 'Jual')->sum('nominal_akhir'), 0, ',', '.') }}</strong></td>
-            </tr>
+    <table class="bank">
+        <tr>
+            <td style="width: 38%;">TRANSFER KE :</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>BANK</td>
+            <td>: {{ $bank }}</td>
+        </tr>
+        <tr>
+            <td>AC</td>
+            <td>: {{ $rekening }}</td>
+        </tr>
+        <tr>
+            <td>AN.</td>
+            <td>: {{ $atasNama }}</td>
+        </tr>
+    </table>
 
-            
-
-            
-        </table>
+    <div class="ttd">
+        {{ $kota }}, {{ $penjualan->created_at->format('d/m/Y') }}<br>
+        CV ASIWA BUMI NIAGA
+        <div class="ttd-space"></div>
+        {{ $penandatangan }}<br>
+        Direktur
     </div>
-
-    <div class="footer">
-        <div class="terbilang-title"><strong>Terbilang :</strong></div>
-        <div class="terbilang-box">
-            <strong>## {{ $terbilang }} ##</strong>
-        </div>
-    </div>
-
-    <div class="signature-container">
-        <table class="signature-table">
-            <tr>
-                <td>
-
-                </td>
-                <td>
-                    <p>{{ $setting->alamat ?? 'Baturaja' }} | {{ date('d/m/Y') }}</p>
-                    <div class="signature-space"></div>
-                    <p>( ........................ )</p>
-                </td>
-            </tr>
-        </table>
-    </div>
-
 </body>
-
 </html>

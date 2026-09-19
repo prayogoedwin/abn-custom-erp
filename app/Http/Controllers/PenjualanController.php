@@ -316,9 +316,8 @@ class PenjualanController extends Controller
 
     public function cetakNota(Penjualan $penjualan)
     {
-        $penjualan->load('details.produk', 'pengiriman.customer');
-        // dd($pengirimans->toArray());
-        $terbilang = $this->konversiTerbilang($penjualan->details->sum('nominal_akhir'));
+        $penjualan->load('details.produk', 'pengiriman.customer', 'customer');
+        $terbilang = $this->konversiTerbilang($penjualan->invoiceTotalDibayar());
 
         $pagedata = $this->getPagedata();
 
