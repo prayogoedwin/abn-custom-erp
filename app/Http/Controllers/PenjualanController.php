@@ -319,16 +319,10 @@ class PenjualanController extends Controller
         $penjualan->load('details.produk', 'pengiriman.customer', 'customer');
         $terbilang = $this->konversiTerbilang($penjualan->invoiceTotalDibayar());
 
-        $pagedata = $this->getPagedata();
-
-        // dd($penjualan);
-
-        //debug
-        return view('exports.penjualan-nota', compact('penjualan', 'terbilang'), $pagedata);
-
-        $pdf = Pdf::loadView('exports.penjualan-nota', compact('penjualan', 'terbilang'), $pagedata)
+        $pdf = Pdf::loadView('exports.penjualan-nota', compact('penjualan', 'terbilang'))
             ->setPaper('a4', 'portrait');
-        return $pdf->download('Nota-Penjualan-' . $penjualan->no_transaksi_penjualan . '.pdf');
+
+        return $pdf->download('Invoice-Penjualan-' . $penjualan->no_transaksi_penjualan . '.pdf');
     }
 
     private function konversiTerbilang(int $angka)

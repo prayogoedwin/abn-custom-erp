@@ -62,15 +62,15 @@ class PenjualanInvoiceTest extends TestCase
         $this->assertStringNotContainsString('Grand Total', $html);
     }
 
-    public function test_halaman_cetak_invoice_bisa_dibuka(): void
+    public function test_invoice_penjualan_langsung_terunduh_pdf(): void
     {
         [$penjualan, $user] = $this->buatInvoiceOlam();
 
         $this->actingAs($user)
             ->get(route('penjualans.cetaknota', $penjualan))
             ->assertOk()
-            ->assertSee('I N V O I C E')
-            ->assertSee('TOTAL YANG DIBAYARKAN');
+            ->assertHeader('content-type', 'application/pdf')
+            ->assertDownload('Invoice-Penjualan-J26-00210.pdf');
     }
 
     /**
