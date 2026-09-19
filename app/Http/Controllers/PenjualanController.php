@@ -53,7 +53,7 @@ class PenjualanController extends Controller
         //     'deleted_by',
         // ];
 
-        $pengirimans = Pengiriman::where('deleted_at', null)->get();
+        $pengirimans = Pengiriman::with('customer')->where('deleted_at', null)->get();
         $customers = Customer::where('deleted_at', null)->get();
         // dd($suppliers);
 
@@ -67,7 +67,7 @@ class PenjualanController extends Controller
                     // Ambil data kategori dari database
 
                     ...$pengirimans->map(function ($pengiriman) {
-                        $label = $pengiriman->no_transaksi . ' - ' . $pengiriman->nopol . ' - ' . $pengiriman->customer->nama;
+                        $label = $pengiriman->no_transaksi . ' - ' . $pengiriman->nopol . ' - ' . ($pengiriman->customer?->nama ?? '-');
                         return ['value' => $pengiriman->id, 'label' => $label];
                     })->toArray(),
                 ]],
@@ -119,7 +119,7 @@ class PenjualanController extends Controller
                 })
                 ->addColumn('detail', function ($penjualan) {
                     $produkNames = $penjualan->details->map(function ($detail) {
-                        return   '[' . $detail->tipe . '] ' . $detail->produk->nama_produk;
+                        return   '[' . $detail->tipe . '] ' . ($detail->produk?->nama_produk ?? '-');
                     })->toArray();
                     $content = implode('<br>', $produkNames);
                     return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
@@ -174,7 +174,7 @@ class PenjualanController extends Controller
 
         //cuma ambil pengiriman yang belum ada penjualan
         //pastikan juga penjualans deleted_at null, karena kalau penjualan dihapus, pengiriman bisa dipakai lagi
-        $pengirimans = Pengiriman::where('deleted_at', null)->whereNotIn('id', function ($query) {
+        $pengirimans = Pengiriman::with('customer')->where('deleted_at', null)->whereNotIn('id', function ($query) {
             $query->select('pengiriman_id')->from('penjualans')->where('deleted_at', null);
         })->get();
 
@@ -201,8 +201,8 @@ class PenjualanController extends Controller
         ];
 
         $pengiriman = Pengiriman::find($store_data['pengiriman_id']);
-        $store_data['no_transaksi_penjualan'] = $pengiriman->no_transaksi;
-        $store_data['customer_id'] = $pengiriman->customer->id;
+        $store_data['no_transaksi_penjualan'] = $pengiriman?->no_transaksi;
+        $store_data['customer_id'] = $pengiriman?->customer?->id;
 
 
         $validate = Validator::make($store_data, [

@@ -94,8 +94,8 @@
             <td class="text-right">Tgl: {{ $penjualan->created_at->format('d/m/Y H:i') }}</td>
         </tr>
         <tr>
-            <td>Customer: {{ $penjualan->pengiriman->customer->nama }}</td>
-            <td class="text-right">Mobil: {{ $penjualan->pengiriman->nopol }}</td>
+            <td>Customer: {{ $penjualan->pengiriman?->customer?->nama ?? '-' }}</td>
+            <td class="text-right">Mobil: {{ $penjualan->pengiriman?->nopol }}</td>
         </tr>
     </table>
 

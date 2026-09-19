@@ -172,7 +172,7 @@
                 </div> -->
 
                 <div class="mb-5">
-                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="" />
+                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="{{ old('keterangan', $pembelian->keterangan) }}" />
                 </div>
 
                 <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">

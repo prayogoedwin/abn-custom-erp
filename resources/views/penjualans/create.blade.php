@@ -41,7 +41,7 @@
                         
                         @foreach($pengirimans as $option)
                         <option value="{{ $option->id }}">
-                            {{ $option->no_transaksi . ' - ' . $option->nopol . ' - ' . $option->customer->nama; }}
+                            {{ $option->no_transaksi . ' - ' . $option->nopol . ' - ' . ($option->customer->nama ?? '-') }}
                         </option>
                         @endforeach
                     </select>
@@ -396,7 +396,7 @@
 
                 if (selectedPengiriman) {
                     // Update quick info
-                    document.getElementById('customer-name').textContent = selectedPengiriman.customer.nama;
+                    document.getElementById('customer-name').textContent = selectedPengiriman.customer?.nama || '-';
                     document.getElementById('nopol').textContent = selectedPengiriman.nopol || '-';
                     document.getElementById('no-transaksi').textContent = selectedPengiriman.no_transaksi || '-';
                     pengirimanInfo.classList.remove('hidden');

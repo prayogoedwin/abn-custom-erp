@@ -34,7 +34,7 @@ class PengirimanExport implements FromCollection, WithHeadings, WithMapping
         return [
             $pengiriman->id,
             $pengiriman->no_transaksi,
-            $pengiriman->customer->nama,
+            $pengiriman->customer?->nama ?? '-',
             $pengiriman->nopol,
             $pengiriman->created_at->format('d-m-Y H:i:s'),
             $pengiriman->updated_at?->format('d-m-Y H:i:s'),

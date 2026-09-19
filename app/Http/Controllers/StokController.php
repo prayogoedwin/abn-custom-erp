@@ -72,10 +72,10 @@ class StokController extends Controller
                         return $pembelian->supplier->nama;
                     } elseif ($stok->penjualan_detail_id) {
                         $penjualan = $stok->penjualanDetail->penjualan;
-                        return $penjualan->customer->nama;
+                        return $penjualan->customer?->nama ?? '-';
                     } elseif ($stok->pengiriman_detail_id) {
                         $pengiriman = $stok->pengirimanDetail->pengiriman;
-                        return $pengiriman->customer->nama;
+                        return $pengiriman->customer?->nama ?? '-';
                     } else {
                         return '-';
                     }

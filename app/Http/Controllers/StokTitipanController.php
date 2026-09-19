@@ -205,6 +205,9 @@ class StokTitipanController extends Controller
             'created_by' => auth()->id(),
         ]);
 
+        Pembelian::where('id', $request->pembelian_id)->update([
+            'keterangan' => 'TITIPAN',
+        ]);
 
         return to_route('pembelians.createlanjut', $request->pembelian_id);
     }

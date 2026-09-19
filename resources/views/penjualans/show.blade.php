@@ -45,7 +45,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Customer</label>
-                            <div class="text-md font-semibold text-gray-900 dark:text-gray-100">{{ $penjualan->customer->nama ?? '-' }}</div>
+                            <div class="text-md font-semibold text-gray-900 dark:text-gray-100">{{ $penjualan->customer?->nama ?? '-' }}</div>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Informasi Pengiriman</label>

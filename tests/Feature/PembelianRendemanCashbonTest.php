@@ -69,7 +69,8 @@ class PembelianRendemanCashbonTest extends TestCase
             ->assertSee('value="10010000"', false)
             ->assertSee('Rp 77.075.963')
             ->assertSee("addEventListener('blur', hitungOtomatis)", false)
-            ->assertDontSee("addEventListener('input', hitungOtomatis)", false);
+            ->assertDontSee("addEventListener('input', hitungOtomatis)", false)
+            ->assertDontSee('value="TITIPAN"', false);
     }
 
     public function test_admin_bisa_memotong_cashbon_secara_manual(): void
