@@ -123,6 +123,7 @@ class PembelianHargaNotaTest extends TestCase
             'terbilang' => 'Nol Rupiah',
         ])->render();
 
-        $this->assertStringNotContainsString('Keterangan :', $htmlKosong);
+        $this->assertStringContainsString('Keterangan :', $htmlKosong);
+        $this->assertStringNotContainsString('jual titipan', $htmlKosong);
     }
 }

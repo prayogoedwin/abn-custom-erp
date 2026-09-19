@@ -141,11 +141,9 @@
 
     
 
-    @if(filled($pembelian->keterangan))
     <div class="footer" style="margin-top: 10px;">
         <div><strong>Keterangan :</strong> {{ $pembelian->keterangan }}</div>
     </div>
-    @endif
 
     <div class="signature-container">
         <table class="signature-table">

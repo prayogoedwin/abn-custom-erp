@@ -189,11 +189,9 @@
         </table>
     </div>
 
-    @if(filled($pembelian->keterangan))
     <div class="footer" style="margin-top: 10px; margin-bottom: 0;">
         <div><strong>Keterangan :</strong> {{ $pembelian->keterangan }}</div>
     </div>
-    @endif
 
     <div class="footer">
         <div class="terbilang-title"><strong>Terbilang :</strong></div>
