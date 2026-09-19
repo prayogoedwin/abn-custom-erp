@@ -112,6 +112,7 @@ class StokTitipanController extends Controller
             'nopol' => $request->input('nopol'),
             'supplier_id' => $request->input('supplier_id'),
             'stok_titipan_id' => $request->input('stok_titipan_id'),
+            'keterangan' => 'TITIPAN',
             'created_by' => auth()->id(),
         ];
 
@@ -206,7 +207,7 @@ class StokTitipanController extends Controller
         ]);
 
         Pembelian::where('id', $request->pembelian_id)->update([
-            'keterangan' => 'TITIPAN',
+            'keterangan' => $request->input('keterangan', 'TITIPAN'),
         ]);
 
         return to_route('pembelians.createlanjut', $request->pembelian_id);

@@ -19,7 +19,13 @@ class PembelianKeteranganTitipanTest extends TestCase
 
     public function test_jual_stok_titipan_mengisi_keterangan_titipan_dan_tetap_bisa_diubah(): void
     {
-        [$user, $pembelian, $produk] = $this->buatPembelianTitipan();
+        [$user, $pembelian, $produk, $stokTitipan] = $this->buatPembelianTitipan();
+
+        $this->actingAs($user)
+            ->get(route('stoktitipans.jualnow', ['pembelian' => $pembelian, 'detail' => $stokTitipan]))
+            ->assertOk()
+            ->assertSee('name="keterangan"', false)
+            ->assertSee('value="TITIPAN"', false);
 
         $this->actingAs($user)
             ->post(route('stoktitipans.jualNowStore'), [
@@ -32,6 +38,7 @@ class PembelianKeteranganTitipanTest extends TestCase
                 'harga' => [56250],
                 'harga_basis_pembelian' => [62500],
                 'harga_netto' => [5625000],
+                'keterangan' => 'TITIPAN',
             ])
             ->assertRedirect(route('pembelians.createlanjut', $pembelian));
 
@@ -58,7 +65,7 @@ class PembelianKeteranganTitipanTest extends TestCase
     }
 
     /**
-     * @return array{0: User, 1: Pembelian, 2: Produk}
+     * @return array{0: User, 1: Pembelian, 2: Produk, 3: StokTitipan}
      */
     private function buatPembelianTitipan(): array
     {
@@ -91,7 +98,7 @@ class PembelianKeteranganTitipanTest extends TestCase
             'supplier_id' => $supplier->id,
             'nopol' => 'BG 1 AA',
         ]);
-        StokTitipan::create([
+        $stokTitipan = StokTitipan::create([
             'produk_id' => $produk->id,
             'supplier_id' => $supplier->id,
             'pembelian_id' => $pembelian->id,
@@ -101,6 +108,6 @@ class PembelianKeteranganTitipanTest extends TestCase
             'keterangan' => 'Pembelian Titip',
         ]);
 
-        return [$user, $pembelian, $produk];
+        return [$user, $pembelian, $produk, $stokTitipan];
     }
 }

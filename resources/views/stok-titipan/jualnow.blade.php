@@ -109,7 +109,9 @@
                     </div>
                 </div>
 
-                
+                <div class="mb-5">
+                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="{{ old('keterangan', $pembelian->keterangan ?: 'TITIPAN') }}" />
+                </div>
 
                 <div class="flex gap-3 mt-3 border-t justify-between items-center pt-4">
 
