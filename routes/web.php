@@ -19,6 +19,8 @@ use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\PengirimanDetailController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\PenjualanDetailController;
+use App\Http\Controllers\PengeluaranController;
+use App\Http\Controllers\KategoriPengeluaranController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Pihak3Controller;
 use App\Http\Controllers\ProdukController;
@@ -375,6 +377,28 @@ Route::middleware(['auth'])->group(function () {
     Route::post('stoktitipans/jualstore', [StokTitipanController::class, 'jualStore'])->name('stoktitipans.jualstore')->middleware('permission:create-stok-titipans');
     Route::get('stoktitipans/jualnow/{pembelian}/{detail}', [StokTitipanController::class, 'jualnow'])->name('stoktitipans.jualnow')->middleware('permission:create-stok-titipans');
     Route::post('stoktitipans/jualnowstore', [StokTitipanController::class, 'jualNowStore'])->name('stoktitipans.jualNowStore')->middleware('permission:create-stok-titipans');
+
+    //Pengeluaran==================================================================================================================
+    Route::get('pengeluarans', [PengeluaranController::class, 'index'])->name('pengeluarans.index')->middleware('permission:view-pengeluarans');
+    Route::get('pengeluarans/table', [PengeluaranController::class, 'indexTable'])->name('pengeluarans.indexTable')->middleware('permission:view-pengeluarans');
+    Route::get('pengeluarans/export', [PengeluaranController::class, 'export'])->name('pengeluarans.export')->middleware('permission:download-pengeluarans');
+    Route::get('pengeluarans/create', [PengeluaranController::class, 'create'])->name('pengeluarans.create')->middleware('permission:create-pengeluarans');
+    Route::post('pengeluarans', [PengeluaranController::class, 'store'])->name('pengeluarans.store')->middleware('permission:create-pengeluarans');
+    Route::get('pengeluarans/{pengeluaran}', [PengeluaranController::class, 'show'])->name('pengeluarans.show')->middleware('permission:show-pengeluarans');
+    Route::get('pengeluarans/{pengeluaran}/edit', [PengeluaranController::class, 'edit'])->name('pengeluarans.edit')->middleware('permission:edit-pengeluarans');
+    Route::put('pengeluarans/{pengeluaran}', [PengeluaranController::class, 'update'])->name('pengeluarans.update')->middleware('permission:edit-pengeluarans');
+    Route::delete('pengeluarans/{pengeluaran}', [PengeluaranController::class, 'destroy'])->name('pengeluarans.destroy')->middleware('permission:delete-pengeluarans');
+
+    //Kategori Pengeluaran==================================================================================================================
+    Route::get('kategori_pengeluarans', [KategoriPengeluaranController::class, 'index'])->name('kategori-pengeluarans.index')->middleware('permission:view-kategori-pengeluarans');
+    Route::get('kategori_pengeluarans/table', [KategoriPengeluaranController::class, 'indexTable'])->name('kategori-pengeluarans.indexTable')->middleware('permission:view-kategori-pengeluarans');
+    Route::get('kategori_pengeluarans/export', [KategoriPengeluaranController::class, 'export'])->name('kategori-pengeluarans.export')->middleware('permission:download-kategori-pengeluarans');
+    Route::get('kategori_pengeluarans/create', [KategoriPengeluaranController::class, 'create'])->name('kategori-pengeluarans.create')->middleware('permission:create-kategori-pengeluarans');
+    Route::post('kategori_pengeluarans', [KategoriPengeluaranController::class, 'store'])->name('kategori-pengeluarans.store')->middleware('permission:create-kategori-pengeluarans');
+    
+    Route::get('kategori_pengeluarans/{kategori_pengeluaran}/edit', [KategoriPengeluaranController::class, 'edit'])->name('kategori-pengeluarans.edit')->middleware('permission:edit-kategori-pengeluarans');
+    Route::put('kategori_pengeluarans/{kategori_pengeluaran}', [KategoriPengeluaranController::class, 'update'])->name('kategori-pengeluarans.update')->middleware('permission:edit-kategori-pengeluarans');
+    Route::delete('kategori_pengeluarans/{kategori_pengeluaran}', [KategoriPengeluaranController::class, 'destroy'])->name('kategori-pengeluarans.destroy')->middleware('permission:delete-kategori-pengeluarans');
 
 
 

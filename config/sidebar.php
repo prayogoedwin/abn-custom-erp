@@ -231,6 +231,28 @@ return [
         ],
     ],
     [
+        'title' => 'Pengeluaran',
+        'icon' => 'fas-money-bill-wave',
+        'active' => ['pengeluarans*', 'kategori-pengeluarans*'],
+        'permission' => 'view-pengeluarans',
+        'children' => [
+            [
+                'title' => 'Pengeluaran',
+                'icon' => 'fas-money-bill-wave',
+                'route' => 'pengeluarans.index',
+                'active' => 'pengeluarans*',
+                'permission' => 'view-pengeluarans',
+            ],
+            [
+                'title' => 'Kategori Pengeluaran',
+                'icon' => 'fas-list',
+                'route' => 'kategori-pengeluarans.index',
+                'active' => 'kategori-pengeluarans*',
+                'permission' => 'view-kategori-pengeluarans',
+            ],
+        ],
+    ],
+    [
         'title' => 'Absensi',
         'icon' => 'fas-calendar-check',
         'active' => 'absensis*',

@@ -238,6 +238,24 @@ class RolePermissionSeeder extends Seeder
             'download-stok-titipans',
             'delete-stok-titipans',
 
+            //pengeluarans permissions
+            'view-pengeluarans',
+            'show-pengeluarans',
+            'create-pengeluarans',
+            'edit-pengeluarans',
+            'update-pengeluarans',
+            'download-pengeluarans',
+            'delete-pengeluarans',
+
+            //kategori-pengeluarans permissions
+            'view-kategori-pengeluarans',
+            'show-kategori-pengeluarans',
+            'create-kategori-pengeluarans',
+            'edit-kategori-pengeluarans',
+            'update-kategori-pengeluarans',
+            'download-kategori-pengeluarans',
+            'delete-kategori-pengeluarans',
+
         ];
 
         foreach ($permissions as $permissionName) {
