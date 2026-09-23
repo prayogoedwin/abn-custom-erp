@@ -208,9 +208,8 @@ class RolePermissionSeeder extends Seeder
             'delete-absensis',
 
             //laporans
-            'view-laporanpengiriman',
-            'view-laporanpenjualan',
-            'view-laporanpembelian',
+            'view-laporan',
+            
 
 
             'view-titip-suppliers',

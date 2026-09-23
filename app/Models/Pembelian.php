@@ -72,6 +72,11 @@ class Pembelian extends Model
         });
     }
 
+    public function tanggal()
+    {
+        return $this->created_at?->format('Y-m-d H:i:s');
+    }
+
     public function details()
     {
         return $this->hasMany(PembelianDetail::class);

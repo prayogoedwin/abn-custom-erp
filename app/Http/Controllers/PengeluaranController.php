@@ -80,6 +80,9 @@ class PengeluaranController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('kategori_pengeluaran', function ($row) {
+                    return $row->kategoriPengeluaran->nama_kategori ?? '';
+                })
                 
                 ->addColumn('tanggal', function ($row) {
                     return $row->created_at->format('Y-m-d H:i:s');

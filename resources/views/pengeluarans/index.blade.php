@@ -45,7 +45,7 @@
                     <tr>
 
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nama Pengeluaran</th>
-
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kategori Pengeluaran</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jumlah</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
@@ -70,9 +70,14 @@
                     url: '{{ route("pengeluarans.indexTable") }}',
                     
                 },
-                columns: [{
+                columns: [
+                    {
                         data: 'nama_pengeluaran',
                         name: 'nama_pengeluaran'
+                    },
+                    {
+                        data: 'kategori_pengeluaran',
+                        name: 'kategori_pengeluaran'
                     },
                     {
                         data: 'tanggal',
