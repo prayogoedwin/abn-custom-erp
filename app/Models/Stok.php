@@ -70,4 +70,9 @@ class Stok extends Model
     {
         return $this->belongsTo(PengirimanDetail::class);
     }
+
+    public function tanggal()
+    {
+        return $this->created_at->translatedFormat('d M Y');
+    }
 }

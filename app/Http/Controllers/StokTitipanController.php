@@ -11,7 +11,7 @@ use App\Models\SimpanPinjamSupplier;
 
 class StokTitipanController extends Controller
 {
-    private function toIntMoney($value): int
+    private function toIntMoney(mixed $value): int
     {
         if (is_null($value) || $value === '') {
             return 0;
@@ -79,9 +79,10 @@ class StokTitipanController extends Controller
                         $q->where('nama', 'like', "%{$keyword}%");
                     });
                 })
-                ->addColumn('tanggal', function ($row) {
+                ->editColumn('created_at', function ($row) {
                     return $row->created_at->format('d-m-Y'); // Format tanggal sesuai kebutuhan
                 })
+                
 
                 ->addColumn('action', function ($row) use ($sisaMap) {
                     $sisa = $sisaMap[$row->supplier_id.'-'.$row->produk_id] ?? 0;

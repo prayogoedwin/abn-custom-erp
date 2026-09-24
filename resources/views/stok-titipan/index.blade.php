@@ -52,7 +52,7 @@
                     { data: 'tipe_stok', name: 'tipe_stok' },
                     { data: 'jumlah', name: 'jumlah' },
                     { data: 'keterangan', name: 'keterangan' },
-                    { data: 'tanggal', name: 'tanggal' },
+                    { data: 'created_at', name: 'created_at' },
                     { data: 'action', name: 'action', orderable: false, searchable: false }
                     
                 ],

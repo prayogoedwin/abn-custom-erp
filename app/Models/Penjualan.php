@@ -39,6 +39,11 @@ class Penjualan extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    public function tanggal()
+    {
+        return $this->created_at->translatedFormat('d M Y');
+    }
+
     public function details()
     {
         return $this->hasMany(PenjualanDetail::class);

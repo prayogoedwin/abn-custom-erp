@@ -24,7 +24,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PembelianController extends Controller
 {
-    private function toIntMoney($value): int
+    private function toIntMoney(mixed $value): int
     {
         if (is_null($value) || $value === '') {
             return 0;
@@ -417,7 +417,7 @@ class PembelianController extends Controller
         return trim($terbilang);
     }
 
-    public function show($id): View
+    public function show(int $id): View
     {
         $pembelian = Pembelian::find($id);
         $pembelian->details = PembelianDetail::where('pembelian_id', $id)->get();

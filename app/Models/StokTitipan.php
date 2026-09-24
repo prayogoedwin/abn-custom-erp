@@ -90,4 +90,9 @@ class StokTitipan extends Model
             ->mapWithKeys(fn ($row) => [$row->supplier_id.'-'.$row->produk_id => (float) $row->sisa])
             ->all();
     }
+
+    public function tanggal()
+    {
+        return $this->created_at->translatedFormat('d M Y');
+    }
 }

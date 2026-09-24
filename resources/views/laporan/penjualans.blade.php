@@ -12,16 +12,16 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">{{ __('Laporan Pembelian') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">{{ __('Laporan Penjualan') }}</span>
     </div>
 
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Laporan Pembelian') }}</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage System Laporan Pembelian') }}</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Laporan Penjualan') }}</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage System Laporan Penjualan') }}</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('laporanpembelians.export') }}">
+            <a href="{{ route('laporanpenjualans.export') }}">
                 <x-button type="secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -62,17 +62,17 @@
             </div>
 
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
-                <!-- Supplier Select Group -->
+                <!-- Customer Select Group -->
                 <div class="flex-1">
-                    <label for="supplier" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
-                        Supplier
+                    <label for="customer" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                        Customer
                     </label>
                     <div class="relative">
-                        <select id="supplier" name="supplier" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
-                            <option value="">Semua Supplier</option>
-                            @foreach($suppliers as $supplier)
-                            <option value="{{ $supplier->id }}" {{ request('supplier') == $supplier->id ? 'selected' : '' }}>
-                                {{ $supplier->nama }}
+                        <select id="customer" name="customer" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
+                            <option value="">Semua Customer</option>
+                            @foreach($customers as $customer)
+                            <option value="{{ $customer->id }}" {{ request('customer') == $customer->id ? 'selected' : '' }}>
+                                {{ $customer->nama }}
                             </option>
                             @endforeach
                         </select>
@@ -136,10 +136,10 @@
                     <tr>
 
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">No Transaksi</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Detail</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status Pembayaran</th>
+
 
                     </tr>
                 </thead>
@@ -153,14 +153,6 @@
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
 
-    @if (session('print_url'))
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Buka tab baru untuk cetak nota
-            window.open("{{ session('print_url') }}", '_blank');
-        });
-    </script>
-    @endif
 
     <script>
         $(document).ready(function() {
@@ -168,21 +160,21 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route("laporanpembelians.index") }}',
+                    url: '{{ route("laporanpenjualans.index") }}',
                     data: function(d) {
-                        d.supplier = $('#supplier').val();
+                        d.customer = $('#customer').val();
                         d.startdate = $('#startdate').val();
                         d.enddate = $('#enddate').val();
                         d.barang = $('#barang').val();
                     }
                 },
                 columns: [{
-                        data: 'no_transaksi',
-                        name: 'no_transaksi'
+                        data: 'no_transaksi_penjualan',
+                        name: 'no_transaksi_penjualan'
                     },
                     {
-                        data: 'supplier',
-                        name: 'supplier'
+                        data: 'customer',
+                        name: 'customer'
                     },
                     {
                         data: 'created_at',
@@ -192,23 +184,20 @@
                         data: 'detail',
                         name: 'detail'
                     },
-                    {
-                        data: 'status_pembayaran',
-                        name: 'status_pembayaran'
-                    }
+
                 ],
                 order: [
                     [0, 'desc']
                 ],
                 language: {
                     search: "_INPUT_",
-                    searchPlaceholder: "Search " + "Pembelians",
+                    searchPlaceholder: "Search " + "Penjualans",
                     lengthMenu: "Show _MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ Pembelians",
-                    infoEmpty: "No Pembelians found",
-                    infoFiltered: "(filtered from _MAX_ total Pembelians)",
-                    zeroRecords: "No matching Pembelians found",
-                    emptyTable: "No Pembelians available"
+                    info: "Showing _START_ to _END_ of _TOTAL_ Penjualans",
+                    infoEmpty: "No Penjualans found",
+                    infoFiltered: "(filtered from _MAX_ total Penjualans)",
+                    zeroRecords: "No matching Penjualans found",
+                    emptyTable: "No Penjualans available"
                 },
                 dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"lf>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip>',
                 pageLength: 10,
@@ -219,6 +208,7 @@
                 stripeClasses: ['bg-white dark:bg-gray-800', 'bg-gray-50 dark:bg-gray-900']
             });
         });
+
         document.addEventListener('DOMContentLoaded', function() {
 
             document.getElementById('current-filter-info').textContent = 'Menampilkan Semua Data';
@@ -226,9 +216,10 @@
 
         function tableReload() {
             $('#dynamic-table').DataTable().ajax.reload();
+
             let semuaWaktu = !$('#startdate').val() && !$('#enddate').val();
 
-            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : $('#startdate').val()) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : $('#enddate').val()) + '</strong> untuk ' + ($('#supplier').val() ? 'Supplier <strong>' + $('#supplier option:selected').text() + '</strong>' : 'Semua Supplier') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
+            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : $('#startdate').val()) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : $('#enddate').val()) + '</strong> untuk ' + ($('#customer').val() ? 'Customer <strong>' + $('#customer option:selected').text() + '</strong>' : 'Semua Customer') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
             $('#current-filter-info').html(text);
 
         }
