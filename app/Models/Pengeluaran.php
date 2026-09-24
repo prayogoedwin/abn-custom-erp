@@ -14,6 +14,7 @@ class Pengeluaran extends Model
         'nama_pengeluaran',
         'tanggal',
         'nominal',
+        'metode_pembayaran',
         'keterangan',
         'created_by',
         'updated_by',
@@ -24,4 +25,6 @@ class Pengeluaran extends Model
     {
         return $this->belongsTo(KategoriPengeluaran::class, 'kategori_pengeluaran_id');
     }
+
+    
 }

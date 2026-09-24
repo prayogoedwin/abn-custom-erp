@@ -54,6 +54,10 @@ class PengeluaranController extends Controller
                 ]],
                 ['name' => 'tanggal', 'value' => 'tanggal',  'title' => 'Tanggal', 'type' => 'date', 'inform' => true, 'inshow' => true, 'intable' => true, 'required' => true],
                 ['name' => 'nominal', 'value' => 'nominal',  'title' => 'Nominal', 'type' => 'number', 'inform' => true, 'inshow' => true, 'intable' => true, 'required' => true],
+                ['name' => 'metode_pembayaran', 'value' => 'metode_pembayaran',  'title' => 'Metode Pembayaran', 'type' => 'select', 'inform' => true, 'intable' => true, 'required' => false, 'options' => [
+                    ['value' => 'Tunai', 'label' => 'Cash'],
+                    ['value' => 'Transfer', 'label' => 'Transfer'],
+                ]],
                 ['name' => 'keterangan', 'value' => 'keterangan',  'title' => 'Keterangan', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true, 'required' => false],
 
             ],
@@ -84,8 +88,14 @@ class PengeluaranController extends Controller
                     return $row->kategoriPengeluaran->nama_kategori ?? '';
                 })
                 
-                ->addColumn('tanggal', function ($row) {
-                    return $row->created_at->format('Y-m-d H:i:s');
+                // ->editColumn('tanggal', function ($row) {
+                //     return $row->tanggal->translatedFormat('d M Y');
+                // })
+                ->editColumn('nominal', function ($row) {
+                    return '<div style="text-align: right;">' . number_format($row->nominal, 0, ',', '.') . '</div>';
+                })
+                ->editColumn('metode_pembayaran', function ($row) {
+                    return $row->metode_pembayaran;
                 })
                 ->addColumn('actions', function ($pengeluaran) {
                     $actions = '';
@@ -107,7 +117,7 @@ class PengeluaranController extends Controller
 
                     return $actions;
                 })
-                ->rawColumns(['actions'])
+                ->rawColumns(['actions', 'nominal'])
                 ->make(true);
         }
 
@@ -137,6 +147,7 @@ class PengeluaranController extends Controller
             'kategori_pengeluaran_id' => $request->input('kategori_pengeluaran_id'),
             'tanggal' => $request->input('tanggal'),
             'nominal' => $request->input('nominal'),
+            'metode_pembayaran' => $request->input('metode_pembayaran'),
             'keterangan' => $request->input('keterangan'),
             'created_by' => auth()->id(),
         ];
@@ -150,6 +161,7 @@ class PengeluaranController extends Controller
             'kategori_pengeluaran_id' => ['required', 'integer'],
             'tanggal' => ['required', 'date'],
             'nominal' => ['required', 'numeric'],
+            'metode_pembayaran' => ['nullable', 'string', 'max:255'],
             'keterangan' => ['nullable', 'string', 'max:255'],
             'created_by' => ['required', 'integer']
         ]);
@@ -203,6 +215,7 @@ class PengeluaranController extends Controller
             'kategori_pengeluaran_id' => $request->input('kategori_pengeluaran_id'),
             'tanggal' => $request->input('tanggal'),
             'nominal' => $request->input('nominal'),
+            'metode_pembayaran' => $request->input('metode_pembayaran'),
             'keterangan' => $request->input('keterangan'),
             'updated_by' => auth()->id(),
         ];
@@ -216,6 +229,7 @@ class PengeluaranController extends Controller
             'kategori_pengeluaran_id' => ['required', 'integer'],
             'tanggal' => ['required', 'date'],
             'nominal' => ['required', 'numeric'],
+            'metode_pembayaran' => ['nullable', 'string', 'max:255'],
             'keterangan' => ['nullable', 'string', 'max:255'],
             'updated_by' => ['required', 'integer']
         ]);

@@ -48,6 +48,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kategori Pengeluaran</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jumlah</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Metode Pembayaran</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
                     </tr>
@@ -88,6 +89,10 @@
                         name: 'nominal'
                     },
                     {
+                        data: 'metode_pembayaran',
+                        name: 'metode_pembayaran'
+                    },
+                    {
                         data: 'keterangan',
                         name: 'keterangan'
                     },
@@ -100,7 +105,7 @@
                     
                 ],
                 order: [
-                    [3, 'desc'] //sort by tanggal
+                    [2, 'desc'] //sort by tanggal
                 ],
                 language: {
                     search: "_INPUT_",

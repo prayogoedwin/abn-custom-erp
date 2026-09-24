@@ -74,7 +74,7 @@ class Pembelian extends Model
 
     public function tanggal()
     {
-        return $this->created_at?->format('Y-m-d H:i:s');
+        return $this->created_at->translatedFormat('d M Y');
     }
 
     public function details()
