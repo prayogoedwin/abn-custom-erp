@@ -63,6 +63,7 @@
                             <div class="container-tara hidden">
                                 <x-forms.input label="Tara" name="tara[]" type="decimal" />
                                 <p class="text-xs text-gray-500 mt-1">*Jumlah Karung x 0.3 KG</p>
+                                <p class="text-xs text-gray-500 mt-1">*Dibulatkan jika > 0.50 maka ke atas, jika <= 0.50 maka ke bawah</p>
                             </div>
 
                             <div class="container-netto hidden">
@@ -136,13 +137,21 @@
 
 
             // Function to calculate Tara (Jumlah Karung × 0.3 KG)
+            // Dibulatkan jika > 0.50 maka ke atas, jika <= 0.50 maka ke bawah
             function calculateTara(row) {
                 const jumlahKarungInput = row.querySelector('.container-jumlah_karung input');
                 const taraInput = row.querySelector('.container-tara input');
 
                 if (jumlahKarungInput && taraInput) {
                     const jumlahKarung = parseFloat(jumlahKarungInput.value) || 0;
-                    const tara = jumlahKarung * 0.3; // 0.3 kg per karung
+                    let tara = jumlahKarung * 0.3; // 0.3 kg per karung
+                    // Pembulatan sesuai aturan
+                    const decimalPart = tara - Math.floor(tara);
+                    if (decimalPart > 0.5) {
+                        tara = Math.ceil(tara);
+                    } else {
+                        tara = Math.floor(tara);
+                    }
                     taraInput.value = tara.toFixed(2);
 
                     // Make tara input readonly
