@@ -111,12 +111,10 @@
                         Filter
                     </button>
 
-                    @if(request('startdate') || request('enddate') || request('supplier'))
                     <a href="{{ route('laporanpembelians.index') }}"
-                        class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none transition-all h-[38px]">
+                        class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none transition-all h-[38px] hidden" id="reset-filter-button">
                         Reset
                     </a>
-                    @endif
                 </div>
             </div>
         </div>
@@ -230,6 +228,9 @@
 
             let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : $('#startdate').val()) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : $('#enddate').val()) + '</strong> untuk ' + ($('#supplier').val() ? 'Supplier <strong>' + $('#supplier option:selected').text() + '</strong>' : 'Semua Supplier') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
             $('#current-filter-info').html(text);
+
+            // Show the reset button
+            document.getElementById('reset-filter-button').classList.remove('hidden');
 
         }
     </script>

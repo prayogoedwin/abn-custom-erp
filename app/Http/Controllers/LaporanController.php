@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashbonSupplier;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
 use App\Models\Produk;
@@ -374,9 +375,36 @@ class LaporanController extends Controller
         $barangs = Produk::all();
         return view('laporan.titipanbarangs', compact('supplier', 'barangs'));
     }
-    public function laporanbonsuppliers()
+    public function laporanbonsuppliers(Request $request)
     {
-        return view('laporan.comingsoon');
+        if (request()->ajax()) {
+            $bonSuppliers = CashbonSupplier::with('supplier')->whereNull('deleted_at');
+
+            //filter supplier
+            if ($request->filled('supplier')) {
+                $supplier = $request->supplier;
+                $bonSuppliers->whereHas('supplier', function ($q) use ($supplier) {
+                    $q->where('id', $supplier);
+                });
+            }
+
+            return DataTables::of($bonSuppliers)
+                ->editColumn('nominal_cashbon', function ($cashbonsupplier) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    // rata kanan
+                    return '<div style="text-align: right;">' . number_format($cashbonsupplier->nominal_cashbon, 0, ',', '.') . '</div>';
+                })
+                    
+                ->editColumn('created_at', function ($cashbonsupplier) {
+                    return $cashbonsupplier->created_at->translatedFormat('d M Y');
+                })
+                ->rawColumns(['nominal_cashbon']) 
+                ->make(true);
+        }
+
+        $suppliers = Supplier::where('deleted_at', null)->get();
+
+        return view('laporan.bonsuppliers', compact('suppliers'));
     }
     public function laporanritans()
     {

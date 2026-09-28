@@ -12,16 +12,16 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">{{ __('Laporan Penjualan') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">{{ __('Laporan Bon Supplier') }}</span>
     </div>
 
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Laporan Penjualan') }}</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage System Laporan Penjualan') }}</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Laporan Bon Supplier') }}</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage System Laporan Bon Supplier') }}</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('laporanpenjualans.export') }}">
+            <a href="{{ route('laporanbonsuppliers.export') }}">
                 <x-button type="secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -37,6 +37,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <!-- Section Wrapper Form Filter -->
         <div class="p-5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30">
+
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
                 <!-- Start Date Group -->
                 <div class="flex-1">
@@ -62,17 +63,17 @@
             </div>
 
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
-                <!-- Customer Select Group -->
+                <!-- Supplier Select Group -->
                 <div class="flex-1">
-                    <label for="customer" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
-                        Customer
+                    <label for="supplier" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                        Supplier
                     </label>
                     <div class="relative">
-                        <select id="customer" name="customer" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
-                            <option value="">Semua Customer</option>
-                            @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}" {{ request('customer') == $customer->id ? 'selected' : '' }}>
-                                {{ $customer->nama }}
+                        <select id="supplier" name="supplier" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
+                            <option value="">Semua Supplier</option>
+                            @foreach($suppliers as $supplier)
+                            <option value="{{ $supplier->id }}" {{ request('supplier') == $supplier->id ? 'selected' : '' }}>
+                                {{ $supplier->nama }}
                             </option>
                             @endforeach
                         </select>
@@ -80,24 +81,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
-                <!-- Barang Select Group -->
-                <div class="flex-1">
-                    <label for="barang" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
-                        Barang
-                    </label>
-                    <div class="relative">
-                        <select id="barang" name="barang" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
-                            <option value="">Semua Barang</option>
-                            @foreach($barangs as $barang)
-                            <option value="{{ $barang->id }}" {{ request('barang') == $barang->id ? 'selected' : '' }}>
-                                {{ $barang->nama_produk }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            </div>
+
 
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl">
 
@@ -111,10 +95,12 @@
                         Filter
                     </button>
 
-                    <a href="{{ route('laporanpembelians.index') }}"
-                        class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none transition-all h-[38px] hidden" id="reset-filter-button">
+                    <!-- hanya muncul ketika sudah me filter -->
+                    <a href="{{ route('laporanbonsuppliers.index') }}" id="reset-filter-button"
+                        class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none transition-all h-[38px] hidden" >
                         Reset
                     </a>
+                
                 </div>
             </div>
         </div>
@@ -133,10 +119,11 @@
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
 
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">No Transaksi</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nominal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Detail</th>
+
 
 
                     </tr>
@@ -158,44 +145,46 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route("laporanpenjualans.index") }}',
+                    url: '{{ route("laporanbonsuppliers.index") }}',
                     data: function(d) {
-                        d.customer = $('#customer').val();
+                        d.supplier = $('#supplier').val();
                         d.startdate = $('#startdate').val();
                         d.enddate = $('#enddate').val();
-                        d.barang = $('#barang').val();
+
                     }
                 },
                 columns: [{
-                        data: 'no_transaksi_penjualan',
-                        name: 'no_transaksi_penjualan'
+                        data: 'supplier.nama',
+                        name: 'supplier.nama'
                     },
                     {
-                        data: 'customer',
-                        name: 'customer'
+                        data: 'nominal_cashbon',
+                        name: 'nominal_cashbon'
+                    },
+                    {
+                        data: 'keterangan',
+                        name: 'keterangan'
                     },
                     {
                         data: 'created_at',
                         name: 'created_at'
-                    },
-                    {
-                        data: 'detail',
-                        name: 'detail'
-                    },
+                    }
+
 
                 ],
                 order: [
-                    [0, 'desc']
+                    [3, 'desc'] // order by tanggal descending by default
                 ],
+
                 language: {
                     search: "_INPUT_",
-                    searchPlaceholder: "Search " + "Penjualans",
+                    searchPlaceholder: "Search " + "Bon Supplier",
                     lengthMenu: "Show _MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ Penjualans",
-                    infoEmpty: "No Penjualans found",
-                    infoFiltered: "(filtered from _MAX_ total Penjualans)",
-                    zeroRecords: "No matching Penjualans found",
-                    emptyTable: "No Penjualans available"
+                    info: "Showing _START_ to _END_ of _TOTAL_ Bon Suppliers",
+                    infoEmpty: "No Bon Suppliers found",
+                    infoFiltered: "(filtered from _MAX_ total Bon Suppliers)",
+                    zeroRecords: "No matching Bon Suppliers found",
+                    emptyTable: "No Bon Suppliers available"
                 },
                 dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"lf>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip>',
                 pageLength: 10,
@@ -217,7 +206,7 @@
 
             let semuaWaktu = !$('#startdate').val() && !$('#enddate').val();
 
-            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : $('#startdate').val()) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : $('#enddate').val()) + '</strong> untuk ' + ($('#customer').val() ? 'Customer <strong>' + $('#customer option:selected').text() + '</strong>' : 'Semua Customer') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
+            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : $('#startdate').val()) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : $('#enddate').val()) + '</strong> untuk ' + ($('#supplier').val() ? 'Supplier <strong>' + $('#supplier option:selected').text() + '</strong>' : 'Semua Supplier') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
             $('#current-filter-info').html(text);
 
             // Show the reset button
