@@ -7,6 +7,7 @@ use App\Models\Pembelian;
 use App\Models\Penjualan;
 use App\Models\Produk;
 use App\Models\Customer;
+use App\Models\Pengiriman;
 use App\Models\Stok;
 use App\Models\StokTitipan;
 use Yajra\DataTables\Facades\DataTables;
@@ -380,6 +381,14 @@ class LaporanController extends Controller
         if (request()->ajax()) {
             $bonSuppliers = CashbonSupplier::with('supplier')->whereNull('deleted_at');
 
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $bonSuppliers->whereBetween('cashbon_suppliers.created_at', [$start, $end]);
+            }
+
             //filter supplier
             if ($request->filled('supplier')) {
                 $supplier = $request->supplier;
@@ -394,11 +403,11 @@ class LaporanController extends Controller
                     // rata kanan
                     return '<div style="text-align: right;">' . number_format($cashbonsupplier->nominal_cashbon, 0, ',', '.') . '</div>';
                 })
-                    
+
                 ->editColumn('created_at', function ($cashbonsupplier) {
                     return $cashbonsupplier->created_at->translatedFormat('d M Y');
                 })
-                ->rawColumns(['nominal_cashbon']) 
+                ->rawColumns(['nominal_cashbon'])
                 ->make(true);
         }
 
@@ -406,9 +415,59 @@ class LaporanController extends Controller
 
         return view('laporan.bonsuppliers', compact('suppliers'));
     }
-    public function laporanritans()
+    public function laporanritans(Request $request)
     {
-        return view('laporan.comingsoon');
+        if (request()->ajax()) {
+            $ritans = Pengiriman::whereNull('deleted_at')->with('customer');
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $ritans->whereBetween('pengirimans.created_at', [$start, $end]);
+            }
+
+            //filter supplier
+            if ($request->filled('supplier')) {
+                $supplier = $request->supplier;
+                $ritans->whereHas('supplier', function ($q) use ($supplier) {
+                    $q->where('id', $supplier);
+                });
+            }
+
+            //filter barang
+            if ($request->filled('barang')) {
+                $barang = $request->barang;
+                $ritans->whereHas('details.produk', function ($q) use ($barang) {
+                    $q->where('id', $barang);
+                });
+            }
+
+            return DataTables::of($ritans)
+                ->addColumn('detail', function ($ritan) {
+                    $produkNames = $ritan->details->map(function ($detail) {
+                        return   ($detail->produk?->nama_produk ?? '-');
+                    })->toArray();
+                    $content = implode('<br>', $produkNames);
+                    return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
+                })
+                ->filterColumn('detail', function ($query, $keyword) {
+                    $query->whereHas('details.produk', function ($q) use ($keyword) {
+                        $q->where('nama_produk', 'like', "%{$keyword}%");
+                    });
+                })
+
+                ->editColumn('created_at', function ($ritan) {
+                    return $ritan->created_at->translatedFormat('d M Y');
+                })
+                ->rawColumns(['detail'])
+                ->make(true);
+        }
+
+        $customers = Customer::where('deleted_at', null)->get();
+        $barangs = Produk::where('deleted_at', null)->get();
+        return view('laporan.ritans', compact('customers', 'barangs'));
     }
     public function laporantitipankecustomers()
     {

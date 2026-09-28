@@ -52,4 +52,9 @@ class Pengiriman extends Model
     {
         return $this->hasMany(PengirimanDetail::class);
     }
+    
+    public function details()
+    {
+        return $this->hasMany(PengirimanDetail::class);
+    }
 }
