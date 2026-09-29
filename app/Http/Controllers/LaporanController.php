@@ -473,9 +473,26 @@ class LaporanController extends Controller
     {
         return view('laporan.comingsoon');
     }
-    public function laporantransaksikas()
+    public function laporantransaksikas(Request $request)
     {
-        return view('laporan.comingsoon');
+        if ($request->ajax()) {
+            
+
+            return DataTables::of($data)
+                ->editColumn('nominal_cashbon', function ($cashbonsupplier) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    // rata kanan
+                    return '<div style="text-align: right;">' . number_format($cashbonsupplier->nominal_cashbon, 0, ',', '.') . '</div>';
+                })
+
+                ->editColumn('created_at', function ($cashbonsupplier) {
+                    return $cashbonsupplier->created_at->translatedFormat('d M Y');
+                })
+                ->rawColumns(['nominal_cashbon'])
+                ->make(true);
+        }
+
+        return view('laporan.transaksikas');
     }
     public function laporantransaksibanks()
     {

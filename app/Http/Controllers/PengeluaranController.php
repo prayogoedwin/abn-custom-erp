@@ -252,7 +252,9 @@ class PengeluaranController extends Controller
     //soft delete
     public function destroy(Pengeluaran $pengeluaran): RedirectResponse
     {
-        $pengeluaran->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
+        $pengeluaran->update(['deleted_by' => auth()->id()]);
+
+        $pengeluaran->delete();
 
 
         return to_route('pengeluarans.index')->with('status', 'Pengeluaran deleted successfully.');
