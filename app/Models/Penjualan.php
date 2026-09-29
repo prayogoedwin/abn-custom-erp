@@ -19,6 +19,8 @@ class Penjualan extends Model
     //         $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
     //     });
 
+    protected $table = 'penjualans';
+
     protected $fillable = [
         'no_transaksi_penjualan',
         'pengiriman_id',
@@ -72,5 +74,10 @@ class Penjualan extends Model
     public function invoiceTotalDibayar(): int
     {
         return $this->invoiceJumlah() + $this->invoicePpn() - $this->invoicePph22();
+    }
+
+    public function TotalNominalAkhir(): int
+    {
+        return (int) $this->detailsJual()->sum('nominal_akhir');
     }
 }

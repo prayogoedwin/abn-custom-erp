@@ -273,20 +273,20 @@ return [
         'active' => ['laporansuppliers*', 'laporancustomers*', 'laporanpembelians*', 'laporanpengirimans*', 'laporanpenjualans*', 'laporanstoks*', 'laporantitipanbarangs*', 'laporanbonsuppliers*', 'laporanritans*', 'laporantitipankecustomers*', 'laporantransaksikas*', 'laporantransaksibanks*', 'laporankasbonkaryawans*', 'laporantransaksipihakketigas*', 'laporanbiayas*', 'laporanrugilabas*'],
         'permission' => ['view-laporan'],
         'children' => [
-            [
-                'title' => 'Data Supplier',
-                'icon' => 'fas-file-invoice-dollar',
-                'route' => 'laporansuppliers.index',
-                'active' => 'laporansuppliers*',
-                'permission' => 'view-laporan',
-            ],
-            [
-                'title' => 'Data Customer',
-                'icon' => 'fas-clipboard-list',
-                'route' => 'laporancustomers.index',
-                'active' => 'laporancustomers*',
-                'permission' => 'view-laporan',
-            ],
+            // [
+            //     'title' => 'Data Supplier',
+            //     'icon' => 'fas-file-invoice-dollar',
+            //     'route' => 'laporansuppliers.index',
+            //     'active' => 'laporansuppliers*',
+            //     'permission' => 'view-laporan',
+            // ],
+            // [
+            //     'title' => 'Data Customer',
+            //     'icon' => 'fas-clipboard-list',
+            //     'route' => 'laporancustomers.index',
+            //     'active' => 'laporancustomers*',
+            //     'permission' => 'view-laporan',
+            // ],
             [
                 'title' => 'Pembelian',
                 'icon' => 'fas-file-medical-alt',

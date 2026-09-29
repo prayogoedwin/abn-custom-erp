@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\Karyawan;
 use App\Models\Pengeluaran;
 use App\Models\Pengiriman;
+use App\Models\PenjualanDetail;
 use App\Models\Stok;
 use App\Models\StokTitipan;
 use Yajra\DataTables\Facades\DataTables;
@@ -519,7 +520,7 @@ class LaporanController extends Controller
 
             $query = $pengeluaran->unionAll($pembelian);
 
-            
+
 
 
 
@@ -562,13 +563,6 @@ class LaporanController extends Controller
                 ])
                 ->selectRaw("'pengeluaran' as sumber");
 
-            //filter tanggal
-            if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
-
-                $pengeluaran->whereBetween('created_at', [$start, $end]);
-            }
 
             $pembelian = Pembelian::whereNotNull('ambil_transfer')
                 ->where('ambil_transfer', '>', 0)
@@ -586,11 +580,10 @@ class LaporanController extends Controller
                 $end   = Carbon::parse($request->enddate)->endOfDay();
 
                 $pembelian->whereBetween('created_at', [$start, $end]);
+                $pengeluaran->whereBetween('created_at', [$start, $end]);
             }
 
             $query = $pengeluaran->unionAll($pembelian);
-
-            
 
 
 
@@ -663,12 +656,133 @@ class LaporanController extends Controller
     {
         return view('laporan.comingsoon');
     }
-    public function laporanbiayas()
+    public function laporanbiayas(Request $request)
     {
-        return view('laporan.comingsoon');
+        if ($request->ajax()) {
+            //ambil data Tunai dari table pengeluaran dan pembelian
+            $pengeluaran = Pengeluaran::select([
+                'id',
+                'nama_pengeluaran as transaksi',
+                'nominal',
+                'created_at',
+            ])
+                ->selectRaw("'pengeluaran' as sumber");
+
+
+            $pembelian = Pembelian::whereNotNull('total_nominal_terbayar')
+                ->where('total_nominal_terbayar', '>', 0)
+                ->select([
+                    'id',
+                    'no_transaksi as transaksi',
+                    'total_nominal_terbayar as nominal',
+                    'created_at',
+                ])
+
+                ->selectRaw("'pembelian' as sumber");
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $pembelian->whereBetween('created_at', [$start, $end]);
+                $pengeluaran->whereBetween('created_at', [$start, $end]);
+            }
+
+            $query = $pengeluaran->unionAll($pembelian);
+
+            $totalNominalFromPengeluaran = $pengeluaran->sum('nominal');
+            $totalNominalFromPembelian = $pembelian->sum('total_nominal_terbayar');
+            $totalNominal = $totalNominalFromPengeluaran + $totalNominalFromPembelian;
+
+
+            return DataTables::of($query)
+                ->editColumn('nominal', function ($row) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    // rata kanan
+                    return '<div style="text-align: right;">' . number_format($row->nominal, 0, ',', '.') . '</div>';
+                })
+
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->translatedFormat('d M Y');
+                })
+                ->rawColumns(['nominal'])
+                ->with([
+                    'total_nominal' => $totalNominal,
+                    'total_nominal_pengeluaran' => $totalNominalFromPengeluaran,
+                    'total_nominal_pembelian' => $totalNominalFromPembelian,
+                ])
+
+                ->make(true);
+        }
+
+        return view('laporan.biayas');
     }
-    public function laporanrugilabas()
+    public function laporanrugilabas(Request $request)
     {
-        return view('laporan.comingsoon');
+        if ($request->ajax()) {
+            //ambil data Tunai dari table pengeluaran dan pembelian
+            $pengeluaran = Pengeluaran::select([
+                'id',
+                'nama_pengeluaran as transaksi',
+                'nominal',
+                'created_at',
+            ])
+                ->selectRaw("'pengeluaran' as sumber");
+
+
+            $pembelian = Pembelian::whereNotNull('total_nominal_terbayar')
+                ->where('total_nominal_terbayar', '>', 0)
+                ->select([
+                    'id',
+                    'no_transaksi as transaksi',
+                    'total_nominal_terbayar as nominal',
+                    'created_at',
+                ])
+
+                ->selectRaw("'pembelian' as sumber");
+
+            //TODO: Add Penjualan data to the report
+            $penjualan = Penjualan::query();
+                
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $pembelian->whereBetween('created_at', [$start, $end]);
+                $pengeluaran->whereBetween('created_at', [$start, $end]);
+                $penjualan->whereBetween('created_at', [$start, $end]);
+            }
+
+            $query = $pengeluaran->unionAll($pembelian)->unionAll($penjualan);
+
+            $totalNominalFromPengeluaran = $pengeluaran->sum('nominal');
+            $totalNominalFromPembelian = $pembelian->sum('total_nominal_terbayar');
+            $totalNominalFromPenjualan = $penjualan->sum('TotalNominalAkhir');
+            $totalNominal = $totalNominalFromPengeluaran + $totalNominalFromPembelian + $totalNominalFromPenjualan;
+
+
+            return DataTables::of($query)
+                ->editColumn('nominal', function ($row) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    // rata kanan
+                    return '<div style="text-align: right;">' . number_format($row->nominal, 0, ',', '.') . '</div>';
+                })
+
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->translatedFormat('d M Y');
+                })
+                ->rawColumns(['nominal'])
+                ->with([
+                    'total_nominal' => $totalNominal,
+                    'total_nominal_pengeluaran' => $totalNominalFromPengeluaran + $totalNominalFromPembelian,
+                    'total_nominal_pemasukan' => $totalNominalFromPenjualan,
+                ])
+
+                ->make(true);
+        }
+        return view('laporan.rugilabas');
     }
 }
