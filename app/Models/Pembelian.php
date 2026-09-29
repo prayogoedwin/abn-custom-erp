@@ -29,6 +29,8 @@ class Pembelian extends Model
     //     });
     // }
 
+    protected $table = 'pembelians';
+
     protected $fillable = [
         'no_transaksi',
         'supplier_id',

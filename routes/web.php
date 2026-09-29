@@ -313,8 +313,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('export/laporanritans', [LaporanController::class, 'laporanritansExport'])->name('laporanritans.export')->middleware('permission:view-laporan');
     Route::get('laporantitipankecustomers', [LaporanController::class, 'laporantitipankecustomers'])->name('laporantitipankecustomers.index')->middleware('permission:view-laporan');
     Route::get('export/laporantitipankecustomers', [LaporanController::class, 'laporantitipankecustomersExport'])->name('laporantitipankecustomers.export')->middleware('permission:view-laporan');
-    Route::get('laporantransaksikas', [LaporanController::class, 'laporantransaksikas'])->name('laporantransaksikas.index')->middleware('permission:view-laporan');
-    Route::get('export/laporantransaksikas', [LaporanController::class, 'laporantransaksikasExport'])->name('laporantransaksikas.export')->middleware('permission:view-laporan');
+    Route::get('laporantransaksitunai', [LaporanController::class, 'laporantransaksitunai'])->name('laporantransaksitunai.index')->middleware('permission:view-laporan');
+    Route::get('export/laporantransaksitunai', [LaporanController::class, 'laporantransaksitunaiExport'])->name('laporantransaksitunai.export')->middleware('permission:view-laporan');
     Route::get('laporantransaksibanks', [LaporanController::class, 'laporantransaksibanks'])->name('laporantransaksibanks.index')->middleware('permission:view-laporan');
     Route::get('export/laporantransaksibanks', [LaporanController::class, 'laporantransaksibanksExport'])->name('laporantransaksibanks.export')->middleware('permission:view-laporan');
     Route::get('laporankasbonkaryawans', [LaporanController::class, 'laporankasbonkaryawans'])->name('laporankasbonkaryawans.index')->middleware('permission:view-laporan');

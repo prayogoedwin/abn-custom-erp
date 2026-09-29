@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashbonKaryawan;
 use App\Models\CashbonSupplier;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
 use App\Models\Produk;
 use App\Models\Customer;
+use App\Models\Karyawan;
+use App\Models\Pengeluaran;
 use App\Models\Pengiriman;
 use App\Models\Stok;
 use App\Models\StokTitipan;
@@ -16,6 +19,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Supplier;
+use Illuminate\Support\Facades\DB;
 
 // 'active' => ['laporansuppliers*', 'laporancustomers*', 'laporanpembelians*', 'laporanpengirimans*', 'laporanpenjualans*', 'laporanstoks*', 'laporantitipanbarangs*', 'laporanbonsuppliers*', 'laporanritans*', 'laporantitipankecustomers*', 'laporantransaksikas*', 'laporantransaksibanks*', 'laporankasbonkaryawans*', 'laporantransaksipihakketigas*', 'laporanbiayas*', 'laporanrugilabas*'],
 // 'permission' => ['view-laporan'],
@@ -447,7 +451,7 @@ class LaporanController extends Controller
             return DataTables::of($ritans)
                 ->addColumn('detail', function ($ritan) {
                     $produkNames = $ritan->details->map(function ($detail) {
-                        return   ($detail->produk?->nama_produk ?? '-');
+                        return ($detail->produk?->nama_produk ?? '-');
                     })->toArray();
                     $content = implode('<br>', $produkNames);
                     return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
@@ -473,34 +477,187 @@ class LaporanController extends Controller
     {
         return view('laporan.comingsoon');
     }
-    public function laporantransaksikas(Request $request)
+    public function laporantransaksitunai(Request $request)
     {
         if ($request->ajax()) {
+
+            //ambil data Tunai dari table pengeluaran dan pembelian
+            $pengeluaran = Pengeluaran::where('metode_pembayaran', 'Tunai')
+                ->select([
+                    'id',
+                    'nama_pengeluaran as transaksi',
+                    'nominal',
+                    'created_at',
+                ])
+                ->selectRaw("'pengeluaran' as sumber");
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $pengeluaran->whereBetween('created_at', [$start, $end]);
+            }
+
+            $pembelian = Pembelian::whereNotNull('ambil_tunai')
+                ->where('ambil_tunai', '>', 0)
+                ->select([
+                    'id',
+                    'no_transaksi as transaksi',
+                    'ambil_tunai as nominal',
+                    'created_at',
+                ])
+                ->selectRaw("'pembelian' as sumber");
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $pembelian->whereBetween('created_at', [$start, $end]);
+            }
+
+            $query = $pengeluaran->unionAll($pembelian);
+
             
 
-            return DataTables::of($data)
-                ->editColumn('nominal_cashbon', function ($cashbonsupplier) {
+
+
+            return DataTables::of($query)
+                ->editColumn('nominal', function ($row) {
                     // Formats to: Rp 1.500.000 (0 decimals)
                     // rata kanan
-                    return '<div style="text-align: right;">' . number_format($cashbonsupplier->nominal_cashbon, 0, ',', '.') . '</div>';
+                    return '<div style="text-align: right;">' . number_format($row->nominal, 0, ',', '.') . '</div>';
                 })
 
-                ->editColumn('created_at', function ($cashbonsupplier) {
-                    return $cashbonsupplier->created_at->translatedFormat('d M Y');
+                ->filterColumn('transaksi', function ($query, $keyword) {
+                    $query->where('transaksi', 'like', "%{$keyword}%");
+                })
+
+                ->filterColumn('sumber', function ($query, $keyword) {
+                    $query->where('sumber', 'like', "%{$keyword}%");
+                })
+
+
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->translatedFormat('d M Y');
+                })
+                ->rawColumns(['nominal'])
+                ->make(true);
+        }
+
+        return view('laporan.transaksitunai');
+    }
+    public function laporantransaksibanks(Request $request)
+    {
+        if ($request->ajax()) {
+
+            //ambil data Tunai dari table pengeluaran dan pembelian
+            $pengeluaran = Pengeluaran::where('metode_pembayaran', 'Transfer')
+                ->select([
+                    'id',
+                    'nama_pengeluaran as transaksi',
+                    'nominal',
+                    'created_at',
+                ])
+                ->selectRaw("'pengeluaran' as sumber");
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $pengeluaran->whereBetween('created_at', [$start, $end]);
+            }
+
+            $pembelian = Pembelian::whereNotNull('ambil_transfer')
+                ->where('ambil_transfer', '>', 0)
+                ->select([
+                    'id',
+                    'no_transaksi as transaksi',
+                    'ambil_transfer as nominal',
+                    'created_at',
+                ])
+                ->selectRaw("'pembelian' as sumber");
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $pembelian->whereBetween('created_at', [$start, $end]);
+            }
+
+            $query = $pengeluaran->unionAll($pembelian);
+
+            
+
+
+
+            return DataTables::of($query)
+                ->editColumn('nominal', function ($row) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    // rata kanan
+                    return '<div style="text-align: right;">' . number_format($row->nominal, 0, ',', '.') . '</div>';
+                })
+
+                ->filterColumn('transaksi', function ($query, $keyword) {
+                    $query->where('transaksi', 'like', "%{$keyword}%");
+                })
+
+                ->filterColumn('sumber', function ($query, $keyword) {
+                    $query->where('sumber', 'like', "%{$keyword}%");
+                })
+
+
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->translatedFormat('d M Y');
+                })
+                ->rawColumns(['nominal'])
+                ->make(true);
+        }
+
+        return view('laporan.transaksibanks');
+    }
+    public function laporankasbonkaryawans(Request $request)
+    {
+        if ($request->ajax()) {
+            // dd('masuk ajax');
+
+            $kasbonKaryawans = CashbonKaryawan::with('karyawan')->whereNull('deleted_at');
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $kasbonKaryawans->whereBetween('cashbon_karyawans.created_at', [$start, $end]);
+            }
+
+            //filter karyawan
+            if ($request->filled('karyawan')) {
+                $karyawan = $request->karyawan;
+                $kasbonKaryawans->whereHas('karyawan', function ($q) use ($karyawan) {
+                    $q->where('id', $karyawan);
+                });
+            }
+
+            return DataTables::of($kasbonKaryawans)
+                ->editColumn('nominal_cashbon', function ($cashbonkaryawan) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    // rata kanan
+                    return '<div style="text-align: right;">' . number_format($cashbonkaryawan->nominal_cashbon, 0, ',', '.') . '</div>';
+                })
+
+                ->editColumn('created_at', function ($cashbonkaryawan) {
+                    return $cashbonkaryawan->created_at->translatedFormat('d M Y');
                 })
                 ->rawColumns(['nominal_cashbon'])
                 ->make(true);
         }
 
-        return view('laporan.transaksikas');
-    }
-    public function laporantransaksibanks()
-    {
-        return view('laporan.comingsoon');
-    }
-    public function laporankasbonkaryawans()
-    {
-        return view('laporan.comingsoon');
+        $karyawans = Karyawan::where('deleted_at', null)->get();
+        return view('laporan.kasbonkaryawans', compact('karyawans'));
     }
     public function laporantransaksipihakketigas()
     {

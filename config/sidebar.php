@@ -337,17 +337,10 @@ return [
                 'permission' => 'view-laporan',
             ],
             [
-                'title' => 'Transaksi Kas',
+                'title' => 'Transaksi Tunai',
                 'icon' => 'fas-file-invoice-dollar',
-                'route' => 'laporantransaksikas.index',
-                'active' => 'laporantransaksikas*',
-                'permission' => 'view-laporan',
-            ],
-            [
-                'title' => 'Transaksi Bank',
-                'icon' => 'fas-file-invoice-dollar',
-                'route' => 'laporantransaksibanks.index',
-                'active' => 'laporantransaksibanks*',
+                'route' => 'laporantransaksitunai.index',
+                'active' => 'laporantransaksitunai*',
                 'permission' => 'view-laporan',
             ],
             [
