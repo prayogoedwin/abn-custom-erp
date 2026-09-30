@@ -49,14 +49,34 @@ class LaporanController extends Controller
         return view('laporan.comingsoon');
     }
 
-    public function laporansuppliers()
+    public function laporansuppliers(Request $request)
     {
-        return view('laporan.comingsoon');
+        if (request()->ajax()) {
+            $suppliers = Supplier::whereNull('deleted_at');
+
+            return DataTables::of($suppliers)
+                ->editColumn('created_at', function ($supplier) {
+                    return $supplier->created_at->translatedFormat('d M Y');
+                })
+                ->make(true);
+        }
+
+        return view('laporan.suppliers');
     }
 
-    public function laporancustomers()
+    public function laporancustomers(Request $request)
     {
-        return view('laporan.comingsoon');
+        if (request()->ajax()) {
+            $customers = Customer::whereNull('deleted_at');
+
+            return DataTables::of($customers)
+                ->editColumn('created_at', function ($customer) {
+                    return $customer->created_at->translatedFormat('d M Y');
+                })
+                ->make(true);
+        }
+
+        return view('laporan.customers');
     }
     public function laporanpembelians(Request $request)
     {
