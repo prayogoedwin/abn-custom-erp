@@ -720,6 +720,8 @@ class LaporanController extends Controller
     }
     public function laporanrugilabas(Request $request)
     {
+
+
         if ($request->ajax()) {
             //ambil data Tunai dari table pengeluaran dan pembelian
             $pengeluaran = Pengeluaran::select([
@@ -742,9 +744,24 @@ class LaporanController extends Controller
 
                 ->selectRaw("'pembelian' as sumber");
 
-            //TODO: Add Penjualan data to the report
-            $penjualan = Penjualan::query();
-                
+            $penjualan = Penjualan::query()
+                ->select([
+                    'penjualans.id as id',
+                    'penjualans.no_transaksi_penjualan as transaksi',
+                ])
+                ->selectSub(
+                    PenjualanDetail::query()
+                        ->selectRaw('COALESCE(SUM(nominal_akhir), 0)')
+                        ->whereColumn(
+                            'penjualan_details.penjualan_id',
+                            'penjualans.id'
+                        ),
+                    'nominal'
+                )
+                ->selectRaw('penjualans.created_at as created_at')
+                ->selectRaw("'penjualan' as sumber");
+
+
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
@@ -758,27 +775,49 @@ class LaporanController extends Controller
 
             $query = $pengeluaran->unionAll($pembelian)->unionAll($penjualan);
 
-            $totalNominalFromPengeluaran = $pengeluaran->sum('nominal');
-            $totalNominalFromPembelian = $pembelian->sum('total_nominal_terbayar');
-            $totalNominalFromPenjualan = $penjualan->sum('TotalNominalAkhir');
-            $totalNominal = $totalNominalFromPengeluaran + $totalNominalFromPembelian + $totalNominalFromPenjualan;
+            // Bungkus UNION sebagai subquery
+
+            
+            
+
+            $totals = DB::query()
+                ->fromSub($query, 'laporan')
+                ->selectRaw('sumber, SUM(nominal) as total')
+                ->groupBy('sumber')
+                ->pluck('total', 'sumber');
+
+            $query = DB::query()
+                ->fromSub($query, 'laporan')
+                ;
+
+            $totalPenjualan   = (float) ($totals['penjualan'] ?? 0);
+            $totalPembelian   = (float) ($totals['pembelian'] ?? 0);
+            $totalPengeluaran = (float) ($totals['pengeluaran'] ?? 0);
+
+            $totalNominal = $totalPenjualan - $totalPembelian - $totalPengeluaran;
 
 
             return DataTables::of($query)
+                ->filterColumn('transaksi', function ($query, $keyword) {
+                    $query->where('transaksi', 'like', "%{$keyword}%");
+                })
+                ->filterColumn('sumber', function ($query, $keyword) {
+                    $query->where('sumber', 'like', "%{$keyword}%");
+                })
                 ->editColumn('nominal', function ($row) {
                     // Formats to: Rp 1.500.000 (0 decimals)
                     // rata kanan
-                    return '<div style="text-align: right;">' . number_format($row->nominal, 0, ',', '.') . '</div>';
+                    return '<div style="text-align: right;">' . number_format((float) $row->nominal, 0, ',', '.') . '</div>';
                 })
 
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at->translatedFormat('d M Y');
+                    return Carbon::parse($row->created_at)->translatedFormat('d M Y');
                 })
                 ->rawColumns(['nominal'])
                 ->with([
                     'total_nominal' => $totalNominal,
-                    'total_nominal_pengeluaran' => $totalNominalFromPengeluaran + $totalNominalFromPembelian,
-                    'total_nominal_pemasukan' => $totalNominalFromPenjualan,
+                    'total_nominal_pengeluaran' => $totalPengeluaran + $totalPembelian,
+                    'total_nominal_pemasukan' => $totalPenjualan,
                 ])
 
                 ->make(true);

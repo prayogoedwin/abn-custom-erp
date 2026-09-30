@@ -97,7 +97,7 @@
 
         <div class="grid grid-cols-1  gap-4 p-5">
             <div class="bg-blue-600 rounded-lg p-5 text-white shadow-sm">
-                <p class="text-blue-100 text-sm font-medium uppercase">Total Nominal</p>
+                <p class="text-blue-100 text-sm font-medium uppercase">Total Laba</p>
                 <h3 class="text-2xl font-bold mt-1" id="totalNominal">Rp 0</h3>
             </div>
 
@@ -173,7 +173,7 @@
                 columns: [{
                         data: 'transaksi',
                         name: 'transaksi',
-                        searchable: false,
+                        searchable: true,
 
                     },
                     {
@@ -183,7 +183,7 @@
                     {
                         data: 'sumber',
                         name: 'sumber',
-                        searchable: false,
+                        searchable: true,
                     },
                     {
                         data: 'created_at',
