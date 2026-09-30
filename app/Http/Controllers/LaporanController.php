@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Supplier;
+use App\Models\TitipSupplier;
 use Illuminate\Support\Facades\DB;
 
 // 'active' => ['laporansuppliers*', 'laporancustomers*', 'laporanpembelians*', 'laporanpengirimans*', 'laporanpenjualans*', 'laporanstoks*', 'laporantitipanbarangs*', 'laporanbonsuppliers*', 'laporanritans*', 'laporantitipankecustomers*', 'laporantransaksikas*', 'laporantransaksibanks*', 'laporankasbonkaryawans*', 'laporantransaksipihakketigas*', 'laporanbiayas*', 'laporanrugilabas*'],
@@ -474,9 +475,36 @@ class LaporanController extends Controller
         $barangs = Produk::where('deleted_at', null)->get();
         return view('laporan.ritans', compact('customers', 'barangs'));
     }
-    public function laporantitipankecustomers()
+    public function laporantitipankecustomers(Request $request)
     {
-        return view('laporan.comingsoon');
+        if (request()->ajax()) {
+            $query = TitipSupplier::with('supplier')
+                ;
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $query->whereBetween('created_at', [$start, $end]);
+            }
+
+            return datatables()->of($query)
+                ->editColumn('nominal_titip', function ($titipSupplier) {
+                    // Formats to: Rp 1.500.000 (0 decimals)
+                    return number_format($titipSupplier->nominal_titip, 0, ',', '.');
+                })
+                ->addColumn('supplier', function ($row) {
+                    return $row->supplier->nama;
+                })
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->translatedFormat('d M Y');
+                })
+            
+                ->make(true);
+        }
+
+        return view('laporan.titipankecustomers');
     }
     public function laporantransaksitunai(Request $request)
     {
