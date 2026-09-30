@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\CashbonKaryawan;
+use App\Models\CashbonPihak3;
+use App\Models\CashbonPihak3Pembayaran;
 use App\Models\CashbonSupplier;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
@@ -680,9 +682,55 @@ class LaporanController extends Controller
         $karyawans = Karyawan::where('deleted_at', null)->get();
         return view('laporan.kasbonkaryawans', compact('karyawans'));
     }
-    public function laporantransaksipihakketigas()
+    public function laporantransaksipihakketigas(Request $request)
     {
-        return view('laporan.comingsoon');
+        if ($request->ajax()) {
+
+            $cashbon = CashbonPihak3::with('pihak3')
+            ->select([
+                'id',
+                'pihak3_id',
+                'nominal_cashbon as nominal',
+                'keterangan',
+                'created_at',
+            ])
+            ->selectRaw("'cashbon' as sumber");
+            
+            $pembayaran = CashbonPihak3Pembayaran::with('pihak3')
+            ->select([
+                'id',
+                'pihak3_id',
+                
+                'nominal_bayar as nominal',
+                'keterangan',
+                'created_at',
+            ])
+            ->selectRaw("'pembayaran' as sumber");
+
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $cashbon->whereBetween('created_at', [$start, $end]);
+                $pembayaran->whereBetween('created_at', [$start, $end]);
+            }
+
+            $query = $cashbon->unionAll($pembayaran);
+
+            return DataTables::of($query)
+                ->editColumn('nominal', function ($row) {
+                    return '<div style="text-align: right;">' . number_format($row->nominal, 0, ',', '.') . '</div>';
+                })
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->translatedFormat('d M Y');
+                })
+                ->rawColumns(['nominal'])
+                ->make(true);
+        }
+
+        return view('laporan.transaksipihakketigas');
     }
     public function laporanbiayas(Request $request)
     {

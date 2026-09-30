@@ -10,6 +10,7 @@ class Pengeluaran extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'pihak3_id',
         'kategori_pengeluaran_id',
         'nama_pengeluaran',
         'tanggal',
@@ -20,6 +21,11 @@ class Pengeluaran extends Model
         'updated_by',
         'deleted_by',
     ];
+
+    public function pihak3()
+    {
+        return $this->belongsTo(Pihak3::class, 'pihak3_id');
+    }
 
     public function kategoriPengeluaran()
     {

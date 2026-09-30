@@ -22,8 +22,8 @@
         </div>
         <div class="flex gap-2">
             @if(auth()->user()->hasPermission('edit-' . $tablename))
-            <a href="{{ route($tablename . '.edit', $pengiriman->id) }}">
-                <x-button type="primary">{{ __('Edit Pengiriman') }}</x-button>
+            <a href="{{ route($tablename . '.edit', $pengeluaran->id) }}">
+                <x-button type="primary">{{ __('Edit Pengeluaran') }}</x-button>
             </a>
             @endif
             <a href="{{ route($tablename . '.index') }}">
@@ -43,10 +43,22 @@
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nama Pengeluaran</label>
                             <div class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $pengeluaran->nama_pengeluaran }}</div>
                         </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Pihak 3</label>
+                            <div class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $pengeluaran->pihak3 ? $pengeluaran->pihak3->nama : 'Tidak Ada' }}</div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kategori</label>
+                            <div class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $pengeluaran->kategoriPengeluaran ? $pengeluaran->kategoriPengeluaran->nama_kategori : 'Tidak Ada' }}</div>
+                        </div>
                         
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tanggal</label>
                             <div class="text-md font-semibold text-gray-900 dark:text-gray-100">{{ $pengeluaran->created_at->format('d F Y H:i') }}</div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Keterangan</label>
+                            <div class="text-md font-semibold text-gray-900 dark:text-gray-100">{{ $pengeluaran->keterangan ?? 'Tidak Ada' }}</div>
                         </div>
                     </div>
                 </div>

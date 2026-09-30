@@ -7,6 +7,7 @@ use App\Models\KategoriPengeluaran;
 use App\Models\Pengeluaran;
 use App\Models\Customer;
 use App\Exports\PengeluaranExport;
+use App\Models\Pihak3;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Validator;
@@ -37,6 +38,7 @@ class PengeluaranController extends Controller
 
 
         $kategori_pengeluaran = KategoriPengeluaran::where('deleted_at', null)->get();
+        $pihak3s = Pihak3::where('deleted_at', null)->get();
         // dd($suppliers);
 
         $pagedata = [
@@ -45,6 +47,13 @@ class PengeluaranController extends Controller
             'tableaction' => true,
             'columns' => [
                 ['name' => 'nama_pengeluaran', 'value' => 'nama_pengeluaran',  'title' => 'Nama Pengeluaran', 'type' => 'text', 'inform' => true, 'inshow' => true, 'intable' => true, 'required' => true],
+                ['name' => 'pihak3_id', 'value' => 'pihak3',  'title' => 'Pihak 3', 'type' => 'select', 'inform' => true, 'intable' => false, 'required' => false, 'options' => [
+                    // Ambil data pihak3 dari database
+                    ['value' => null, 'label' => 'Tidak Ada'],
+                    ...$pihak3s->map(function ($pihak3) {
+                        return ['value' => $pihak3->id, 'label' => $pihak3->nama];
+                    })->toArray(),
+                ]],
                 ['name' => 'kategori_pengeluaran_id', 'value' => 'kategori_pengeluaran',  'title' => 'Kategori Pengeluaran', 'type' => 'select', 'inform' => true, 'intable' => true, 'required' => true, 'options' => [
                     // Ambil data kategori dari database
 
@@ -144,12 +153,14 @@ class PengeluaranController extends Controller
 
         $store_data = [
             'nama_pengeluaran' => $request->input('nama_pengeluaran'),
+            'pihak3_id' => $request->input('pihak3_id') ?? null,
             'kategori_pengeluaran_id' => $request->input('kategori_pengeluaran_id'),
             'tanggal' => $request->input('tanggal'),
             'nominal' => $request->input('nominal'),
             'metode_pembayaran' => $request->input('metode_pembayaran'),
             'keterangan' => $request->input('keterangan'),
             'created_by' => auth()->id(),
+            
         ];
 
         //$store_data['no_transaksi'] = terjadi di model
@@ -163,6 +174,7 @@ class PengeluaranController extends Controller
             'nominal' => ['required', 'numeric'],
             'metode_pembayaran' => ['nullable', 'string', 'max:255'],
             'keterangan' => ['nullable', 'string', 'max:255'],
+            'pihak3_id' => ['nullable', 'integer'],
             'created_by' => ['required', 'integer']
         ]);
 
@@ -212,6 +224,7 @@ class PengeluaranController extends Controller
         // dd("current user id: " . $current_user_id);
         $store_data = [
             'nama_pengeluaran' => $request->input('nama_pengeluaran'),
+            'pihak3_id' => $request->input('pihak3_id') ?? null,
             'kategori_pengeluaran_id' => $request->input('kategori_pengeluaran_id'),
             'tanggal' => $request->input('tanggal'),
             'nominal' => $request->input('nominal'),
@@ -226,6 +239,7 @@ class PengeluaranController extends Controller
 
         $validate = Validator::make($store_data, [
             'nama_pengeluaran' => ['required', 'string', 'max:255'],
+            'pihak3_id' => ['nullable', 'integer'],
             'kategori_pengeluaran_id' => ['required', 'integer'],
             'tanggal' => ['required', 'date'],
             'nominal' => ['required', 'numeric'],
