@@ -91,7 +91,7 @@ return [
     [
         'title' => 'Cashbon',
         'icon' => 'fas-money-bill-wave',
-        'active' => ['cashbonkaryawans*', 'cashbonkaryawanpembayarans*', 'cashbonsuppliers*', 'cashbonsupplierpembayarans*'],
+        'active' => ['cashbonkaryawans*', 'cashbonkaryawanpembayarans*', 'cashbonsuppliers*', 'cashbonsupplierpembayarans*', 'cashbonpihak3s*', 'cashbonpihak3pembayarans*'],
         'permission' => ['view-cashbonkaryawans', 'view-cashbonsuppliers'],
         'children' => [
             [
@@ -131,6 +131,26 @@ return [
                         'route' => 'cashbonsupplierpembayarans.index',
                         'active' => 'cashbonsupplierpembayarans*',
                         'permission' => 'view-cashbonsuppliers',
+                    ],
+                ],
+            ],
+            [
+                'title' => 'Pihak 3',
+                'icon' => 'fas-person',
+                'active' => ['cashbonpihak3s*', 'cashbonpihak3pembayarans*'],
+                'permission' => 'view-cashbonpihak3s',
+                'children' => [
+                    [
+                        'title' => '-- Cashbon',
+                        'route' => 'cashbonpihak3s.index',
+                        'active' => 'cashbonpihak3s*',
+                        'permission' => 'view-cashbonpihak3s',
+                    ],
+                    [
+                        'title' => '-- Pembayaran Cashbon',
+                        'route' => 'cashbonpihak3pembayarans.index',
+                        'active' => 'cashbonpihak3pembayarans*',
+                        'permission' => 'view-cashbonpihak3s',
                     ],
                 ],
             ],

@@ -5,6 +5,8 @@ use App\Http\Controllers\AmbilSupplierController;
 use App\Http\Controllers\BackupRestoreController;
 use App\Http\Controllers\CashbonKaryawanController;
 use App\Http\Controllers\CashbonKaryawanPembayaranController;
+use App\Http\Controllers\CashbonPihak3Controller;
+use App\Http\Controllers\CashbonPihak3PembayaranController;
 use App\Http\Controllers\CashbonSupplierController;
 use App\Http\Controllers\CashbonSupplierPembayaranController;
 use App\Http\Controllers\CustomerController;
@@ -369,6 +371,26 @@ Route::middleware(['auth'])->group(function () {
     Route::put('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CashbonSupplierPembayaranController::class, 'update'])->name('cashbonsupplierpembayarans.update')->middleware('permission:edit-cashbonsupplierpembayarans');
     Route::delete('cashbonsupplierpembayarans/{cashbonsupplierpembayaran}', [CashbonSupplierPembayaranController::class, 'destroy'])->name('cashbonsupplierpembayarans.destroy')->middleware('permission:delete-cashbonsupplierpembayarans');
     //=============================================================================================================
+
+    //Cashbon Pihak 3==================================================================================================
+    Route::get('cashbonpihak3s', [CashbonPihak3Controller::class, 'index'])->name('cashbonpihak3s.index')->middleware('permission:view-cashbonpihak3s');
+    Route::get('cashbonpihak3s/export', [CashbonPihak3Controller::class, 'export'])->name('cashbonpihak3s.export')->middleware('permission:download-cashbonpihak3s');
+    Route::get('cashbonpihak3s/create', [CashbonPihak3Controller::class, 'create'])->name('cashbonpihak3s.create')->middleware('permission:create-cashbonpihak3s');
+    Route::post('cashbonpihak3s', [CashbonPihak3Controller::class, 'store'])->name('cashbonpihak3s.store')->middleware('permission:create-cashbonpihak3s');
+    Route::get('cashbonpihak3s/{cashbonpihak3}', [CashbonPihak3Controller::class, 'show'])->name('cashbonpihak3s.show')->middleware('permission:show-cashbonpihak3s');
+    Route::get('cashbonpihak3s/{cashbonpihak3}/edit', [CashbonPihak3Controller::class, 'edit'])->name('cashbonpihak3s.edit')->middleware('permission:edit-cashbonpihak3s');
+    Route::put('cashbonpihak3s/{cashbonpihak3}', [CashbonPihak3Controller::class, 'update'])->name('cashbonpihak3s.update')->middleware('permission:edit-cashbonpihak3s');
+    Route::delete('cashbonpihak3s/{cashbonpihak3}', [CashbonPihak3Controller::class, 'destroy'])->name('cashbonpihak3s.destroy')->middleware('permission:delete-cashbonpihak3s');
+
+    //pembayaran
+    Route::get('cashbonpihak3pembayarans', [CashbonPihak3PembayaranController::class, 'index'])->name('cashbonpihak3pembayarans.index')->middleware('permission:view-cashbonpihak3pembayarans');
+    Route::get('cashbonpihak3pembayarans/export', [CashbonPihak3PembayaranController::class, 'export'])->name('cashbonpihak3pembayarans.export')->middleware('permission:download-cashbonpihak3pembayarans');
+    Route::get('cashbonpihak3pembayarans/create', [CashbonPihak3PembayaranController::class, 'create'])->name('cashbonpihak3pembayarans.create')->middleware('permission:create-cashbonpihak3pembayarans');
+    Route::post('cashbonpihak3pembayarans', [CashbonPihak3PembayaranController::class, 'store'])->name('cashbonpihak3pembayarans.store')->middleware('permission:create-cashbonpihak3pembayarans');
+    Route::get('cashbonpihak3pembayarans/{cashbonpihak3pembayaran}', [CashbonPihak3PembayaranController::class, 'show'])->name('cashbonpihak3pembayarans.show')->middleware('permission:show-cashbonpihak3pembayarans');
+    Route::get('cashbonpihak3pembayarans/{cashbonpihak3pembayaran}/edit', [CashbonPihak3PembayaranController::class, 'edit'])->name('cashbonpihak3pembayarans.edit')->middleware('permission:edit-cashbonpihak3pembayarans');
+    Route::put('cashbonpihak3pembayarans/{cashbonpihak3pembayaran}', [CashbonPihak3PembayaranController::class, 'update'])->name('cashbonpihak3pembayarans.update')->middleware('permission:edit-cashbonpihak3pembayarans');
+    Route::delete('cashbonpihak3pembayarans/{cashbonpihak3pembayaran}', [CashbonPihak3PembayaranController::class, 'destroy'])->name('cashbonpihak3pembayarans.destroy')->middleware('permission:delete-cashbonpihak3pembayarans');
 
 
     //Titipan supplier==================================================================================================
