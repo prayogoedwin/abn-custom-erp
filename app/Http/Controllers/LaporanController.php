@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\Laporan\PembelianExport;
 use App\Models\CashbonKaryawan;
 use App\Models\CashbonPihak3;
 use App\Models\CashbonPihak3Pembayaran;
@@ -24,24 +25,12 @@ use Illuminate\Http\RedirectResponse;
 use App\Models\Supplier;
 use App\Models\TitipSupplier;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 // 'active' => ['laporansuppliers*', 'laporancustomers*', 'laporanpembelians*', 'laporanpengirimans*', 'laporanpenjualans*', 'laporanstoks*', 'laporantitipanbarangs*', 'laporanbonsuppliers*', 'laporanritans*', 'laporantitipankecustomers*', 'laporantransaksikas*', 'laporantransaksibanks*', 'laporankasbonkaryawans*', 'laporantransaksipihakketigas*', 'laporanbiayas*', 'laporanrugilabas*'],
 // 'permission' => ['view-laporan'],
 class LaporanController extends Controller
 {
-    private function toIntMoney(mixed $value): int
-    {
-        if (is_null($value) || $value === '') {
-            return 0;
-        }
-
-        if (is_numeric($value)) {
-            return (int) round((float) $value);
-        }
-
-        $cleaned = preg_replace('/[^\d\-]/', '', (string) $value);
-        return $cleaned === '' || $cleaned === '-' ? 0 : (int) $cleaned;
-    }
 
     public function index()
     {
@@ -148,10 +137,61 @@ class LaporanController extends Controller
         $barangs = Produk::all();
         return view('laporan.pembelians', compact('suppliers', 'barangs'));
     }
-    public function laporanpengirimans()
+
+    public function laporanpembeliansExport(Request $request)
     {
-        return view('laporan.comingsoon');
+        $query = Pembelian::with('supplier', 'details.produk')->whereNull('deleted_at');
+
+        //filter tanggal
+        if ($request->filled(['startdate', 'enddate'])) {
+            $start = Carbon::parse($request->startdate)->startOfDay();
+            $end   = Carbon::parse($request->enddate)->endOfDay();
+
+            $query->whereBetween('created_at', [$start, $end]);
+        }
+
+        //filter supplier
+        if ($request->filled('supplier')) {
+            $supplier = $request->supplier;
+            $query->where('supplier_id', $supplier);
+        }
+
+        //filter barang
+        if ($request->filled('barang')) {
+            $barang = $request->barang;
+            $query->whereHas('details.produk', function ($q) use ($barang) {
+                $q->where('id', $barang);
+            });
+        }
+
+        $data = $query->get();
+
+        $data->transform(function ($pembelian) {
+            $pembelian->produk_list = $pembelian->details->map(function ($detail) {
+                return '[' . $detail->tipe_transaksi_pembelian . '] ' . ($detail->produk?->nama_produk ?? '-');
+            })->implode(', ');
+            return $pembelian;
+        });
+
+        $data->transform(function ($pembelian) {
+            $pembelian->kekurangan = number_format($pembelian->kekurangan, 0, ',', '.');
+            return $pembelian;
+        });
+
+        $data->transform(function ($pembelian) {
+            $pembelian->created_at = $pembelian->created_at->translatedFormat('d M Y');
+            return $pembelian;
+        });
+
+        $data->transform(function ($pembelian) {
+            $pembelian->supplier = $pembelian->supplier?->nama ?? '-';
+            return $pembelian;
+        });
+        // dd($data);
+
+        return Excel::download(new PembelianExport($data), 'pembelians-' . date('Y-m-d') . '.xlsx');
     }
+
     public function laporanpenjualans(Request $request)
     {
         if ($request->ajax()) {
@@ -500,8 +540,7 @@ class LaporanController extends Controller
     public function laporantitipankecustomers(Request $request)
     {
         if (request()->ajax()) {
-            $query = TitipSupplier::with('supplier')
-                ;
+            $query = TitipSupplier::with('supplier');
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
@@ -522,7 +561,7 @@ class LaporanController extends Controller
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->translatedFormat('d M Y');
                 })
-            
+
                 ->make(true);
         }
 
@@ -707,25 +746,25 @@ class LaporanController extends Controller
         if ($request->ajax()) {
 
             $cashbon = CashbonPihak3::with('pihak3')
-            ->select([
-                'id',
-                'pihak3_id',
-                'nominal_cashbon as nominal',
-                'keterangan',
-                'created_at',
-            ])
-            ->selectRaw("'cashbon' as sumber");
-            
+                ->select([
+                    'id',
+                    'pihak3_id',
+                    'nominal_cashbon as nominal',
+                    'keterangan',
+                    'created_at',
+                ])
+                ->selectRaw("'cashbon' as sumber");
+
             $pembayaran = CashbonPihak3Pembayaran::with('pihak3')
-            ->select([
-                'id',
-                'pihak3_id',
-                
-                'nominal_bayar as nominal',
-                'keterangan',
-                'created_at',
-            ])
-            ->selectRaw("'pembayaran' as sumber");
+                ->select([
+                    'id',
+                    'pihak3_id',
+
+                    'nominal_bayar as nominal',
+                    'keterangan',
+                    'created_at',
+                ])
+                ->selectRaw("'pembayaran' as sumber");
 
 
             //filter tanggal
@@ -873,8 +912,8 @@ class LaporanController extends Controller
 
             // Bungkus UNION sebagai subquery
 
-            
-            
+
+
 
             $totals = DB::query()
                 ->fromSub($query, 'laporan')
@@ -883,8 +922,7 @@ class LaporanController extends Controller
                 ->pluck('total', 'sumber');
 
             $query = DB::query()
-                ->fromSub($query, 'laporan')
-                ;
+                ->fromSub($query, 'laporan');
 
             $totalPenjualan   = (float) ($totals['penjualan'] ?? 0);
             $totalPembelian   = (float) ($totals['pembelian'] ?? 0);
