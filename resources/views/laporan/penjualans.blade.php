@@ -166,6 +166,7 @@
                         d.barang = $('#barang').val();
                     }
                 },
+                //columns : no_transaksi_penjualan, customer, created_at, detail
                 columns: [{
                         data: 'no_transaksi_penjualan',
                         name: 'no_transaksi_penjualan'

@@ -159,6 +159,7 @@
                         return json.data;
                     },
                 },
+                //columns : transaksi, nominal, sumber, created_at
                 columns: [{
                         data: 'transaksi',
                         name: 'transaksi',

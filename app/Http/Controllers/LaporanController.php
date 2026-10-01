@@ -257,6 +257,8 @@ class LaporanController extends Controller
         $barangs = Produk::all();
         return view('laporan.penjualans', compact('customers', 'barangs'));
     }
+
+
     public function laporanstoks(Request $request)
     {
         if ($request->ajax()) {

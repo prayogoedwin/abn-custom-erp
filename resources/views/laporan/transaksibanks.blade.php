@@ -131,6 +131,7 @@
                         d.enddate = $('#enddate').val();
                     }
                 },
+                //columns : transaksi, nominal, sumber, created_at
                 columns: [{
                         data: 'transaksi',
                         name: 'transaksi',

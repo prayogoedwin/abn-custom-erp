@@ -173,6 +173,7 @@
                         d.barang = $('#barang').val();
                     }
                 },
+                //columns : produk.nama_produk, sumber, tipe_stok, jenis_stok, jumlah, harga, relasi, created_at
                 columns: [{
                         data: 'produk.nama_produk',
                         name: 'produk.nama_produk'

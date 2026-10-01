@@ -70,6 +70,7 @@
                     url: '{{ route("laporansuppliers.index") }}',
                     
                 },
+                //columns : nama, kontak, alamat, created_at
                 columns: [{
                         data: 'nama',
                         name: 'nama',

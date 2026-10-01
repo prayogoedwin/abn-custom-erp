@@ -166,6 +166,7 @@
                         d.barang = $('#barang').val();
                     }
                 },
+                //columns : produk.nama_produk, supplier.nama, tipe_stok, jumlah, keterangan, created_at
                 columns: [{
                         data: 'produk.nama_produk',
                         name: 'produk.nama_produk'

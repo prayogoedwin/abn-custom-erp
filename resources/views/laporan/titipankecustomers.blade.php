@@ -131,6 +131,7 @@
                         d.enddate = $('#enddate').val();
                     }
                 },
+                //columns : supplier, nominal_titip, keterangan, created_at
                 columns: [{
                         data: 'supplier',
                         name: 'supplier',

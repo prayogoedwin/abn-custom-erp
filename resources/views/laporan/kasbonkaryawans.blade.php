@@ -153,6 +153,7 @@
 
                     }
                 },
+                //columns : karyawan.nama, nominal_cashbon, keterangan, created_at
                 columns: [{
                         data: 'karyawan.nama',
                         name: 'karyawan.nama'

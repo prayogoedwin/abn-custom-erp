@@ -132,6 +132,7 @@
                         d.enddate = $('#enddate').val();
                     }
                 },
+                //columns : pihak3.nama, sumber, nominal, created_at
                 columns: [{
                         data: 'pihak3.nama',
                         name: 'pihak3.nama',
