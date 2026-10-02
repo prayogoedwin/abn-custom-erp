@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\Laporan\BiayaExport;
+use App\Exports\Laporan\RugiLabaExport;
 use App\Exports\LaporanExport;
 use App\Models\CashbonKaryawan;
 use App\Models\CashbonPihak3;
@@ -29,7 +31,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 
-    /* ======================================================================
+/* ======================================================================
      |  HELPER
      * ====================================================================== */
 
@@ -76,6 +78,34 @@ class LaporanExportController extends Controller
                 $this->formatTanggal($row->created_at),
             ]);
     }
+
+    private function periodeLabel(Request $request): array
+    {
+        if ($request->filled(['startdate', 'enddate'])) {
+            return [
+                Carbon::parse($request->startdate)->translatedFormat('d M Y'),
+                Carbon::parse($request->enddate)->translatedFormat('d M Y'),
+            ];
+        }
+
+        return ['Semua', 'Semua'];
+    }
+
+    /** Hasil UNION -> collection array asosiatif [transaksi, nominal, sumber, tanggal] */
+    private function unionRowsAssoc($unionQuery): Collection
+    {
+        return DB::query()
+            ->fromSub($unionQuery, 'laporan')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn($row) => [
+                'transaksi' => $row->transaksi,
+                'nominal'   => (float) $row->nominal,
+                'sumber'    => ucfirst($row->sumber), // Pengeluaran | Pembelian | Penjualan
+                'tanggal'   => $this->formatTanggal($row->created_at),
+            ]);
+    }
+
 
     /* ======================================================================
      |  SUPPLIER
@@ -472,14 +502,19 @@ class LaporanExportController extends Controller
         $this->applyDateFilter($pengeluaran, $request);
         $this->applyDateFilter($pembelian, $request);
 
-        $rows = $this->rowsFromUnion($pengeluaran->unionAll($pembelian));
+        $rows = $this->unionRowsAssoc($pengeluaran->unionAll($pembelian));
 
-        return $this->downloadLaporan(
-            'biayas',
-            ['Transaksi', 'Nominal', 'Sumber', 'Tanggal'],
-            $rows
+        $totalPengeluaran = (float) $rows->where('sumber', 'Pengeluaran')->sum('nominal');
+        $totalPembelian   = (float) $rows->where('sumber', 'Pembelian')->sum('nominal');
+
+        [$start, $end] = $this->periodeLabel($request);
+
+        return Excel::download(
+            new BiayaExport($rows, $start, $end, $totalPengeluaran, $totalPembelian),
+            'biayas-' . date('Y-m-d') . '.xlsx'
         );
     }
+
 
     /* ======================================================================
      |  RUGI LABA
@@ -512,14 +547,19 @@ class LaporanExportController extends Controller
         $this->applyDateFilter($pembelian, $request);
         $this->applyDateFilter($penjualan, $request, 'penjualans.created_at');
 
-        $rows = $this->rowsFromUnion(
+        $rows = $this->unionRowsAssoc(
             $pengeluaran->unionAll($pembelian)->unionAll($penjualan)
         );
 
-        return $this->downloadLaporan(
-            'rugi-laba',
-            ['Transaksi', 'Nominal', 'Sumber', 'Tanggal'],
-            $rows
+        $totalPemasukan   = (float) $rows->where('sumber', 'Penjualan')->sum('nominal');
+        $totalPengeluaran = (float) $rows->where('sumber', 'Pembelian')->sum('nominal')
+            + (float) $rows->where('sumber', 'Pengeluaran')->sum('nominal');
+
+        [$start, $end] = $this->periodeLabel($request);
+
+        return Excel::download(
+            new RugiLabaExport($rows, $start, $end, $totalPemasukan, $totalPengeluaran),
+            'rugi-laba-' . date('Y-m-d') . '.xlsx'
         );
     }
 }

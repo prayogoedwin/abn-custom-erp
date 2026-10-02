@@ -826,10 +826,12 @@ class LaporanController extends Controller
                 $pengeluaran->whereBetween('created_at', [$start, $end]);
             }
 
-            $query = $pengeluaran->unionAll($pembelian);
-
             $totalNominalFromPengeluaran = $pengeluaran->sum('nominal');
             $totalNominalFromPembelian = $pembelian->sum('total_nominal_terbayar');
+
+            $query = $pengeluaran->unionAll($pembelian);
+
+            
             $totalNominal = $totalNominalFromPengeluaran + $totalNominalFromPembelian;
 
 
