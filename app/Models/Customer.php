@@ -11,6 +11,7 @@ class Customer extends Model
         'nama',
         'kontak',
         'alamat',
+        'npwp',
         'isactive',
         'created_by',
         'updated_by',

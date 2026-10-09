@@ -25,6 +25,7 @@ class CustomerController extends Controller
                 
                 ['name' => 'kontak', 'value' => 'kontak', 'title' => 'Kontak', 'type' => 'text', 'inform' => true, 'intable' => true],
                 ['name' => 'alamat', 'value' => 'alamat', 'title' => 'Alamat', 'type' => 'text', 'inform' => true, 'intable' => true],
+                ['name' => 'npwp', 'value' => 'npwp', 'title' => 'NPWP', 'type' => 'text', 'inform' => true, 'intable' => true],
                 
             ],
         ];
@@ -37,8 +38,8 @@ class CustomerController extends Controller
         // dd($request->headers->all());
         if ($request->ajax()) {
             // dd('masuk ajax');
-            $customers = Customer::where('customers.isactive', true)
-                ->get();
+            $customers = Customer::where('customers.isactive', true);
+                
             // dd($customers);
 
             return DataTables::of($customers)
@@ -104,7 +105,7 @@ class CustomerController extends Controller
             'nama' => $request->input('nama'),
             'kontak' => $request->input('kontak'),
             'alamat' => $request->input('alamat'),
-            
+            'npwp' => $request->input('npwp'),
             'created_by' => auth()->id(),
         ];
 
@@ -113,6 +114,7 @@ class CustomerController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'kontak' => ['required'],
             'alamat' => ['required', 'string', 'max:50'],
+            'npwp' => ['nullable', 'string', 'max:50'],
             
             'created_by' => ['required', 'integer']
         ]);
@@ -182,7 +184,7 @@ class CustomerController extends Controller
             'nama' => $request->input('nama'),
             'kontak' => $request->input('kontak'),
             'alamat' => $request->input('alamat'),
-            
+            'npwp' => $request->input('npwp'),
             'updated_by' => auth()->id(),
         ];
 
@@ -191,7 +193,7 @@ class CustomerController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'kontak' => ['required'],
             'alamat' => ['required', 'string', 'max:50'],
-            
+            'npwp' => ['nullable', 'string', 'max:50'],
             'updated_by' => ['required', 'integer']
         ]);
 
