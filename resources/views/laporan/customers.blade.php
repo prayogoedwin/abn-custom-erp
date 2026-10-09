@@ -6,22 +6,28 @@
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
+        <a href="{{ route('laporancustomers.index') }}"
+            class="text-blue-600 dark:text-blue-400 hover:underline">{{ __('Laporan') }}</a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
         <a href="#"
             class="text-blue-600 dark:text-blue-400 hover:underline">{{ __('Laporan') }}</a>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2 text-gray-400" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-        <span class="text-gray-500 dark:text-gray-400">{{ __('Laporan Data Supplier') }}</span>
+        <span class="text-gray-500 dark:text-gray-400">{{ __('Laporan Data Customer') }}</span>
     </div>
 
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Laporan Data Supplier') }}</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage System Laporan Data Supplier') }}</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Laporan Data Customer') }}</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage System Laporan Data Customer') }}</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('laporansuppliers.export') }}">
+            <a href="{{ route('laporancustomers.export') }}">
                 <x-button type="secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -41,9 +47,10 @@
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
 
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nama Supplier</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nama Customer</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kontak</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Alamat</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">NPWP</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dibuat Pada</th>
                         
 
@@ -67,7 +74,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route("laporansuppliers.index") }}',
+                    url: '{{ route("laporancustomers.index") }}',
                     
                 },
                 //columns : nama, kontak, alamat, created_at
@@ -85,6 +92,10 @@
                         name: 'alamat',
                     },
                     {
+                        data: 'npwp',
+                        name: 'npwp'
+                    },
+                    {
                         data: 'created_at',
                         name: 'created_at'
                     },
@@ -94,13 +105,13 @@
                 
                 language: {
                     search: "_INPUT_",
-                    searchPlaceholder: "Search " + "Suppliers",
+                    searchPlaceholder: "Search " + "Customers",
                     lengthMenu: "Show _MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ Suppliers",
-                    infoEmpty: "No Suppliers found",
-                    infoFiltered: "(filtered from _MAX_ total Suppliers)",
-                    zeroRecords: "No matching Suppliers found",
-                    emptyTable: "No Suppliers available"
+                    info: "Showing _START_ to _END_ of _TOTAL_ Customers",
+                    infoEmpty: "No Customers found",
+                    infoFiltered: "(filtered from _MAX_ total Customers)",
+                    zeroRecords: "No matching Customers found",
+                    emptyTable: "No Customers available"
                 },
                 dom: '<"flex flex-col md:flex-row justify-between items-center mb-4"lf>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip>',
                 pageLength: 10,
