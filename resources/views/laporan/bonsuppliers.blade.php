@@ -207,12 +207,22 @@
 
             let semuaWaktu = !$('#startdate').val() && !$('#enddate').val();
 
-            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : $('#startdate').val()) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : $('#enddate').val()) + '</strong> untuk ' + ($('#supplier').val() ? 'Supplier <strong>' + $('#supplier option:selected').text() + '</strong>' : 'Semua Supplier') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
+            let startDate = formatTanggalDDMMYYYY($('#startdate').val());
+            let endDate = formatTanggalDDMMYYYY($('#enddate').val());
+
+            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#supplier').val() ? 'Supplier <strong>' + $('#supplier option:selected').text() + '</strong>' : 'Semua Supplier') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
             $('#current-filter-info').html(text);
 
             // Show the reset button
             document.getElementById('reset-filter-button').classList.remove('hidden');
 
+        }
+        function formatTanggalDDMMYYYY(tanggal) {
+            const date = new Date(tanggal);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
         }
     </script>
 
