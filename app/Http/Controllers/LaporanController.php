@@ -602,22 +602,22 @@ class LaporanController extends Controller
         if ($request->ajax()) {
 
             //ambil data Tunai dari table pengeluaran dan pembelian
-            $pengeluaran = Pengeluaran::where('metode_pembayaran', 'Tunai')
+            $pengeluaran = Pengeluaran::leftJoin(
+                'kategori_pengeluarans',
+                'pengeluarans.kategori_pengeluaran_id',
+                '=',
+                'kategori_pengeluarans.id'
+            )
+                ->where('pengeluarans.metode_pembayaran', 'Tunai')
                 ->select([
-                    'id',
-                    'nama_pengeluaran as transaksi',
-                    'nominal',
-                    'created_at',
+                    'pengeluarans.id',
+                    'pengeluarans.nama_pengeluaran as transaksi',
+                    'pengeluarans.nominal',
+                    'pengeluarans.created_at',
+                    'kategori_pengeluarans.nama_kategori as kategori',
                 ])
                 ->selectRaw("'pengeluaran' as sumber");
 
-            //filter tanggal
-            if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
-
-                $pengeluaran->whereBetween('created_at', [$start, $end]);
-            }
 
             $pembelian = Pembelian::whereNotNull('ambil_tunai')
                 ->where('ambil_tunai', '>', 0)
@@ -627,7 +627,9 @@ class LaporanController extends Controller
                     'ambil_tunai as nominal',
                     'created_at',
                 ])
+                ->selectRaw("' ' as kategori")
                 ->selectRaw("'pembelian' as sumber");
+                
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
@@ -635,11 +637,30 @@ class LaporanController extends Controller
                 $end   = Carbon::parse($request->enddate)->endOfDay();
 
                 $pembelian->whereBetween('created_at', [$start, $end]);
+                $pengeluaran->whereBetween('created_at', [$start, $end]);
+            }
+
+            //filter sumber
+            if ($request->filled('sumber')) {
+                $sumber = $request->sumber;
+                $pengeluaran->whereRaw("'pengeluaran' = ?", [$sumber]);
+                $pembelian->whereRaw("'pembelian' = ?", [$sumber]);
+            }
+
+            //filter kategori
+            if ($request->filled('kategori')) {
+                $kategori = $request->kategori;
+                $pengeluaran->where('pengeluarans.kategori_pengeluaran_id', $kategori);
+
+                // kosongkan pembelian
+                $pembelian = $pembelian->whereRaw('1 = 0');
             }
 
             $query = $pengeluaran->unionAll($pembelian);
 
+            // dd($query->get());
 
+            $totalNominal = $query->sum('nominal');
 
 
 
@@ -662,11 +683,22 @@ class LaporanController extends Controller
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->translatedFormat('d M Y');
                 })
+                ->with([
+                    'total_nominal' => $totalNominal,
+                ])
                 ->rawColumns(['nominal'])
                 ->make(true);
         }
 
-        return view('laporan.transaksitunai');
+        $kategoris = KategoriPengeluaran::where('deleted_at', null)->get();
+        $sumbers = collect([
+            (object)['id' => 'pembelian', 'nama' => 'Pembelian'],
+            (object)['id' => 'pengeluaran', 'nama' => 'Pengeluaran'],
+        ])->values();
+
+        // dd($kategoris, $sumbers);
+
+        return view('laporan.transaksitunai', compact('kategoris', 'sumbers'));
     }
     public function laporantransaksibanks(Request $request)
     {
