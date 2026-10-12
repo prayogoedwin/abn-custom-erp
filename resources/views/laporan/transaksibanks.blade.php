@@ -62,8 +62,44 @@
             </div>
 
             
-
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
+                <!-- Sumber Select Group -->
+                <div class="flex-1">
+                    <label for="sumber" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                        Sumber
+                    </label>
+                    <div class="relative">
+                        <select id="sumber" name="sumber" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
+                            <option value="">Semua Sumber</option>
+                            @foreach($sumbers as $sumber)
+                            <option value="{{ $sumber->id }}" {{ request('sumber') == $sumber->id ? 'selected' : '' }}>
+                                {{ $sumber->nama }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
             
+
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
+                <!-- Kaategori Select Group -->
+                <div class="flex-1">
+                    <label for="kategori" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                        Kategori
+                    </label>
+                    <div class="relative">
+                        <select id="kategori" name="kategori" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
+                            <option value="">Semua Kategori</option>
+                            @foreach($kategoris as $kategori)
+                            <option value="{{ $kategori->id }}" {{ request('kategori') == $kategori->id ? 'selected' : '' }}>
+                                {{ $kategori->nama_kategori }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl">
 
@@ -94,6 +130,15 @@
 
             </span>
         </div>
+
+        <div class="grid grid-cols-1  gap-4 p-5">
+            <div class="bg-blue-600 rounded-lg p-5 text-white shadow-sm">
+                <p class="text-blue-100 text-sm font-medium uppercase">Total Nominal</p>
+                <h3 class="text-2xl font-bold mt-1" id="totalNominal">Rp 0</h3>
+            </div>
+
+        </div>
+
         <div class="p-4">
             <table id="dynamic-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
@@ -102,6 +147,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Transaksi</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nominal</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sumber</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kategori</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
                         
 
@@ -127,8 +173,17 @@
                 ajax: {
                     url: '{{ route("laporantransaksibanks.index") }}',
                     data: function(d) {
+                        d.sumber = $('#sumber').val();
+                        d.kategori = $('#kategori').val();
                         d.startdate = $('#startdate').val();
                         d.enddate = $('#enddate').val();
+                    },
+                    dataSrc: function(json) {
+
+                        $('#totalNominal').text(
+                            formatRupiah(json.total_nominal)
+                        );
+                        return json.data;
                     }
                 },
                 //columns : transaksi, nominal, sumber, created_at
@@ -145,6 +200,11 @@
                     {
                         data: 'sumber',
                         name: 'sumber',
+                        searchable: false,
+                    },
+                    {
+                        data: 'kategori',
+                        name: 'kategori',
                         searchable: false,
                     },
                     {
@@ -186,11 +246,10 @@
             $('#dynamic-table').DataTable().ajax.reload();
 
             let semuaWaktu = !$('#startdate').val() && !$('#enddate').val();
-
             let startDate = formatTanggalDDMMYYYY($('#startdate').val());
             let endDate = formatTanggalDDMMYYYY($('#enddate').val());
 
-            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong>';
+            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#sumber').val() ? 'Sumber <strong>' + $('#sumber option:selected').text() + '</strong>' : 'Semua Sumber') + ', ' + ($('#kategori').val() ? 'Kategori: <strong>' + $('#kategori option:selected').text() + '</strong>' : 'Semua Kategori');
             $('#current-filter-info').html(text);
 
             // Show the reset button
@@ -204,6 +263,10 @@
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
             return `${day}-${month}-${year}`;
+        }
+
+        function formatRupiah(angka) {
+            return 'Rp ' + Number(angka).toLocaleString('id-ID');
         }
     </script>
 

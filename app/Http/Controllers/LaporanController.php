@@ -12,6 +12,7 @@ use App\Models\Penjualan;
 use App\Models\Produk;
 use App\Models\Customer;
 use App\Models\Karyawan;
+use App\Models\KategoriPengeluaran;
 use App\Models\Pengeluaran;
 use App\Models\Pengiriman;
 use App\Models\PenjualanDetail;
@@ -672,12 +673,19 @@ class LaporanController extends Controller
         if ($request->ajax()) {
 
             //ambil data Tunai dari table pengeluaran dan pembelian
-            $pengeluaran = Pengeluaran::where('metode_pembayaran', 'Transfer')
+            $pengeluaran = Pengeluaran::leftJoin(
+                'kategori_pengeluarans',
+                'pengeluarans.kategori_pengeluaran_id',
+                '=',
+                'kategori_pengeluarans.id'
+            )
+                ->where('pengeluarans.metode_pembayaran', 'Transfer')
                 ->select([
-                    'id',
-                    'nama_pengeluaran as transaksi',
-                    'nominal',
-                    'created_at',
+                    'pengeluarans.id',
+                    'pengeluarans.nama_pengeluaran as transaksi',
+                    'pengeluarans.nominal',
+                    'pengeluarans.created_at',
+                    'kategori_pengeluarans.nama_kategori as kategori',
                 ])
                 ->selectRaw("'pengeluaran' as sumber");
 
@@ -690,7 +698,9 @@ class LaporanController extends Controller
                     'ambil_transfer as nominal',
                     'created_at',
                 ])
+                ->selectRaw("' ' as kategori")
                 ->selectRaw("'pembelian' as sumber");
+                
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
@@ -701,7 +711,27 @@ class LaporanController extends Controller
                 $pengeluaran->whereBetween('created_at', [$start, $end]);
             }
 
+            //filter sumber
+            if ($request->filled('sumber')) {
+                $sumber = $request->sumber;
+                $pengeluaran->whereRaw("'pengeluaran' = ?", [$sumber]);
+                $pembelian->whereRaw("'pembelian' = ?", [$sumber]);
+            }
+
+            //filter kategori
+            if ($request->filled('kategori')) {
+                $kategori = $request->kategori;
+                $pengeluaran->where('pengeluarans.kategori_pengeluaran_id', $kategori);
+
+                // kosongkan pembelian
+                $pembelian = $pembelian->whereRaw('1 = 0');
+            }
+
             $query = $pengeluaran->unionAll($pembelian);
+
+            // dd($query->get());
+
+            $totalNominal = $query->sum('nominal');
 
 
 
@@ -724,11 +754,22 @@ class LaporanController extends Controller
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->translatedFormat('d M Y');
                 })
+                ->with([
+                    'total_nominal' => $totalNominal,
+                ])
                 ->rawColumns(['nominal'])
                 ->make(true);
         }
 
-        return view('laporan.transaksibanks');
+        $kategoris = KategoriPengeluaran::where('deleted_at', null)->get();
+        $sumbers = collect([
+            (object)['id' => 'pembelian', 'nama' => 'Pembelian'],
+            (object)['id' => 'pengeluaran', 'nama' => 'Pengeluaran'],
+        ])->values();
+
+        // dd($kategoris, $sumbers);
+
+        return view('laporan.transaksibanks', compact('kategoris', 'sumbers'));
     }
     public function laporankasbonkaryawans(Request $request)
     {
