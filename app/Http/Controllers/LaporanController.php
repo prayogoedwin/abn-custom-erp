@@ -897,12 +897,20 @@ class LaporanController extends Controller
     {
         if ($request->ajax()) {
             //ambil data Tunai dari table pengeluaran dan pembelian
-            $pengeluaran = Pengeluaran::select([
-                'id',
-                'nama_pengeluaran as transaksi',
-                'nominal',
-                'created_at',
-            ])
+            $pengeluaran = Pengeluaran::leftJoin(
+                'kategori_pengeluarans',
+                'pengeluarans.kategori_pengeluaran_id',
+                '=',
+                'kategori_pengeluarans.id'
+            )
+                
+                ->select([
+                    'pengeluarans.id',
+                    'pengeluarans.nama_pengeluaran as transaksi',
+                    'pengeluarans.nominal',
+                    'pengeluarans.created_at',
+                    'kategori_pengeluarans.nama_kategori as kategori',
+                ])
                 ->selectRaw("'pengeluaran' as sumber");
 
 
@@ -914,7 +922,7 @@ class LaporanController extends Controller
                     'total_nominal_terbayar as nominal',
                     'created_at',
                 ])
-
+                ->selectRaw("' ' as kategori")
                 ->selectRaw("'pembelian' as sumber");
 
             //filter tanggal
@@ -924,6 +932,22 @@ class LaporanController extends Controller
 
                 $pembelian->whereBetween('created_at', [$start, $end]);
                 $pengeluaran->whereBetween('created_at', [$start, $end]);
+            }
+
+            //filter sumber
+            if ($request->filled('sumber')) {
+                $sumber = $request->sumber;
+                $pengeluaran->whereRaw("'pengeluaran' = ?", [$sumber]);
+                $pembelian->whereRaw("'pembelian' = ?", [$sumber]);
+            }
+
+            //filter kategori
+            if ($request->filled('kategori')) {
+                $kategori = $request->kategori;
+                $pengeluaran->where('pengeluarans.kategori_pengeluaran_id', $kategori);
+
+                // kosongkan pembelian
+                $pembelian = $pembelian->whereRaw('1 = 0');
             }
 
             $totalNominalFromPengeluaran = $pengeluaran->sum('nominal');
@@ -955,7 +979,13 @@ class LaporanController extends Controller
                 ->make(true);
         }
 
-        return view('laporan.biayas');
+        $kategoris = KategoriPengeluaran::where('deleted_at', null)->get();
+        $sumbers = collect([
+            (object)['id' => 'pembelian', 'nama' => 'Pembelian'],
+            (object)['id' => 'pengeluaran', 'nama' => 'Pengeluaran'],
+        ])->values();
+
+        return view('laporan.biayas', compact('kategoris', 'sumbers'));
     }
     public function laporanrugilabas(Request $request)
     {
