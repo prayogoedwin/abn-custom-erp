@@ -353,20 +353,27 @@ class LaporanExportController extends Controller
      * ====================================================================== */
     public function laporantitipankecustomersExport(Request $request)
     {
-        $query = TitipSupplier::with('supplier');
+        $query = PenjualanDetail::with('penjualan.customer', 'produk')->where('tipe', 'Titip')->whereHas('penjualan', fn($q) => $q->whereNull('deleted_at'));
 
-        $this->applyDateFilter($query, $request);
+        $this->applyDateFilter($query, $request, 'penjualan_details.created_at');
+        //filter customer
+        if ($request->filled('customer')) {
+            $customer = $request->customer;
+            $query->whereHas('penjualan.customer', fn($q) => $q->where('id', $customer));
+        }
 
         $rows = $query->latest()->get()->map(fn($row) => [
-            $row->supplier?->nama ?? '-',
-            (float) $row->nominal_titip,
-            $row->keterangan,
+            $row->penjualan->no_transaksi_penjualan,
+            $row->penjualan->customer?->nama ?? '-',
+            $row->produk?->nama_produk ?? '-',
+            $row->rendeman !== null ? $row->rendeman . '%' : '-',
+            $row->netto !== null ? $row->netto . ' ' . ($row->produk?->satuan ?? '') : '-',
             $this->formatTanggal($row->created_at),
         ]);
 
         return $this->downloadLaporan(
             'titipan-ke-customers',
-            ['Supplier', 'Nominal Titip', 'Keterangan', 'Tanggal'],
+            ['No Transaksi', 'Customer', 'Barang', 'Rendeman', 'Netto', 'Tanggal'],
             $rows
         );
     }
