@@ -61,10 +61,26 @@
                 </div>
             </div>
 
-            
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
+                <!-- Customer Select Group -->
+                <div class="flex-1">
+                    <label for="customer" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                        Customer
+                    </label>
+                    <div class="relative">
+                        <select id="customer" name="customer" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
+                            <option value="">Semua Customer</option>
+                            @foreach($customers as $customer)
+                            <option value="{{ $customer->id }}" {{ request('customer') == $customer->id ? 'selected' : '' }}>
+                                {{ $customer->nama }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             
-
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl">
 
                 <!-- Action Buttons -->
@@ -99,9 +115,11 @@
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
 
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nominal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">No.Transaksi</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Barangs</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rendeman</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Netto</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
                         
 
@@ -127,25 +145,36 @@
                 ajax: {
                     url: '{{ route("laporantitipankecustomers.index") }}',
                     data: function(d) {
+                        d.customer = $('#customer').val();
                         d.startdate = $('#startdate').val();
                         d.enddate = $('#enddate').val();
                     }
                 },
                 //columns : supplier, nominal_titip, keterangan, created_at
-                columns: [{
-                        data: 'supplier',
-                        name: 'supplier',
+                columns: [
+                    {
+                        data: 'penjualan.no_transaksi_penjualan',
+                        name: 'penjualan.no_transaksi_penjualan'
+                    },
+                    {
+                        data: 'customer',
+                        name: 'customer',
                         
                         
                     },
                     {
-                        data: 'nominal_titip',
-                        name: 'nominal_titip'
+                        data: 'barangs',
+                        name: 'barangs'
                     },
                     {
-                        data: 'keterangan',
-                        name: 'keterangan'
+                        data: 'rendeman',
+                        name: 'rendeman'
                     },
+                    {
+                        data: 'netto',
+                        name: 'netto'
+                    },
+                    
                     
                     {
                         data: 'created_at',
@@ -155,7 +184,7 @@
 
                 ],
                 order: [
-                    [3, 'desc']
+                    [5, 'desc']
                 ],
                 language: {
                     search: "_INPUT_",
@@ -186,11 +215,10 @@
             $('#dynamic-table').DataTable().ajax.reload();
 
             let semuaWaktu = !$('#startdate').val() && !$('#enddate').val();
-
             let startDate = formatTanggalDDMMYYYY($('#startdate').val());
             let endDate = formatTanggalDDMMYYYY($('#enddate').val());
 
-            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong>';
+            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#customer').val() ? 'Customer <strong>' + $('#customer option:selected').text() + '</strong>' : 'Semua Customer') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
             $('#current-filter-info').html(text);
 
             // Show the reset button

@@ -539,34 +539,63 @@ class LaporanController extends Controller
     }
     public function laporantitipankecustomers(Request $request)
     {
-        if (request()->ajax()) {
-            $query = TitipSupplier::with('supplier');
+        if ($request->ajax()) {
+            $query = PenjualanDetail::with([
+                'penjualan.customer',
+                'produk'
+            ])
+                ->where('tipe', 'Titip')
+                ->whereHas('penjualan', function ($q) {
+                    $q->whereNull('deleted_at');
+                });
 
-            //filter tanggal
+            // Filter tanggal berdasarkan tanggal penjualan
             if ($request->filled(['startdate', 'enddate'])) {
                 $start = Carbon::parse($request->startdate)->startOfDay();
                 $end   = Carbon::parse($request->enddate)->endOfDay();
 
-                $query->whereBetween('created_at', [$start, $end]);
+                $query->whereHas('penjualan', function ($q) use ($start, $end) {
+                    $q->whereBetween('created_at', [$start, $end]);
+                });
+            }
+
+            //filter supplier
+            if ($request->filled('customer')) {
+                $customer = $request->customer;
+                $query->whereHas('penjualan', function ($q) use ($customer) {
+                    $q->where('customer_id', $customer);
+                });
             }
 
             return datatables()->of($query)
-                ->editColumn('nominal_titip', function ($titipSupplier) {
-                    // Formats to: Rp 1.500.000 (0 decimals)
-                    return number_format($titipSupplier->nominal_titip, 0, ',', '.');
-                })
-                ->addColumn('supplier', function ($row) {
-                    return $row->supplier->nama;
-                })
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at->translatedFormat('d M Y');
+                    return $row->penjualan->created_at
+                        ->translatedFormat('d M Y');
                 })
-
+                ->addColumn('customer', function ($row) {
+                    return $row->penjualan->customer->nama ?? '-';
+                })
+                ->addColumn('barangs', function ($row) {
+                    return $row->produk?->nama_produk ?? '-';
+                })
+                ->addColumn('rendeman', function ($row) {
+                    // allign right
+                    return $row->rendeman !== null
+                        ? '<div style="text-align: right;">' . $row->rendeman . '%</div>'
+                        : '<div style="text-align: right;">-</div>';
+                })
+                ->addColumn('netto', function ($row) {
+                    return '<div style="text-align: right;">' . ($row->netto ?? '-') . ' '
+                        . ($row->produk?->satuan ?? '') . '</div>';
+                })
+                ->rawColumns(['rendeman', 'netto'])
                 ->make(true);
         }
 
-        return view('laporan.titipankecustomers');
+        $customers = Customer::whereNull('deleted_at')->get();
+        return view('laporan.titipankecustomers', compact('customers'));
     }
+
     public function laporantransaksitunai(Request $request)
     {
         if ($request->ajax()) {
@@ -829,7 +858,7 @@ class LaporanController extends Controller
 
             $query = $pengeluaran->unionAll($pembelian);
 
-            
+
             $totalNominal = $totalNominalFromPengeluaran + $totalNominalFromPembelian;
 
 

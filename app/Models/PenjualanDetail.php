@@ -117,6 +117,11 @@ class PenjualanDetail extends Model
         return strtolower((string) $this->tipe) === 'jual';
     }
 
+    public function isTitip(): bool
+    {
+        return strtolower((string) $this->tipe) === 'titip';
+    }
+
     public function hargaUntukNota(): int
     {
         $netto = (float) $this->netto;

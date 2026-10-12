@@ -56,6 +56,11 @@ class Penjualan extends Model
         return $this->details->filter(fn (PenjualanDetail $detail) => $detail->isJual());
     }
 
+    public function detailsTitip()
+    {
+        return $this->details->filter(fn (PenjualanDetail $detail) => $detail->isTitip());
+    }
+
     public function invoiceJumlah(): int
     {
         return (int) $this->detailsJual()->sum('sub_total');
