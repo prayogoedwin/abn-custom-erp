@@ -24,6 +24,7 @@ use App\Http\Controllers\PenjualanDetailController;
 use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\KategoriPengeluaranController;
 use App\Http\Controllers\LaporanExportController;
+use App\Http\Controllers\LaporanLabaRugiController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Pihak3Controller;
 use App\Http\Controllers\ProdukController;
@@ -328,6 +329,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('export/laporanbiayas', [LaporanExportController::class, 'laporanbiayasExport'])->name('laporanbiayas.export')->middleware('permission:view-laporan');
     Route::get('laporanrugilabas', [LaporanController::class, 'laporanrugilabas'])->name('laporanrugilabas.index')->middleware('permission:view-laporan');
     Route::get('export/laporanrugilabas', [LaporanExportController::class, 'laporanrugilabasExport'])->name('laporanrugilabas.export')->middleware('permission:view-laporan');
+    Route::get('export/laporansak', [LaporanLabaRugiController::class, 'exportPdf'])->name('laporanrugilabas.laporansak')->middleware('permission:view-laporan');
     //************************************************************************************************************
 
     //Cashbon Karyawan==================================================================================================

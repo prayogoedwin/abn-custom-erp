@@ -558,9 +558,16 @@ class LaporanExportController extends Controller
             $pengeluaran->unionAll($pembelian)->unionAll($penjualan)
         );
 
-        $totalPemasukan   = (float) $rows->where('sumber', 'Penjualan')->sum('nominal');
-        $totalPengeluaran = (float) $rows->where('sumber', 'Pembelian')->sum('nominal')
-            + (float) $rows->where('sumber', 'Pengeluaran')->sum('nominal');
+        $totalPemasukan = (float) $rows
+            ->where('sumber', 'penjualan')
+            ->sum('nominal');
+
+        $totalPengeluaran = (float) $rows
+            ->where('sumber', 'pembelian')
+            ->sum('nominal')
+            + (float) $rows
+                ->where('sumber', 'pengeluaran')
+                ->sum('nominal');
 
         [$start, $end] = $this->periodeLabel($request);
 
