@@ -62,17 +62,17 @@
             </div>
 
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
-                <!-- Customer Select Group -->
+                <!-- Nopol Select Group -->
                 <div class="flex-1">
-                    <label for="customer" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
-                        Customer
+                    <label for="nopol" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                        Nopol
                     </label>
                     <div class="relative">
-                        <select id="customer" name="customer" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
-                            <option value="">Semua Customer</option>
-                            @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}" {{ request('customer') == $customer->id ? 'selected' : '' }}>
-                                {{ $customer->nama }}
+                        <select id="nopol" name="nopol" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
+                            <option value="">Semua Nopol</option>
+                            @foreach($nopols as $nopol)
+                            <option value="{{ $nopol }}" {{ request('nopol') == $nopol ? 'selected' : '' }}>
+                                {{ $nopol }}
                             </option>
                             @endforeach
                         </select>
@@ -161,7 +161,7 @@
                 ajax: {
                     url: '{{ route("laporanritans.index") }}',
                     data: function(d) {
-                        d.customer = $('#customer').val();
+                        d.nopol = $('#nopol').val();
                         d.startdate = $('#startdate').val();
                         d.enddate = $('#enddate').val();
                         d.barang = $('#barang').val();
@@ -226,7 +226,7 @@
             let startDate = formatTanggalDDMMYYYY($('#startdate').val());
             let endDate = formatTanggalDDMMYYYY($('#enddate').val());
 
-            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#customer').val() ? 'Customer <strong>' + $('#customer option:selected').text() + '</strong>' : 'Semua Customer') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
+            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#nopol').val() ? 'Nopol <strong>' + $('#nopol option:selected').text() + '</strong>' : 'Semua Nopol') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
             $('#current-filter-info').html(text);
 
             // Show the reset button

@@ -498,12 +498,10 @@ class LaporanController extends Controller
                 $ritans->whereBetween('pengirimans.created_at', [$start, $end]);
             }
 
-            //filter supplier
-            if ($request->filled('supplier')) {
-                $supplier = $request->supplier;
-                $ritans->whereHas('supplier', function ($q) use ($supplier) {
-                    $q->where('id', $supplier);
-                });
+            //filter nopol
+            if ($request->filled('nopol')) {
+                $nopol = $request->nopol;
+                $ritans->where('nopol', $nopol);
             }
 
             //filter barang
@@ -535,9 +533,9 @@ class LaporanController extends Controller
                 ->make(true);
         }
 
-        $customers = Customer::where('deleted_at', null)->get();
+        $nopols = Pengiriman::where('deleted_at', null)->pluck('nopol')->unique();
         $barangs = Produk::where('deleted_at', null)->get();
-        return view('laporan.ritans', compact('customers', 'barangs'));
+        return view('laporan.ritans', compact('nopols', 'barangs'));
     }
     public function laporantitipankecustomers(Request $request)
     {
