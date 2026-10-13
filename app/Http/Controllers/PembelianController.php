@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\PembelianExport;
-use App\Models\CashbonSupplierPembayaran;
+use App\Models\BonSupplier;
 use App\Models\Pembelian;
 use App\Models\PembelianDetail;
 use App\Models\SimpanPinjamSupplier;
@@ -45,10 +45,10 @@ class PembelianController extends Controller
 
     private function nominalPotongBon(Pembelian $pembelian): int
     {
-        return (int) CashbonSupplierPembayaran::query()
+        return (int) BonSupplier::query()
             ->where('supplier_id', $pembelian->supplier_id)
             ->where('keterangan', $this->keteranganPotongBon($pembelian))
-            ->sum('nominal_bayar');
+            ->sum('keluar');
     }
 
     private function saldoCashbonTersedia(Pembelian $pembelian): int
@@ -302,19 +302,19 @@ class PembelianController extends Controller
         $keteranganPotongBon = $this->keteranganPotongBon($pembelian);
 
         if ($store_data['potong_bon'] > 0) {
-            CashbonSupplierPembayaran::updateOrCreate(
+            BonSupplier::updateOrCreate(
                 [
                     'supplier_id' => $pembelian->supplier_id,
                     'keterangan' => $keteranganPotongBon,
                 ],
                 [
-                    'tipe' => 'Lewat Pembelian',
-                    'nominal_bayar' => $store_data['potong_bon'],
+                    'metode' => 'Lewat Pembelian',
+                    'keluar' => $store_data['potong_bon'],
                     'created_by' => auth()->id(),
                 ]
             );
         } else {
-            CashbonSupplierPembayaran::query()
+            BonSupplier::query()
                 ->where('supplier_id', $pembelian->supplier_id)
                 ->where('keterangan', $keteranganPotongBon)
                 ->delete();
@@ -360,14 +360,14 @@ class PembelianController extends Controller
 
         // 2. Cari riwayat pemotongan cashbon yang spesifik untuk pembelian ini
         // Menggunakan no_transaksi agar akurat dan tidak tertukar dengan transaksi lain
-        $pembayarancashbon = CashbonSupplierPembayaran::where('supplier_id', $pembelian->supplier_id)
+        $pembayarancashbon = BonSupplier::where('supplier_id', $pembelian->supplier_id)
             ->where('keterangan', 'like', '%' . $pembelian->no_transaksi . '%')
             ->latest()
             ->first();
 
-        $nominalPotong = $pembayarancashbon ? $pembayarancashbon->nominal_bayar : 0;
+        $nominalPotong = $pembayarancashbon ? $pembayarancashbon->keluar : 0;
 
-        $cashbonsebelum = $pembelian->supplier->totalCashbon() + $nominalPotong;
+        $cashbonsebelum = $pembayarancashbon->generateSisa() + $nominalPotong;
 
         $terbilang = $this->konversiTerbilang($pembelian->total_nominal_pembelian) . " Rupiah";
         // dd($pembelian, $pembayarancashbon, $cashbonsebelum);

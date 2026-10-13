@@ -152,7 +152,6 @@ class SupplierController extends Controller
         // Eager load semua relasi yang dibutuhkan oleh view detail supplier
         $supplier->load([
             'cashbons', 
-            'cashbonspembayaran',
             // Memuat riwayat stok titipan diurutkan dari yang terbaru, beserta data produknya
             'titipSuppliers',
             'ambilSuppliers',

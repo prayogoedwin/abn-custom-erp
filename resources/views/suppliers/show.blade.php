@@ -46,21 +46,13 @@
 
             <!-- Sisa Hutang Cashbon (Hutang Supplier ke Toko) -->
             <div class="bg-amber-600 rounded-lg p-5 text-white shadow-sm">
-                <p class="text-amber-100 text-xs font-medium uppercase tracking-wider">Sisa Hutang Cashbon</p>
+                <p class="text-amber-100 text-xs font-medium uppercase tracking-wider">Sisa Cashbon</p>
                 <h3 class="text-2xl font-bold mt-1">Rp {{ number_format($supplier->totalCashbon(), 0, ',', '.') }}</h3>
             </div>
 
-            <!-- Total Titip Uang Supplier -->
-            <div class="bg-blue-600 rounded-lg p-5 text-white shadow-sm">
-                <p class="text-blue-100 text-xs font-medium uppercase tracking-wider">Total Titipan Uang</p>
-                <h3 class="text-2xl font-bold mt-1">Rp {{ number_format($supplier->cashbons ? \App\Models\TitipSupplier::where('supplier_id', $supplier->id)->sum('nominal_titip') : 0, 0, ',', '.') }}</h3>
-            </div>
+            
 
-            <!-- Total Ambil Uang Supplier -->
-            <div class="bg-emerald-600 rounded-lg p-5 text-white shadow-sm">
-                <p class="text-emerald-100 text-xs font-medium uppercase tracking-wider">Total Penarikan (Ambil)</p>
-                <h3 class="text-2xl font-bold mt-1">Rp {{ number_format($supplier->cashbons ? \App\Models\AmbilSupplier::where('supplier_id', $supplier->id)->sum('nominal_ambil') : 0, 0, ',', '.') }}</h3>
-            </div>
+            
         </div>
     </div>
 

@@ -40,17 +40,18 @@ class Supplier extends Model
 
     public function cashbons(): HasMany
     {
-        return $this->hasMany(CashbonSupplier::class);
+        return $this->hasMany(BonSupplier::class);
     }
 
-    public function cashbonspembayaran(): HasMany
-    {
-        return $this->hasMany(CashbonSupplierPembayaran::class);
-    }
+
 
     public function totalCashbon()
     {
-        return $this->cashbons->sum('nominal_cashbon') - $this->cashbonspembayaran->sum('nominal_bayar');
+        $lastCashbon = $this->cashbons()
+            ->latest('id')
+            ->first();
+
+        return $lastCashbon?->generateSisa() ?? 0;
     }
 
     public function titipSuppliers(): HasMany

@@ -71,10 +71,10 @@
                                 <span class="font-semibold text-gray-900 dark:text-gray-100">Rp {{ number_format($pembelian->ambil_transfer ?? 0, 0, ',', '.') }}</span>
                             </div>
                             @php
-                                $potongBon = \App\Models\CashbonSupplierPembayaran::query()
+                                $potongBon = \App\Models\BonSupplier::query()
                                     ->where('supplier_id', $pembelian->supplier_id)
                                     ->where('keterangan', 'Lewat Pembelian' . $pembelian->no_transaksi)
-                                    ->sum('nominal_bayar');
+                                    ->sum('keluar');
                             @endphp
                             @if($potongBon > 0)
                             <div class="flex justify-between text-red-500">

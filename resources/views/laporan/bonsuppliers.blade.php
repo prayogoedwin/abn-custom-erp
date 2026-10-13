@@ -120,9 +120,12 @@
                     <tr>
 
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nominal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Masuk</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keluar</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sisa</th>
+                        
 
 
 
@@ -159,23 +162,31 @@
                         name: 'supplier.nama'
                     },
                     {
-                        data: 'nominal_cashbon',
-                        name: 'nominal_cashbon'
+                        data: 'created_at',
+                        name: 'created_at'
                     },
                     {
                         data: 'keterangan',
                         name: 'keterangan'
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
-                    }
+                        data: 'masuk',
+                        name: 'masuk'
+                    },
+                    {
+                        data: 'keluar',
+                        name: 'keluar'
+                    },
+                    {
+                        data: 'sisa',
+                        name: 'sisa'
+                    },
+                    
+                    
 
 
                 ],
-                order: [
-                    [3, 'desc'] // order by tanggal descending by default
-                ],
+                
 
                 language: {
                     search: "_INPUT_",

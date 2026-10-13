@@ -117,22 +117,9 @@ return [
             [
                 'title' => 'Supplier',
                 'icon' => 'fas-person',
-                'active' => ['cashbonsuppliers*', 'cashbonsupplierpembayarans*'],
+                'active' => ['bon-suppliers*'],
                 'permission' => 'view-cashbonsuppliers',
-                'children' => [
-                    [
-                        'title' => '-- Cashbon',
-                        'route' => 'cashbonsuppliers.index',
-                        'active' => 'cashbonsuppliers*',
-                        'permission' => 'view-cashbonsuppliers',
-                    ],
-                    [
-                        'title' => '-- Pembayaran Cashbon',
-                        'route' => 'cashbonsupplierpembayarans.index',
-                        'active' => 'cashbonsupplierpembayarans*',
-                        'permission' => 'view-cashbonsuppliers',
-                    ],
-                ],
+                'route' => 'bon-suppliers.index',
             ],
             [
                 'title' => 'Pihak 3',

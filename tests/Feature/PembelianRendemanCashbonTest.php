@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\BonSupplier;
 use App\Models\CashbonSupplier;
 use App\Models\CashbonSupplierPembayaran;
 use App\Models\KategoriProduk;
@@ -143,9 +144,9 @@ class PembelianRendemanCashbonTest extends TestCase
             'isactive' => true,
         ]);
 
-        CashbonSupplier::create([
+        BonSupplier::create([
             'supplier_id' => $supplier->id,
-            'nominal_cashbon' => $cashbon,
+            'masuk' => $cashbon,
             'tipe' => 'Cash',
             'keterangan' => 'Cashbon awal',
         ]);

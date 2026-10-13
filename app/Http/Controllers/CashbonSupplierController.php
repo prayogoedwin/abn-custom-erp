@@ -13,6 +13,7 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
+//DEPRECATED: This controller handles CashbonSupplier, which may be replaced by BonSupplier in the future.
 class CashbonSupplierController extends Controller
 {
     private function getPagedata()
