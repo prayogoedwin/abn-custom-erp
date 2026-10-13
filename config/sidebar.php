@@ -97,22 +97,9 @@ return [
             [
                 'title' => 'Karyawan',
                 'icon' => 'fas-person',
-                'active' => ['cashbonkaryawans*', 'cashbonkaryawanpembayarans*'],
+                'active' => ['bon-karyawans*'],
                 'permission' => 'view-cashbonkaryawans',
-                'children' => [ // Mendukung Level 3
-                    [
-                        'title' => '-- Cashbon',
-                        'route' => 'cashbonkaryawans.index',
-                        'active' => 'cashbonkaryawans*',
-                        'permission' => 'view-cashbonkaryawans',
-                    ],
-                    [
-                        'title' => '-- Pembayaran Cashbon',
-                        'route' => 'cashbonkaryawanpembayarans.index',
-                        'active' => 'cashbonkaryawanpembayarans*',
-                        'permission' => 'view-cashbonkaryawans',
-                    ],
-                ],
+                'route' => 'bon-karyawans.index',
             ],
             [
                 'title' => 'Supplier',
