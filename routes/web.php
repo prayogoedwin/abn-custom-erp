@@ -180,6 +180,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Pembelians Management - dengan permission check
     Route::get('pembelians', [PembelianController::class, 'index'])->name('pembelians.index')->middleware('permission:view-pembelians');
+    Route::get('pembelians/indexTable', [PembelianController::class, 'indexTable'])->name('pembelians.indexTable')->middleware('permission:view-pembelians');
     Route::get('pembelians/export', [PembelianController::class, 'export'])->name('pembelians.export')->middleware('permission:download-pembelians');
     Route::get('pembelians/create', [PembelianController::class, 'create'])->name('pembelians.create')->middleware('permission:create-pembelians');
 

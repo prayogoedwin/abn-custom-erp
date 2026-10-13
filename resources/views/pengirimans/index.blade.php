@@ -50,6 +50,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nopol</th>
                         
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Detail</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
@@ -84,8 +85,14 @@
                         name: 'nopol'
                     },
                     {
-                        data: 'tanggal',
-                        name: 'tanggal'
+                        data: 'created_at',
+                        name: 'created_at'
+                    },
+                    {
+                        data: 'detail',
+                        name: 'detail',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'actions',
@@ -95,9 +102,7 @@
                     }
                     
                 ],
-                order: [
-                    [3, 'desc'] //sort by tanggal
-                ],
+                
                 language: {
                     search: "_INPUT_",
                     searchPlaceholder: "Search Pengiriman...",

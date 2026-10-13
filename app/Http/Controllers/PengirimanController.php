@@ -74,13 +74,6 @@ class PengirimanController extends Controller
 
     public function index(Request $request)
     {
-        // dd($request->headers->all());
-        // $pengirimans = Pengiriman::join('customers', 'pengirimans.customer_id', '=', 'customers.id')
-        //         // Select everything from pengiriman, and specific fields from users
-        //         ->select('pengirimans.*', 'customers.nama as customer')
-        //         ->where('pengirimans.deleted_at', null)
-        //         ->get();
-        // dd($pengirimans);
         
 
         $pagedata = $this->getPagedata();
@@ -98,8 +91,15 @@ class PengirimanController extends Controller
                 ->addColumn('customer', function ($row) {
                     return $row->customer ? $row->customer->nama : '';
                 })
-                ->addColumn('tanggal', function ($row) {
-                    return $row->created_at->format('Y-m-d H:i:s');
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->translatedFormat('d M Y');
+                })
+                ->addColumn('detail', function ($penjualan) {
+                    $produkNames = $penjualan->details->map(function ($detail) {
+                        return   ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
+                    })->toArray();
+                    $content = implode('<br>', $produkNames);
+                    return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
                 })
                 ->addColumn('actions', function ($pengiriman) {
                     $actions = '';
@@ -121,7 +121,7 @@ class PengirimanController extends Controller
 
                     return $actions;
                 })
-                ->rawColumns(['actions'])
+                ->rawColumns(['actions', 'detail'])
                 ->make(true);
         }
 

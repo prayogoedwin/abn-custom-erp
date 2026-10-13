@@ -119,7 +119,7 @@ class PenjualanController extends Controller
                 })
                 ->addColumn('detail', function ($penjualan) {
                     $produkNames = $penjualan->details->map(function ($detail) {
-                        return   '[' . $detail->tipe . '] ' . ($detail->produk?->nama_produk ?? '-');
+                        return   '[' . $detail->tipe . '] ' . ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
                     })->toArray();
                     $content = implode('<br>', $produkNames);
                     return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';

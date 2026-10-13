@@ -104,26 +104,39 @@ class PembelianController extends Controller
 
     public function index(Request $request)
     {
-        // dd($request->headers->all());
-        // $pembelians = Pembelian::join('suppliers', 'pembelians.supplier_id', '=', 'suppliers.id')
-        //     // Select everything from pembelian, and specific fields from users
-        //     ->select('pembelians.*', 'suppliers.nama as supplier')
-        //     ->where('pembelians.isactive', true)
-        //     ->get();
-        // dd($pembelians);
+        
+
+        $pagedata = $this->getPagedata();
+
+        return view('pembelians.index', $pagedata);
+    }
+
+    public function indexTable(Request $request)
+    {
         if ($request->ajax()) {
             // dd('masuk ajax');
-            $pembelians = Pembelian::join('suppliers', 'pembelians.supplier_id', '=', 'suppliers.id')
-                // Select everything from pembelian, and specific fields from users
-                ->select('pembelians.*', 'suppliers.nama as supplier')
+            $pembelians = Pembelian::with('supplier')
                 ->where('pembelians.isactive', true)
-                ->get();
+                ;
             // dd($pembelians);
 
             return DataTables::of($pembelians)
                 ->editColumn('kekurangan', function ($pembelian) {
                     // Formats to: Rp 1.500.000 (0 decimals)
-                    return number_format($pembelian->kekurangan, 0, ',', '.');
+                    // rata kanan untuk kolom kekurangan
+                    return '<div style="text-align: right;">' . number_format($pembelian->kekurangan, 0, ',', '.') . '</div>';
+                })
+
+                ->addColumn('supplier', function ($pembelian) {
+                    return $pembelian->supplier->nama ?? '';
+                })
+
+                ->addColumn('detail', function ($penjualan) {
+                    $produkNames = $penjualan->details->map(function ($detail) {
+                        return   '[' . $detail->tipe_transaksi_pembelian . '] ' . ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
+                    })->toArray();
+                    $content = implode('<br>', $produkNames);
+                    return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
                 })
 
 
@@ -148,13 +161,10 @@ class PembelianController extends Controller
 
                     return $actions;
                 })
-                ->rawColumns(['actions'])
+                ->rawColumns(['actions', 'detail', 'kekurangan'])
                 ->make(true);
         }
-
-        $pagedata = $this->getPagedata();
-
-        return view('dynamiccrud.index', $pagedata);
+        return response()->json(['message' => 'Invalid request'], 400);
     }
 
     public function export()
