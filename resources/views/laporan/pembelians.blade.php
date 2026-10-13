@@ -21,14 +21,14 @@
             <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage System Laporan Pembelian') }}</p>
         </div>
         <div class="flex gap-2">
-            
-                <x-button type="secondary" onclick="actionExportExcel()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    {{ __('Download Excel') }}
-                </x-button>
-            
+
+            <x-button type="secondary" onclick="actionExportExcel()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                {{ __('Download Excel') }}
+            </x-button>
+
 
 
         </div>
@@ -129,19 +129,39 @@
             </span>
         </div>
         <div class="p-4">
-            <table id="dynamic-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">No Transaksi</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Detail</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status Pembayaran</th>
-
-                    </tr>
-                </thead>
-            </table>
+            <div class="w-full overflow-x-auto">
+                <table id="dynamic-table"
+                    class="min-w-max divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                No Transaksi
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                Supplier
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                Tanggal
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                Detail
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                Total Pembelian
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                Total Terbayar
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                Kekurangan
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                Status Pembayaran
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -192,10 +212,26 @@
                         name: 'detail'
                     },
                     {
+                        data: 'total_nominal_pembelian',
+                        name: 'total_nominal_pembelian'
+                    },
+                    {
+                        data: 'total_nominal_terbayar',
+                        name: 'total_nominal_terbayar'
+                    },
+                    {
+                        data: 'kekurangan',
+                        name: 'kekurangan'
+                    },
+                    {
                         data: 'status_pembayaran',
                         name: 'status_pembayaran'
                     }
                 ],
+                columnDefs: [{
+                    targets: '_all',
+                    className: 'whitespace-nowrap'
+                }],
                 order: [
                     [0, 'desc']
                 ],
@@ -260,7 +296,6 @@
             // Redirect to the constructed URL
             window.location.href = url;
         }
-
     </script>
 
     <style>

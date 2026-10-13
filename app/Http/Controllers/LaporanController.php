@@ -103,19 +103,16 @@ class LaporanController extends Controller
 
 
             return DataTables::of($pembelians)
-                ->editColumn('kekurangan', function ($pembelian) {
-                    // Formats to: Rp 1.500.000 (0 decimals)
-                    return number_format($pembelian->kekurangan, 0, ',', '.');
-                })
+                
                 ->addColumn('supplier', function ($pembelian) {
                     return $pembelian->supplier?->nama ?? '-';
                 })
                 ->editColumn('created_at', function ($pembelian) {
                     return $pembelian->created_at->translatedFormat('d M Y');
                 })
-                ->addColumn('detail', function ($pembelian) {
-                    $produkNames = $pembelian->details->map(function ($detail) {
-                        return   '[' . $detail->tipe_transaksi_pembelian . '] ' . ($detail->produk?->nama_produk ?? '-');
+                ->addColumn('detail', function ($penjualan) {
+                    $produkNames = $penjualan->details->map(function ($detail) {
+                        return   '[' . $detail->tipe_transaksi_pembelian . '] ' . ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
                     })->toArray();
                     $content = implode('<br>', $produkNames);
                     return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
@@ -126,10 +123,21 @@ class LaporanController extends Controller
                     });
                 })
 
+                ->editColumn('total_nominal_pembelian', function ($pembelian) {
+                    //rata kanan
+                    return '<div style="text-align: right;">' . number_format($pembelian->total_nominal_pembelian, 0, ',', '.') . '</div>';
+                })
+                ->editColumn('total_nominal_terbayar', function ($pembelian) {
+                    return '<div style="text-align: right;">' . number_format($pembelian->total_nominal_terbayar, 0, ',', '.') . '</div>';
+                })
+                ->editColumn('kekurangan', function ($pembelian) {
+                    return '<div style="text-align: right;">' . number_format($pembelian->kekurangan, 0, ',', '.') . '</div>';
+                })
 
 
 
-                ->rawColumns(['detail'])
+
+                ->rawColumns(['detail', 'total_nominal_pembelian', 'total_nominal_terbayar', 'kekurangan'])
                 ->make(true);
         }
 
@@ -223,10 +231,7 @@ class LaporanController extends Controller
 
 
             return DataTables::of($penjualans)
-                ->editColumn('kekurangan', function ($penjualan) {
-                    // Formats to: Rp 1.500.000 (0 decimals)
-                    return number_format($penjualan->kekurangan, 0, ',', '.');
-                })
+                
                 ->addColumn('customer', function ($penjualan) {
                     return $penjualan->customer?->nama ?? '-';
                 })
@@ -235,7 +240,7 @@ class LaporanController extends Controller
                 })
                 ->addColumn('detail', function ($penjualan) {
                     $produkNames = $penjualan->details->map(function ($detail) {
-                        return   '[' . $detail->tipe . '] ' . ($detail->produk?->nama_produk ?? '-');
+                        return   '[' . $detail->tipe . '] ' . ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
                     })->toArray();
                     $content = implode('<br>', $produkNames);
                     return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
@@ -246,10 +251,27 @@ class LaporanController extends Controller
                     });
                 })
 
+                ->addColumn('jumlah', function ($penjualan) {
+                    //rata kanan
+                    return '<div style="text-align: right;">' . number_format($penjualan->invoiceJumlah(), 0, ',', '.') . '</div>';
+                })
+                ->addColumn('ppn', function ($penjualan) {
+                    //rata kanan
+                    return '<div style="text-align: right;">' . number_format($penjualan->invoicePpn(), 0, ',', '.') . '</div>';
+                })
+                ->addColumn('pph', function ($penjualan) {
+                    //rata kanan
+                    return '<div style="text-align: right;">' . number_format($penjualan->invoicePph22(), 0, ',', '.') . '</div>';
+                })
+                ->addColumn('total', function ($penjualan) {
+                    //rata kanan
+                    return '<div style="text-align: right;">' . number_format($penjualan->invoiceTotalDibayar(), 0, ',', '.') . '</div>';
+                })
 
 
 
-                ->rawColumns(['detail'])
+
+                ->rawColumns(['detail', 'jumlah', 'ppn', 'pph', 'total'])
                 ->make(true);
         }
 
