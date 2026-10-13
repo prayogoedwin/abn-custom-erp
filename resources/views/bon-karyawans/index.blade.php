@@ -43,7 +43,7 @@
                     </label>
                     <div class="relative">
                         <select id="karyawan" name="karyawan" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
-                            <option value="">Semua Karyawan</option>
+                            <option value="">Pilih Karyawan</option>
                             @foreach($karyawans as $karyawan)
                             <option value="{{ $karyawan->id }}" {{ request('karyawan') == $karyawan->id ? 'selected' : '' }}>
                                 {{ $karyawan->nama }}
