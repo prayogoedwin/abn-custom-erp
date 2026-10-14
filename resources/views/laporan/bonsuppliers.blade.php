@@ -21,15 +21,16 @@
             <p class="text-gray-600 dark:text-gray-400 mt-1">{{ __('Manage System Laporan Bon Supplier') }}</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('laporanbonsuppliers.export') }}">
-                <x-button type="secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    {{ __('Download Excel') }}
-                </x-button>
-            </a>
-
+            <div id="export-bon-supplier" class="hidden">
+                <a id="bon-supplier-link" href="{{ route('laporanbonsuppliers.export', ['supplier_id' => '__SUPPLIER_ID__', 'startdate' => '__STARTDATE__', 'enddate' => '__ENDDATE__']) }}">
+                    <x-button type="secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        {{ __('Download Excel') }}
+                    </x-button>
+                </a>
+            </div>
 
         </div>
     </div>
@@ -97,10 +98,10 @@
 
                     <!-- hanya muncul ketika sudah me filter -->
                     <a href="{{ route('laporanbonsuppliers.index') }}" id="reset-filter-button"
-                        class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none transition-all h-[38px] hidden" >
+                        class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none transition-all h-[38px] hidden">
                         Reset
                     </a>
-                
+
                 </div>
             </div>
         </div>
@@ -120,13 +121,13 @@
                     <tr>
 
 
-                        
+
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Masuk</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keluar</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sisa</th>
-                        
+
 
 
 
@@ -159,8 +160,7 @@
                     }
                 },
                 //columns : supplier.nama, nominal_cashbon, keterangan, created_at
-                columns: [
-                    {
+                columns: [{
                         data: 'created_at',
                         name: 'created_at'
                     },
@@ -180,10 +180,10 @@
                         data: 'sisa',
                         name: 'sisa'
                     },
-                    
+
 
                 ],
-                
+
 
                 language: {
                     search: "_INPUT_",
@@ -223,16 +223,29 @@
 
             if (!supplier) {
                 text = 'Mohon Pilih Supplier Terlebih Dahulu';
-            }
-            else {
+            } else {
                 text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#supplier').val() ? 'Supplier <strong>' + $('#supplier option:selected').text() + '</strong>' : 'Semua Supplier') + '';
             }
             $('#current-filter-info').html(text);
+
+            const container = document.getElementById('export-bon-supplier');
+            const link = document.getElementById('bon-supplier-link');
+            if (supplier) {
+                container.classList.remove('hidden');
+                const url = new URL(link.href);
+                url.searchParams.set('supplier_id', supplier);
+                url.searchParams.set('startdate', $('#startdate').val());
+                url.searchParams.set('enddate', $('#enddate').val());
+                link.href = url.toString();
+            } else {
+                container.classList.add('hidden');
+            }
 
             // Show the reset button
             document.getElementById('reset-filter-button').classList.remove('hidden');
 
         }
+
         function formatTanggalDDMMYYYY(tanggal) {
             const date = new Date(tanggal);
             const day = String(date.getDate()).padStart(2, '0');

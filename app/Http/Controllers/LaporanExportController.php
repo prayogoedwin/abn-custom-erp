@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BonKaryawanExport;
+use App\Exports\BonPihak3Export;
+use App\Exports\BonSupplierExport;
 use App\Exports\Laporan\BiayaExport;
 use App\Exports\Laporan\RugiLabaExport;
 use App\Exports\LaporanExport;
@@ -288,26 +291,21 @@ class LaporanExportController extends Controller
      * ====================================================================== */
     public function laporanbonsuppliersExport(Request $request)
     {
-        $query = CashbonSupplier::with('supplier')->whereNull('deleted_at');
-
-        $this->applyDateFilter($query, $request, 'cashbon_suppliers.created_at');
-
-        if ($request->filled('supplier')) {
-            $supplier = $request->supplier;
-            $query->whereHas('supplier', fn($q) => $q->where('id', $supplier));
-        }
-
-        $rows = $query->orderByDesc('cashbon_suppliers.created_at')->get()->map(fn($row) => [
-            $row->supplier?->nama ?? '-',
-            (float) $row->nominal_cashbon,
-            $row->keterangan,
-            $this->formatTanggal($row->created_at),
+        // dd($request->all());
+        $request->validate([
+            'supplier_id' => 'required|exists:suppliers,id',
+            'startdate' => 'nullable|date|required_with:enddate',
+            'enddate' => 'nullable|date|after_or_equal:startdate|required_with:startdate',
         ]);
+        // dd($request->all());
 
-        return $this->downloadLaporan(
-            'bon-suppliers',
-            ['Supplier', 'Nominal Cashbon', 'Keterangan', 'Tanggal'],
-            $rows
+        return Excel::download(
+            new BonSupplierExport(
+                $request->supplier_id,
+                $request->startdate,
+                $request->enddate
+            ),
+            'laporan-bon-suppliers.xlsx'
         );
     }
 
@@ -435,26 +433,19 @@ class LaporanExportController extends Controller
      * ====================================================================== */
     public function laporankasbonkaryawansExport(Request $request)
     {
-        $query = CashbonKaryawan::with('karyawan')->whereNull('deleted_at');
-
-        $this->applyDateFilter($query, $request, 'cashbon_karyawans.created_at');
-
-        if ($request->filled('karyawan')) {
-            $karyawan = $request->karyawan;
-            $query->whereHas('karyawan', fn($q) => $q->where('id', $karyawan));
-        }
-
-        $rows = $query->orderByDesc('cashbon_karyawans.created_at')->get()->map(fn($row) => [
-            $row->karyawan?->nama ?? '-',
-            (float) $row->nominal_cashbon,
-            $row->keterangan,
-            $this->formatTanggal($row->created_at),
+        $request->validate([
+            'karyawan' => 'required|exists:karyawans,id',
+            'startdate' => 'nullable|date|required_with:enddate',
+            'enddate' => 'nullable|date|after_or_equal:startdate|required_with:startdate',
         ]);
 
-        return $this->downloadLaporan(
-            'kasbon-karyawans',
-            ['Karyawan', 'Nominal Cashbon', 'Keterangan', 'Tanggal'],
-            $rows
+        return Excel::download(
+            new BonKaryawanExport(
+                $request->karyawan,
+                $request->startdate,
+                $request->enddate
+            ),
+            'laporan-bon-karyawans.xlsx'
         );
     }
 
@@ -463,33 +454,19 @@ class LaporanExportController extends Controller
      * ====================================================================== */
     public function laporantransaksipihakketigasExport(Request $request)
     {
-        $cashbon = CashbonPihak3::with('pihak3')
-            ->select(['id', 'pihak3_id', 'nominal_cashbon as nominal', 'keterangan', 'created_at'])
-            ->selectRaw("'cashbon' as sumber");
+        $request->validate([
+            'pihak3' => 'required|exists:pihak3s,id',
+            'startdate' => 'nullable|date|required_with:enddate',
+            'enddate' => 'nullable|date|after_or_equal:startdate|required_with:startdate',
+        ]);
 
-        $pembayaran = CashbonPihak3Pembayaran::select(
-            ['id', 'pihak3_id', 'nominal_bayar as nominal', 'keterangan', 'created_at']
-        )->selectRaw("'pembayaran' as sumber");
-
-        $this->applyDateFilter($cashbon, $request);
-        $this->applyDateFilter($pembayaran, $request);
-
-        // Hasil UNION di-hydrate sebagai model CashbonPihak3, relasi pihak3
-        // di-eager-load berdasarkan pihak3_id dari kedua sumber.
-        $rows = $cashbon->unionAll($pembayaran)
-            ->get()
-            ->sortByDesc('created_at')
-            ->map(fn($row) => [
-                $row->pihak3?->nama ?? '-',
-                ucfirst($row->sumber),
-                (float) $row->nominal,
-                $this->formatTanggal($row->created_at),
-            ]);
-
-        return $this->downloadLaporan(
-            'transaksi-pihak-ketiga',
-            ['Pihak 3', 'Sumber', 'Nominal', 'Tanggal'],
-            $rows
+        return Excel::download(
+            new BonPihak3Export(
+                $request->pihak3,
+                $request->startdate,
+                $request->enddate
+            ),
+            'laporan-bon-pihak3.xlsx'
         );
     }
 
