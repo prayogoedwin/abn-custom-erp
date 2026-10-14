@@ -507,6 +507,64 @@ class LaporanController extends Controller
         $barangs = Produk::where('deleted_at', null)->get();
         return view('laporan.ritans', compact('nopols', 'barangs'));
     }
+
+    public function laporanselisihnetto(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = PenjualanDetail::with('penjualan.customer', 'produk', 'pengiriman_detail.pengiriman');
+
+            // Apply filters based on the request parameters
+            if ($request->filled('customer')) {
+                $customer = $request->customer;
+                $query->whereHas('penjualan.customer', function ($q) use ($customer) {
+                    $q->where('id', $customer);
+                });
+            }
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $query->whereHas('penjualan', function ($q) use ($start, $end) {
+                    $q->whereBetween('created_at', [$start, $end]);
+                });
+            }
+
+            if ($request->filled('barang')) {
+                $barang = $request->barang;
+                $query->whereHas('produk', function ($q) use ($barang) {
+                    $q->where('id', $barang);
+                });
+            }
+
+            return datatables()->of($query)
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->translatedFormat('d M Y');
+                })
+                
+            
+                ->addColumn('rendeman', function ($row) {
+                    return $row->rendeman !== null ? $row->rendeman . '%' : '-';
+                })
+                ->editColumn('netto_pengiriman', function ($row) {
+                    return $row->netto_pengiriman !== null ? $row->netto_pengiriman . ' ' . ($row->produk?->satuan ?? '') : '-';
+                })
+                ->editColumn('netto', function ($row) {
+                    return $row->netto !== null ? $row->netto . ' ' . ($row->produk?->satuan ?? '') : '-';
+                })
+                ->editColumn('selisih', function ($row) {
+                    return $row->netto_pengiriman !== null && $row->netto !== null ? ($row->netto_pengiriman - $row->netto) . ' ' . ($row->produk?->satuan ?? '') : '-';
+                })
+                ->make(true);
+        }
+
+        $customers = Customer::where('deleted_at', null)->get();
+        $barangs = Produk::where('deleted_at', null)->get();
+    
+        return view('laporan.selisihnetto', compact('customers', 'barangs'));
+    }
+
     public function laporantitipankecustomers(Request $request)
     {
         if ($request->ajax()) {

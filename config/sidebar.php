@@ -251,7 +251,7 @@ return [
     [
         'title' => 'Laporan',
         'icon' => 'fas-chart-line',
-        'active' => ['laporansuppliers*', 'laporancustomers*', 'laporanpembelians*', 'laporanpengirimans*', 'laporanpenjualans*', 'laporanstoks*', 'laporantitipanbarangs*', 'laporanbonsuppliers*', 'laporanritans*', 'laporantitipankecustomers*', 'laporantransaksikas*', 'laporantransaksibanks*', 'laporankasbonkaryawans*', 'laporantransaksipihakketigas*', 'laporanbiayas*', 'laporanrugilabas*'],
+        'active' => ['laporansuppliers*', 'laporancustomers*', 'laporanpembelians*', 'laporanpengirimans*', 'laporanpenjualans*', 'laporanstoks*', 'laporantitipanbarangs*', 'laporanbonsuppliers*', 'laporanritans*', 'laporanselisihnetto*', 'laporantitipankecustomers*', 'laporantransaksikas*', 'laporantransaksibanks*', 'laporankasbonkaryawans*', 'laporantransaksipihakketigas*', 'laporanbiayas*', 'laporanrugilabas*'],
         'permission' => ['view-laporan'],
         'children' => [
             [
@@ -308,6 +308,13 @@ return [
                 'icon' => 'fas-file-invoice-dollar',
                 'route' => 'laporanritans.index',
                 'active' => 'laporanritans*',
+                'permission' => 'view-laporan',
+            ],
+            [
+                'title' => 'Selisih Netto',
+                'icon' => 'fas-file-invoice-dollar',
+                'route' => 'laporanselisihnetto.index',
+                'active' => 'laporanselisihnetto*',
                 'permission' => 'view-laporan',
             ],
             [

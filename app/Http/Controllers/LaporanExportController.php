@@ -447,6 +447,43 @@ class LaporanExportController extends Controller
         );
     }
 
+    public function laporanselisihnettoExport(Request $request)
+    {
+        $query = PenjualanDetail::with('penjualan.customer', 'produk', 'pengiriman_detail.pengiriman')->whereNull('deleted_at');
+
+        $this->applyDateFilter($query, $request, 'penjualan_details.created_at');
+
+        //filter customer
+        if ($request->filled('customer')) {
+            $customer = $request->customer;
+            $query->whereHas('penjualan.customer', fn($q) => $q->where('id', $customer));
+        }
+
+        //filter barang
+        if ($request->filled('barang')) {
+            $barang = $request->barang;
+            $query->whereHas('produk', fn($q) => $q->where('id', $barang));
+        }
+
+        $rows = $query->latest()->get()->map(fn($row) => [
+            $row->penjualan->no_transaksi_penjualan,
+            $row->penjualan->customer?->nama ?? '-',
+            $row->pengiriman_detail->pengiriman->nopol,
+            $row->produk?->nama_produk ?? '-',
+            $row->rendeman !== null ? $row->rendeman . '%' : '-',
+            $row->netto_pengiriman !== null ? $row->netto_pengiriman . ' ' . ($row->produk?->satuan ?? '') : '-',
+            $row->netto !== null ? $row->netto . ' ' . ($row->produk?->satuan ?? '') : '-',
+            $row->netto_pengiriman !== null && $row->netto !== null ? ($row->netto_pengiriman - $row->netto) . ' ' . ($row->produk?->satuan ?? '') : '-',
+            $this->formatTanggal($row->created_at),
+        ]);
+
+        return $this->downloadLaporan(
+            'selisih-netto',
+            ['No Transaksi', 'Customer', 'Nopol', 'Barang', 'Rendeman', 'Netto Pengiriman', 'Netto', 'Selisih', 'Tanggal'],
+            $rows
+        );
+    }
+
     /* ======================================================================
      |  TITIPAN KE CUSTOMER
      * ====================================================================== */
