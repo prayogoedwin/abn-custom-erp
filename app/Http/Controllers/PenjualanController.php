@@ -325,6 +325,29 @@ class PenjualanController extends Controller
         return $pdf->download('Invoice-Penjualan-' . $penjualan->no_transaksi_penjualan . '.pdf');
     }
 
+    // Tampilkan halaman edit (data sama persis dengan cetak biasa)
+    public function editNota(Penjualan $penjualan)
+    {
+        $penjualan->load('details.produk', 'pengiriman.customer', 'customer');
+        $terbilang = $this->konversiTerbilang($penjualan->invoiceTotalDibayar());
+        // seperti yang sudah Anda lakukan di method cetak sekarang
+        return view('exports.penjualan-nota-edit', compact(
+            'penjualan',
+            'terbilang',
+            
+        ));
+    }
+
+    // Opsi B: HTML hasil edit -> PDF (tidak menyentuh database)
+    public function cetakNotaEdit(Request $request)
+    {
+        $request->validate(['html' => 'required|string']);
+
+        return Pdf::loadHTML($request->input('html'))
+            ->setPaper('a4', 'portrait')
+            ->download('Nota-Edit-' . now()->format('YmdHis') . '.pdf');
+    }
+
     private function konversiTerbilang(int $angka)
     {
         $angka = abs((int)$angka);

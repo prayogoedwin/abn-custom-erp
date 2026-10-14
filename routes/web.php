@@ -289,6 +289,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('penjualans/{penjualan}/cetaknota', [PenjualanController::class, 'cetakNota'])->name('penjualans.cetaknota')->middleware('permission:show-penjualans');
 
+    Route::get('/penjualan/{penjualan}/nota/edit', [PenjualanController::class, 'editNota'])
+        ->name('penjualan.nota.edit');
+    Route::post('/penjualan/nota/pdf-edit', [PenjualanController::class, 'cetakNotaEdit'])
+        ->name('penjualan.nota.pdf-edit');
+
     Route::get('penjualandetails/create/{penjualan}', [PenjualanDetailController::class, 'create'])->name('penjualandetails.create')->middleware('permission:create-penjualandetails');
     Route::Post('penjualandetails/store', [PenjualanDetailController::class, 'store'])->name('penjualandetails.store')->middleware('permission:create-penjualandetails');
 
@@ -353,7 +358,7 @@ Route::middleware(['auth'])->group(function () {
     //Cashbon supplier==================================================================================================
     Route::get('bon-suppliers', [BonSupplierController::class, 'index'])->name('bon-suppliers.index')->middleware('permission:view-cashbonsuppliers');
     Route::get('bon-suppliers/table', [BonSupplierController::class, 'indexTable'])->name('bon-suppliers.indexTable')->middleware('permission:view-cashbonsuppliers');
-    
+
     Route::get('bon-suppliers/export', [BonSupplierController::class, 'export'])->name('bon-suppliers.export')->middleware('permission:download-cashbonsuppliers');
     Route::get('bon-suppliers/create', [BonSupplierController::class, 'create'])->name('bon-suppliers.create')->middleware('permission:create-cashbonsuppliers');
     Route::post('bon-suppliers', [BonSupplierController::class, 'store'])->name('bon-suppliers.store')->middleware('permission:create-cashbonsuppliers');
@@ -429,7 +434,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('kategori_pengeluarans/export', [KategoriPengeluaranController::class, 'export'])->name('kategori-pengeluarans.export')->middleware('permission:download-kategori-pengeluarans');
     Route::get('kategori_pengeluarans/create', [KategoriPengeluaranController::class, 'create'])->name('kategori-pengeluarans.create')->middleware('permission:create-kategori-pengeluarans');
     Route::post('kategori_pengeluarans', [KategoriPengeluaranController::class, 'store'])->name('kategori-pengeluarans.store')->middleware('permission:create-kategori-pengeluarans');
-    
+
     Route::get('kategori_pengeluarans/{kategori_pengeluaran}/edit', [KategoriPengeluaranController::class, 'edit'])->name('kategori-pengeluarans.edit')->middleware('permission:edit-kategori-pengeluarans');
     Route::put('kategori_pengeluarans/{kategori_pengeluaran}', [KategoriPengeluaranController::class, 'update'])->name('kategori-pengeluarans.update')->middleware('permission:edit-kategori-pengeluarans');
     Route::delete('kategori_pengeluarans/{kategori_pengeluaran}', [KategoriPengeluaranController::class, 'destroy'])->name('kategori-pengeluarans.destroy')->middleware('permission:delete-kategori-pengeluarans');
