@@ -1,6 +1,10 @@
 <?php
+
 namespace App\Http\Controllers;
 
+use App\Models\Pembelian;
+use App\Models\PembelianDetail;
+use App\Models\Produk;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,23 +20,11 @@ class LaporanLabaRugiController extends Controller
         $akhir = Carbon::now()->endOfYear();
 
         if ($request->filled(['startdate', 'enddate'])) {
-                $mulai = Carbon::parse($request->startdate)->startOfDay();
-                $akhir = Carbon::parse($request->enddate)->endOfDay();
+            $mulai = Carbon::parse($request->startdate)->startOfDay();
+            $akhir = Carbon::parse($request->enddate)->endOfDay();
+        }
 
-            }
 
-        // dd($mulai, $akhir);
-
-        /*
-         * 1. DATA PENJUALAN
-         *
-         * Asumsi awal:
-         * - sub_total adalah nilai penjualan sebelum pajak.
-         * - Tanggal laporan berdasarkan penjualans.created_at.
-         *
-         * Pastikan kedua asumsi tersebut sesuai dengan
-         * kebijakan pencatatan transaksi Anda.
-         */
         $penjualan = DB::table('penjualan_details as pd')
             ->join(
                 'penjualans as p',
@@ -62,13 +54,30 @@ class LaporanLabaRugiController extends Controller
         $totalPph = (float) $penjualan->pph;
         $nominalAkhir = (float) $penjualan->nominal_akhir;
 
-        /*
-         * 2. DATA PENGELUARAN PER KATEGORI
-         *
-         */
-        $pengeluaranPerKategori = DB::table(
-                'pengeluarans as pg'
+
+        $pembelianPerBarang = PembelianDetail::query()
+            ->join('pembelians', 'pembelians.id', '=', 'pembelian_details.pembelian_id')
+            ->join('produks', 'produks.id', '=', 'pembelian_details.produk_id')
+            ->whereBetween('pembelians.created_at', [
+                $mulai->toDateString(),
+                $akhir->toDateString(),
+            ])
+            ->where('pembelian_details.tipe_transaksi_pembelian', 'jual')
+            ->whereNull('pembelian_details.deleted_at')
+            ->whereNull('produks.deleted_at')
+            ->select(
+                'produks.id as produk_id',
+                'produks.nama_produk as nama_barang',
+                DB::raw('SUM(pembelian_details.harga_netto) as total')
             )
+            ->groupBy('produks.id', 'produks.nama_produk')
+            ->orderBy('produks.nama_produk')
+            ->get();
+
+
+        $pengeluaranPerKategori = DB::table(
+            'pengeluarans as pg'
+        )
             ->leftJoin(
                 'kategori_pengeluarans as kp',
                 'kp.id',
@@ -92,21 +101,36 @@ class LaporanLabaRugiController extends Controller
             ->orderBy('kp.nama_kategori')
             ->get();
 
-        $totalPengeluaran = (float)
-            $pengeluaranPerKategori->sum('total');
+        $totalPengeluaran = (float) $pengeluaranPerKategori->sum('total') + $pembelianPerBarang->sum('total');
 
         // dd($totalPengeluaran);
 
-        /*
-         * 3. HPP BELUM DAPAT DIHITUNG DARI SKEMA SAAT INI
-         *
-         * Pembelian periode berjalan tidak sama dengan HPP.
-         * Dibutuhkan data persediaan awal, persediaan akhir,
-         * dan penyesuaian persediaan yang relevan.
-         */
-        $hpp = null;
-        $labaSetelahPengeluaranSebelumHpp = 
-            $totalPenjualan - $totalPengeluaran;
+
+        $hpp = DB::table('penjualan_details as pd')
+            ->join('penjualans as p', 'p.id', '=', 'pd.penjualan_id')
+            ->join('produks as pr', 'pr.id', '=', 'pd.produk_id')
+            ->whereBetween('p.created_at', [$mulai, $akhir])
+            ->whereNull('p.deleted_at')
+            ->whereNull('pd.deleted_at')
+            ->whereNull('pr.deleted_at')
+            ->selectRaw('
+                COALESCE(
+                    SUM(pd.netto * pr.harga_basis_pembelian),
+                    0
+                ) as hpp
+            ')
+            ->value('hpp');
+
+        // Pengeluaran operasional, tidak termasuk pembelian persediaan
+        $totalPengeluaranOperasional =
+            (float) $pengeluaranPerKategori->sum('total');
+
+        // HPP barang yang benar-benar terjual
+        // $hpp dihitung menggunakan query sebelumnya
+
+        $labaKotor = $totalPenjualan - $hpp;
+
+        $labaBersih = $labaKotor - $totalPengeluaranOperasional;
 
         /*
          * 4. DATA UNTUK PDF
@@ -119,16 +143,15 @@ class LaporanLabaRugiController extends Controller
             'ppn' => $totalPpn,
             'pph' => $totalPph,
             'nominalAkhir' => $nominalAkhir,
+            'pembelianPerBarang' => $pembelianPerBarang,
 
-            'pengeluaranPerKategori' =>
-                $pengeluaranPerKategori,
+            'pengeluaranPerKategori' => $pengeluaranPerKategori,
             'totalPengeluaran' => $totalPengeluaran,
 
             'hpp' => $hpp,
-            'labaSetelahPengeluaranSebelumHpp' =>
-                $labaSetelahPengeluaranSebelumHpp,
-
-            'labaBersih' => null,
+            'totalPengeluaranOperasional' => $totalPengeluaranOperasional,
+            'labaKotor' => $labaKotor,
+            'labaBersih' => $labaBersih,
         ];
 
         // dd($data);
@@ -138,7 +161,7 @@ class LaporanLabaRugiController extends Controller
             $data
         )->setPaper('a4', 'portrait');
 
-        
+
 
         return $pdf->download('laporan-laba-rugi.pdf');
     }

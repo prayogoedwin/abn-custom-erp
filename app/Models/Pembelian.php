@@ -6,28 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pembelian extends Model
 {
-    //
-    // public function up(): void
-    // {
-    //     Schema::create('pembelians', function (Blueprint $table) {
-    //         $table->id();
-    //         $table->string('no_transaksi');
-
-    //         $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
-    //         $table->string('nopol')->nullable();
-    //         $table->string('tipe_transaksi_pembelian')->default('Titip'); // titip or jual
-    //         $table->integer('total_nominal_pembelian')->default(0);
-    //         $table->integer('total_nominal_terbayar')->default(0);
-    //         $table->integer('kekurangan')->nullable();
-    //         $table->string('status_pembayaran')->default('Lunas'); // lunas or belum lunas
-    //         $table->boolean('isactive')->nullable()->default(true);
-    //         $table->timestamps();
-    //         $table->string('deleted_at')->nullable();
-    //         $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-    //         $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-    //         $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
-    //     });
-    // }
+    
 
     protected $table = 'pembelians';
 

@@ -86,7 +86,7 @@
         s.d.
         {{ $tanggalAkhir->format('d/m/Y') }}
         <br>
-        Basis data operasional — laporan sementara
+        Basis data operasional
     </div>
 
     <table>
@@ -111,21 +111,21 @@
             </tr>
 
             <tr>
-                <td>PPN tercatat (informasi)</td>
+                <td>PPN tercatat</td>
                 <td class="number">
                     {{ number_format($ppn, 0, ',', '.') }}
                 </td>
             </tr>
 
             <tr>
-                <td>PPh tercatat (informasi)</td>
+                <td>PPh tercatat</td>
                 <td class="number">
                     {{ number_format($pph, 0, ',', '.') }}
                 </td>
             </tr>
 
             <tr>
-                <td>Nominal akhir transaksi (informasi)</td>
+                <td>Nominal akhir transaksi</td>
                 <td class="number">
                     {{ number_format($nominalAkhir, 0, ',', '.') }}
                 </td>
@@ -136,16 +136,38 @@
                 <td></td>
             </tr>
 
+            @forelse ($pembelianPerBarang as $barang)
+            <tr>
+                <td>{{ $barang->nama_barang }}</td>
+                <td class="number">
+                    {{ number_format($barang->total, 0, ',', '.') }}
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="2">
+                    Tidak ada pembelian pada periode ini.
+                </td>
+            </tr>
+            @endforelse
+            <tr>
+                <td colspan="2">
+                    <b>Biaya Operasional:</b>
+                </td>
+            </tr>
+
             @forelse ($pengeluaranPerKategori as $item)
             <tr>
-                <td>{{ $item->kategori }}</td>
+                <td style="padding-left: 25px;">
+                    {{ $item->kategori }}
+                </td>
                 <td class="number">
                     {{ number_format($item->total, 0, ',', '.') }}
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="2">
+                <td colspan="2" style="padding-left: 25px;">
                     Tidak ada pengeluaran pada periode ini.
                 </td>
             </tr>
@@ -165,7 +187,7 @@
                 </td>
                 <td class="number">
                     {{ number_format(
-                        $labaSetelahPengeluaranSebelumHpp,
+                        $labaKotor,
                         0, ',', '.'
                     ) }}
                 </td>
@@ -173,22 +195,22 @@
 
             <tr>
                 <td>Harga pokok penjualan (HPP)</td>
-                <td class="number">Belum dihitung</td>
+                <td class="number">{{ number_format($hpp, 0, ',', '.') }}</td>
             </tr>
 
             <tr>
                 <td>Laba sebelum pajak</td>
-                <td class="number">Belum dapat ditentukan</td>
+                <td class="number">{{ number_format($labaKotor - $hpp, 0, ',', '.') }}</td>
             </tr>
 
             <tr>
                 <td>Laba bersih</td>
-                <td class="number">Belum dapat ditentukan</td>
+                <td class="number">{{ number_format($labaBersih, 0, ',', '.') }}</td>
             </tr>
         </tbody>
     </table>
 
-    
+
 
     <div class="footer">
         Dicetak pada {{ now()->format('d/m/Y H:i') }}

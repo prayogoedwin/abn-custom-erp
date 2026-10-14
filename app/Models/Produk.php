@@ -7,17 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Produk extends Model
 {
-    // Schema::create('produks', function (Blueprint $table) {
-    //         $table->id();
-    //         $table->foreignId('kategori_produk_id')->constrained()->cascadeOnDelete();
-    //         $table->string('nama_produk');
-    //         $table->string('satuan');
-    //         $table->decimal('harga_basis_pembelian', 15, 2);
-    //         $table->integer('stok_akhir');
-    //         $table->boolean('isactive')->default(true);
-
-    //         $table->timestampscustom();
-    //     });
 
     use SoftDeletes;
 
