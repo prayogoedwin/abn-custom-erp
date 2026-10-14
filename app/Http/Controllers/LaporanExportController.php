@@ -496,10 +496,18 @@ class LaporanExportController extends Controller
 
         $rows = $this->rowsFromUnion($pengeluaran->unionAll($pembelian));
 
+        $totalNominal = 0;
+        foreach ($rows as $row) {
+            $totalNominal += $row[1];
+        }
+
         return $this->downloadLaporan(
             'transaksi-tunai',
             ['Transaksi', 'Nominal', 'Sumber', 'Tanggal'],
-            $rows
+            $rows,
+            [
+                'Total Nominal' => number_format($totalNominal, 0, ',', '.'),
+            ]
         );
     }
 

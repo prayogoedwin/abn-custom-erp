@@ -2,11 +2,13 @@
 
 namespace App\Exports;
 
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
+
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
@@ -21,15 +23,21 @@ class LaporanExport implements
     WithMapping,
     ShouldAutoSize,
     WithStyles,
-    WithEvents
+    WithEvents,
+    WithCustomStartCell
 {
     protected Collection $rows;
     protected array $headings;
+    protected array $headerInfo;
 
-    public function __construct(Collection $rows, array $headings)
-    {
+    public function __construct(
+        Collection $rows,
+        array $headings,
+        array $headerInfo = []
+    ) {
         $this->rows = $rows;
         $this->headings = $headings;
+        $this->headerInfo = $headerInfo;
     }
 
     public function collection(): Collection
@@ -37,20 +45,27 @@ class LaporanExport implements
         return $this->rows;
     }
 
-    public function headings(): array
-    {
-        return $this->headings;
-    }
-
     public function map($row): array
     {
         return array_values((array) $row);
     }
 
+    public function headings(): array
+    {
+        return $this->headings;
+    }
+
+    public function startCell(): string
+    {
+        return 'A' . (count($this->headerInfo) + 2);
+    }
+
     public function styles(Worksheet $sheet)
     {
+        $headerRow = count($this->headerInfo) + 2;
+
         return [
-            1 => [
+            $headerRow => [
                 'font' => [
                     'bold' => true,
                     'color' => ['rgb' => 'FFFFFF'],
@@ -75,66 +90,61 @@ class LaporanExport implements
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
+                $infoCount = count($this->headerInfo);
+                $headerRow = $infoCount + 2;
                 $lastRow = $sheet->getHighestRow();
                 $lastColumn = $sheet->getHighestColumn();
 
-                $sheet->getRowDimension(1)->setRowHeight(28);
+                // Informasi header laporan
+                $row = 1;
+
+                foreach ($this->headerInfo as $label => $value) {
+                    $sheet->setCellValue("A{$row}", $label);
+                    $sheet->setCellValue("B{$row}", $value);
+
+                    $sheet->getStyle("A{$row}")->getFont()->setBold(true);
+
+                    $row++;
+                }
+
+                // Jarak antara informasi laporan dan tabel
+                $sheet->getRowDimension($infoCount + 1)->setRowHeight(8);
+                $sheet->getRowDimension($headerRow)->setRowHeight(25);
 
                 // Border tabel
-                $sheet->getStyle("A1:{$lastColumn}{$lastRow}")
+                $sheet->getStyle("A{$headerRow}:{$lastColumn}{$lastRow}")
                     ->getBorders()
                     ->getAllBorders()
                     ->setBorderStyle(Border::BORDER_THIN)
                     ->getColor()
                     ->setRGB('D9E2F3');
 
-                // Rata tengah vertikal
-                $sheet->getStyle("A1:{$lastColumn}{$lastRow}")
+                // Perataan vertikal
+                $sheet->getStyle("A{$headerRow}:{$lastColumn}{$lastRow}")
                     ->getAlignment()
                     ->setVertical(Alignment::VERTICAL_TOP);
 
                 // Warna selang-seling
-                for ($row = 2; $row <= $lastRow; $row++) {
-                    if ($row % 2 === 0) {
-                        $sheet->getStyle("A{$row}:{$lastColumn}{$row}")
+                for ($r = $headerRow + 1; $r <= $lastRow; $r++) {
+                    if (($r - $headerRow) % 2 === 1) {
+                        $sheet->getStyle("A{$r}:{$lastColumn}{$r}")
                             ->getFill()
                             ->setFillType(Fill::FILL_SOLID);
 
-                        $sheet->getStyle("A{$row}:{$lastColumn}{$row}")
+                        $sheet->getStyle("A{$r}:{$lastColumn}{$r}")
                             ->getFill()
                             ->getStartColor()
                             ->setRGB('F2F7F4');
                     }
                 }
 
-                // Bungkus teks detail produk (kolom D)
-                if ($lastRow >= 2 && $lastColumn >= 'D') {
-                    $sheet->getStyle("D2:D{$lastRow}")
-                        ->getAlignment()
-                        ->setWrapText(true);
+                // Filter hanya pada heading tabel
+                $sheet->setAutoFilter(
+                    "A{$headerRow}:{$lastColumn}{$lastRow}"
+                );
 
-                    for ($row = 2; $row <= $lastRow; $row++) {
-                        $sheet->getRowDimension($row)->setRowHeight(-1);
-                    }
-                }
-
-                // Format nominal: kolom E, F, G
-                if ($lastColumn >= 'G' && $lastRow >= 2) {
-                    $sheet->getStyle("E2:G{$lastRow}")
-                        ->getNumberFormat()
-                        ->setFormatCode('#,##0;[Red]-#,##0');
-
-                    $sheet->getStyle("E2:G{$lastRow}")
-                        ->getAlignment()
-                        ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-                }
-
-                // Filter dan freeze header
-                // $sheet->freezePane('A2');
-                $sheet->setAutoFilter("A1:{$lastColumn}{$lastRow}");
-
-                // Batasi lebar kolom detail
-                $sheet->getColumnDimension('D')->setWidth(45);
+                // Bekukan heading tabel
+                // $sheet->freezePane('A' . ($headerRow + 1));
             },
         ];
     }
