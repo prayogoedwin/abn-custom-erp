@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Exports\Laporan\PembelianExport;
+use App\Models\BonKaryawan;
+use App\Models\BonPihak3;
+use App\Models\BonSupplier;
 use App\Models\CashbonKaryawan;
 use App\Models\CashbonPihak3;
 use App\Models\CashbonPihak3Pembayaran;
@@ -16,6 +19,7 @@ use App\Models\KategoriPengeluaran;
 use App\Models\Pengeluaran;
 use App\Models\Pengiriman;
 use App\Models\PenjualanDetail;
+use App\Models\Pihak3;
 use App\Models\Stok;
 use App\Models\StokTitipan;
 use Yajra\DataTables\Facades\DataTables;
@@ -103,7 +107,7 @@ class LaporanController extends Controller
 
 
             return DataTables::of($pembelians)
-                
+
                 ->addColumn('supplier', function ($pembelian) {
                     return $pembelian->supplier?->nama ?? '-';
                 })
@@ -231,7 +235,7 @@ class LaporanController extends Controller
 
 
             return DataTables::of($penjualans)
-                
+
                 ->addColumn('customer', function ($penjualan) {
                     return $penjualan->customer?->nama ?? '-';
                 })
@@ -471,36 +475,32 @@ class LaporanController extends Controller
     }
     public function laporanbonsuppliers(Request $request)
     {
-        if (request()->ajax()) {
-            $bonSuppliers = CashbonSupplier::with('supplier')->whereNull('deleted_at');
+        if ($request->ajax()) {
+
+            if (!$request->supplier) {
+                return response()->json(['data' => []]);
+            }
+
+            $bonSuppliers = BonSupplier::where('supplier_id', $request->supplier);
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
                 $start = Carbon::parse($request->startdate)->startOfDay();
                 $end   = Carbon::parse($request->enddate)->endOfDay();
 
-                $bonSuppliers->whereBetween('cashbon_suppliers.created_at', [$start, $end]);
-            }
-
-            //filter supplier
-            if ($request->filled('supplier')) {
-                $supplier = $request->supplier;
-                $bonSuppliers->whereHas('supplier', function ($q) use ($supplier) {
-                    $q->where('id', $supplier);
-                });
+                $bonSuppliers->whereBetween('created_at', [$start, $end]);
             }
 
             return DataTables::of($bonSuppliers)
-                ->editColumn('nominal_cashbon', function ($cashbonsupplier) {
-                    // Formats to: Rp 1.500.000 (0 decimals)
-                    // rata kanan
-                    return '<div style="text-align: right;">' . number_format($cashbonsupplier->nominal_cashbon, 0, ',', '.') . '</div>';
-                })
+                ->addIndexColumn()
 
-                ->editColumn('created_at', function ($cashbonsupplier) {
-                    return $cashbonsupplier->created_at->translatedFormat('d M Y');
+                ->editColumn('created_at', function ($bonSupplier) {
+                    return $bonSupplier->created_at->translatedFormat('d M Y');
                 })
-                ->rawColumns(['nominal_cashbon'])
+                ->editColumn('sisa', function ($bonSupplier) {
+                    return $bonSupplier->generateSisa();
+                })
+                ->rawColumns(['actions'])
                 ->make(true);
         }
 
@@ -651,7 +651,7 @@ class LaporanController extends Controller
                 ])
                 ->selectRaw("' ' as kategori")
                 ->selectRaw("'pembelian' as sumber");
-                
+
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
@@ -754,7 +754,7 @@ class LaporanController extends Controller
                 ])
                 ->selectRaw("' ' as kategori")
                 ->selectRaw("'pembelian' as sumber");
-                
+
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
@@ -828,92 +828,72 @@ class LaporanController extends Controller
     public function laporankasbonkaryawans(Request $request)
     {
         if ($request->ajax()) {
-            // dd('masuk ajax');
 
-            $kasbonKaryawans = CashbonKaryawan::with('karyawan')->whereNull('deleted_at');
+            if (!$request->karyawan) {
+                return response()->json(['data' => []]);
+            }
+
+            $bonKaryawan = BonKaryawan::where('karyawan_id', $request->karyawan);
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
                 $start = Carbon::parse($request->startdate)->startOfDay();
                 $end   = Carbon::parse($request->enddate)->endOfDay();
 
-                $kasbonKaryawans->whereBetween('cashbon_karyawans.created_at', [$start, $end]);
+                $bonKaryawan->whereBetween('created_at', [$start, $end]);
             }
 
-            //filter karyawan
-            if ($request->filled('karyawan')) {
-                $karyawan = $request->karyawan;
-                $kasbonKaryawans->whereHas('karyawan', function ($q) use ($karyawan) {
-                    $q->where('id', $karyawan);
-                });
-            }
+            return DataTables::of($bonKaryawan)
+                ->addIndexColumn()
 
-            return DataTables::of($kasbonKaryawans)
-                ->editColumn('nominal_cashbon', function ($cashbonkaryawan) {
-                    // Formats to: Rp 1.500.000 (0 decimals)
-                    // rata kanan
-                    return '<div style="text-align: right;">' . number_format($cashbonkaryawan->nominal_cashbon, 0, ',', '.') . '</div>';
+                ->editColumn('created_at', function ($bonKaryawan) {
+                    return $bonKaryawan->created_at->translatedFormat('d M Y');
                 })
-
-                ->editColumn('created_at', function ($cashbonkaryawan) {
-                    return $cashbonkaryawan->created_at->translatedFormat('d M Y');
+                ->editColumn('sisa', function ($bonKaryawan) {
+                    return $bonKaryawan->generateSisa();
                 })
-                ->rawColumns(['nominal_cashbon'])
+                ->rawColumns(['actions'])
                 ->make(true);
         }
 
-        $karyawans = Karyawan::where('deleted_at', null)->get();
+        $karyawans = Karyawan::whereNull('deleted_at')->get();
         return view('laporan.kasbonkaryawans', compact('karyawans'));
     }
     public function laporantransaksipihakketigas(Request $request)
     {
         if ($request->ajax()) {
 
-            $cashbon = CashbonPihak3::with('pihak3')
-                ->select([
-                    'id',
-                    'pihak3_id',
-                    'nominal_cashbon as nominal',
-                    'keterangan',
-                    'created_at',
-                ])
-                ->selectRaw("'cashbon' as sumber");
+            if (!$request->pihak3) {
+                return response()->json(['data' => []]);
+            }
 
-            $pembayaran = CashbonPihak3Pembayaran::with('pihak3')
-                ->select([
-                    'id',
-                    'pihak3_id',
-
-                    'nominal_bayar as nominal',
-                    'keterangan',
-                    'created_at',
-                ])
-                ->selectRaw("'pembayaran' as sumber");
-
+            $bonPihak3 = BonPihak3::where('pihak3_id', $request->pihak3);
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
                 $start = Carbon::parse($request->startdate)->startOfDay();
                 $end   = Carbon::parse($request->enddate)->endOfDay();
 
-                $cashbon->whereBetween('created_at', [$start, $end]);
-                $pembayaran->whereBetween('created_at', [$start, $end]);
+                $bonPihak3->whereBetween('created_at', [$start, $end]);
             }
 
-            $query = $cashbon->unionAll($pembayaran);
+            return DataTables::of($bonPihak3)
+                ->addIndexColumn()
 
-            return DataTables::of($query)
-                ->editColumn('nominal', function ($row) {
-                    return '<div style="text-align: right;">' . number_format($row->nominal, 0, ',', '.') . '</div>';
+                ->editColumn('created_at', function ($bonPihak3) {
+                    return $bonPihak3->created_at->translatedFormat('d M Y');
                 })
-                ->editColumn('created_at', function ($row) {
-                    return $row->created_at->translatedFormat('d M Y');
+                ->editColumn('sisa', function ($bonPihak3) {
+                    return $bonPihak3->generateSisa();
                 })
-                ->rawColumns(['nominal'])
+                ->rawColumns(['actions'])
                 ->make(true);
         }
 
-        return view('laporan.transaksipihakketigas');
+        $pihak3s = Pihak3::whereNull('deleted_at')->get();
+
+
+        return view('laporan.transaksipihakketigas', compact('pihak3s'));
     }
     public function laporanbiayas(Request $request)
     {
@@ -925,7 +905,7 @@ class LaporanController extends Controller
                 '=',
                 'kategori_pengeluarans.id'
             )
-                
+
                 ->select([
                     'pengeluarans.id',
                     'pengeluarans.nama_pengeluaran as transaksi',

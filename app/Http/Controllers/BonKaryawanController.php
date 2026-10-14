@@ -11,7 +11,7 @@ class BonKaryawanController extends Controller
 {
     public function index()
     {
-        $karyawans = Karyawan::all();
+        $karyawans = Karyawan::whereNull('deleted_at')->get();
         return view('bon-karyawans.index', compact('karyawans'));
     }
 
@@ -30,7 +30,6 @@ class BonKaryawanController extends Controller
                 ->addColumn('actions', function ($bonSupplier) {
                     $actions = '';
 
-                    $actions .= '<a href="' . route('bon-karyawans.show', $bonSupplier) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
 
 
                     $actions .= '<form action="' . route('bon-karyawans.delete', $bonSupplier) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">

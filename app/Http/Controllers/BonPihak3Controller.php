@@ -31,7 +31,7 @@ class BonPihak3Controller extends Controller
                 ->addColumn('actions', function ($bonSupplier) {
                     $actions = '';
 
-                    $actions .= '<a href="' . route('bon-pihak3s.show', $bonSupplier) . '" class="text-green-600 dark:text-green-400 hover:underline mr-3">View</a>';
+                    
 
 
                     $actions .= '<form action="' . route('bon-pihak3s.delete', $bonSupplier) . '" method="POST" class="inline" onsubmit="return confirm(\'Are you sure?\')">

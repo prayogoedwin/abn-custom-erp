@@ -61,9 +61,26 @@
                 </div>
             </div>
 
-            
 
-            
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
+                <!-- Karyawan Select Group -->
+                <div class="flex-1">
+                    <label for="pihak3" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                        Pihak Ketiga
+                    </label>
+                    <div class="relative">
+                        <select id="pihak3" name="pihak3" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
+                            <option value="">Pilih Pihak Ketiga</option>
+                            @foreach($pihak3s as $pihak3)
+                            <option value="{{ $pihak3->id }}" {{ request('pihak3') == $pihak3->id ? 'selected' : '' }}>
+                                {{ $pihak3->nama }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
 
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl">
 
@@ -99,12 +116,12 @@
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
 
-                        
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pihak Ketiga</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">CashBon / Pembayaran</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nominal</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
-                        
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Masuk</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keluar</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sisa</th>
+
 
 
                     </tr>
@@ -128,35 +145,36 @@
                 ajax: {
                     url: '{{ route("laporantransaksipihakketigas.index") }}',
                     data: function(d) {
+                        d.pihak3 = $('#pihak3').val();
                         d.startdate = $('#startdate').val();
                         d.enddate = $('#enddate').val();
                     }
                 },
                 //columns : pihak3.nama, sumber, nominal, created_at
                 columns: [{
-                        data: 'pihak3.nama',
-                        name: 'pihak3.nama',
-                        
-                    },
-                    
-                    {
-                        data: 'sumber',
-                        name: 'sumber',
-                    },
-                    {
-                        data: 'nominal',
-                        name: 'nominal'
-                    },
-                    {
                         data: 'created_at',
                         name: 'created_at'
                     },
-                    
+                    {
+                        data: 'keterangan',
+                        name: 'keterangan'
+                    },
+                    {
+                        data: 'masuk',
+                        name: 'masuk'
+                    },
+                    {
+                        data: 'keluar',
+                        name: 'keluar'
+                    },
+                    {
+                        data: 'sisa',
+                        name: 'sisa'
+                    },
+
 
                 ],
-                order: [
-                    [3, 'desc']
-                ],
+                
                 language: {
                     search: "_INPUT_",
                     searchPlaceholder: "Search " + "Transaksi Pihak Ketiga",
@@ -179,7 +197,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            document.getElementById('current-filter-info').textContent = 'Menampilkan Semua Data';
+            document.getElementById('current-filter-info').textContent = 'Mohon Pilih Pihak Ketiga Terlebih Dahulu';
         });
 
         function tableReload() {
@@ -190,7 +208,13 @@
             let startDate = formatTanggalDDMMYYYY($('#startdate').val());
             let endDate = formatTanggalDDMMYYYY($('#enddate').val());
 
-            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong>';
+            let text = '';
+            if (!$('#pihak3').val()) {
+                text = 'Mohon Pilih Pihak Ketiga Terlebih Dahulu';
+            }else{
+                text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#pihak3').val() ? 'Pihak Ketiga <strong>' + $('#pihak3 option:selected').text() + '</strong>' : 'Semua Pihak Ketiga') ;
+            }
+
             $('#current-filter-info').html(text);
 
             // Show the reset button

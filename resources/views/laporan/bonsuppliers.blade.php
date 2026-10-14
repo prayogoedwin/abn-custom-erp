@@ -70,7 +70,7 @@
                     </label>
                     <div class="relative">
                         <select id="supplier" name="supplier" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
-                            <option value="">Semua Supplier</option>
+                            <option value="">Pilih Supplier</option>
                             @foreach($suppliers as $supplier)
                             <option value="{{ $supplier->id }}" {{ request('supplier') == $supplier->id ? 'selected' : '' }}>
                                 {{ $supplier->nama }}
@@ -92,7 +92,7 @@
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z" />
                         </svg>
-                        Filter
+                        Terapkan
                     </button>
 
                     <!-- hanya muncul ketika sudah me filter -->
@@ -119,13 +119,15 @@
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
 
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
+
+                        
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Masuk</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keluar</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sisa</th>
                         
+
 
 
 
@@ -157,10 +159,7 @@
                     }
                 },
                 //columns : supplier.nama, nominal_cashbon, keterangan, created_at
-                columns: [{
-                        data: 'supplier.nama',
-                        name: 'supplier.nama'
-                    },
+                columns: [
                     {
                         data: 'created_at',
                         name: 'created_at'
@@ -182,8 +181,6 @@
                         name: 'sisa'
                     },
                     
-                    
-
 
                 ],
                 
@@ -210,7 +207,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            document.getElementById('current-filter-info').textContent = 'Menampilkan Semua Data';
+            document.getElementById('current-filter-info').textContent = 'Mohon Pilih Supplier Terlebih Dahulu';
         });
 
         function tableReload() {
@@ -221,7 +218,15 @@
             let startDate = formatTanggalDDMMYYYY($('#startdate').val());
             let endDate = formatTanggalDDMMYYYY($('#enddate').val());
 
-            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#supplier').val() ? 'Supplier <strong>' + $('#supplier option:selected').text() + '</strong>' : 'Semua Supplier') + ', ' + ($('#barang').val() ? 'Barang: <strong>' + $('#barang option:selected').text() + '</strong>' : 'Semua Barang');
+            let supplier = $('#supplier').val();
+            let text = '';
+
+            if (!supplier) {
+                text = 'Mohon Pilih Supplier Terlebih Dahulu';
+            }
+            else {
+                text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#supplier').val() ? 'Supplier <strong>' + $('#supplier option:selected').text() + '</strong>' : 'Semua Supplier') + '';
+            }
             $('#current-filter-info').html(text);
 
             // Show the reset button

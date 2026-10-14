@@ -70,7 +70,7 @@
                     </label>
                     <div class="relative">
                         <select id="karyawan" name="karyawan" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
-                            <option value="">Semua Karyawan</option>
+                            <option value="">Pilih Karyawan</option>
                             @foreach($karyawans as $karyawan)
                             <option value="{{ $karyawan->id }}" {{ request('karyawan') == $karyawan->id ? 'selected' : '' }}>
                                 {{ $karyawan->nama }}
@@ -119,10 +119,11 @@
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
 
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Karyawan</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nominal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Masuk</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keluar</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sisa</th>
 
 
 
@@ -154,28 +155,31 @@
                     }
                 },
                 //columns : karyawan.nama, nominal_cashbon, keterangan, created_at
-                columns: [{
-                        data: 'karyawan.nama',
-                        name: 'karyawan.nama'
-                    },
+                columns: [
                     {
-                        data: 'nominal_cashbon',
-                        name: 'nominal_cashbon'
+                        data: 'created_at',
+                        name: 'created_at'
                     },
                     {
                         data: 'keterangan',
                         name: 'keterangan'
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
-                    }
+                        data: 'masuk',
+                        name: 'masuk'
+                    },
+                    {
+                        data: 'keluar',
+                        name: 'keluar'
+                    },
+                    {
+                        data: 'sisa',
+                        name: 'sisa'
+                    },
 
 
                 ],
-                order: [
-                    [3, 'desc'] // order by tanggal descending by default
-                ],
+                
 
                 language: {
                     search: "_INPUT_",
@@ -199,7 +203,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            document.getElementById('current-filter-info').textContent = 'Menampilkan Semua Data';
+            document.getElementById('current-filter-info').textContent = 'Mohon Pilih Karyawan Terlebih Dahulu';
         });
 
         function tableReload() {
@@ -210,7 +214,12 @@
             let startDate = formatTanggalDDMMYYYY($('#startdate').val());
             let endDate = formatTanggalDDMMYYYY($('#enddate').val());
 
-            let text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#karyawan').val() ? 'Karyawan <strong>' + $('#karyawan option:selected').text() + '</strong>' : 'Semua Karyawan') ;
+            let text = '';
+            if (!$('#karyawan').val()) {
+                text = 'Mohon Pilih Karyawan Terlebih Dahulu';
+            }else{
+                text = 'Menampilkan data dari <strong>' + (semuaWaktu ? 'Awal' : startDate) + '</strong> sampai <strong>' + (semuaWaktu ? 'Sekarang' : endDate) + '</strong> untuk ' + ($('#karyawan').val() ? 'Karyawan <strong>' + $('#karyawan option:selected').text() + '</strong>' : 'Semua Karyawan') ;
+            }
             $('#current-filter-info').html(text);
 
             // Show the reset button
