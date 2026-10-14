@@ -151,59 +151,6 @@ class LaporanController extends Controller
         return view('laporan.pembelians', compact('suppliers', 'barangs'));
     }
 
-    public function laporanpembeliansExport(Request $request)
-    {
-        $query = Pembelian::with('supplier', 'details.produk')->whereNull('deleted_at');
-
-        //filter tanggal
-        if ($request->filled(['startdate', 'enddate'])) {
-            $start = Carbon::parse($request->startdate)->startOfDay();
-            $end   = Carbon::parse($request->enddate)->endOfDay();
-
-            $query->whereBetween('created_at', [$start, $end]);
-        }
-
-        //filter supplier
-        if ($request->filled('supplier')) {
-            $supplier = $request->supplier;
-            $query->where('supplier_id', $supplier);
-        }
-
-        //filter barang
-        if ($request->filled('barang')) {
-            $barang = $request->barang;
-            $query->whereHas('details.produk', function ($q) use ($barang) {
-                $q->where('id', $barang);
-            });
-        }
-
-        $data = $query->get();
-
-        $data->transform(function ($pembelian) {
-            $pembelian->produk_list = $pembelian->details->map(function ($detail) {
-                return '[' . $detail->tipe_transaksi_pembelian . '] ' . ($detail->produk?->nama_produk ?? '-');
-            })->implode(', ');
-            return $pembelian;
-        });
-
-        $data->transform(function ($pembelian) {
-            $pembelian->kekurangan = number_format($pembelian->kekurangan, 0, ',', '.');
-            return $pembelian;
-        });
-
-        $data->transform(function ($pembelian) {
-            $pembelian->created_at = $pembelian->created_at->translatedFormat('d M Y');
-            return $pembelian;
-        });
-
-        $data->transform(function ($pembelian) {
-            $pembelian->supplier = $pembelian->supplier?->nama ?? '-';
-            return $pembelian;
-        });
-        // dd($data);
-
-        return Excel::download(new PembelianExport($data), 'pembelians-' . date('Y-m-d') . '.xlsx');
-    }
 
     public function laporanpenjualans(Request $request)
     {

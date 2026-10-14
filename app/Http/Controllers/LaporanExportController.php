@@ -8,10 +8,6 @@ use App\Exports\BonSupplierExport;
 use App\Exports\Laporan\BiayaExport;
 use App\Exports\Laporan\RugiLabaExport;
 use App\Exports\LaporanExport;
-use App\Models\CashbonKaryawan;
-use App\Models\CashbonPihak3;
-use App\Models\CashbonPihak3Pembayaran;
-use App\Models\CashbonSupplier;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
 use App\Models\Produk;
@@ -59,10 +55,14 @@ class LaporanExportController extends Controller
         return $value ? Carbon::parse($value)->translatedFormat('d M Y') : '-';
     }
 
-    private function downloadLaporan(string $nama, array $headings, mixed $rows)
+    private function downloadLaporan(string $nama, array $headings, mixed $rows, array $headerInfo = [])
     {
         return Excel::download(
-            new LaporanExport(collect($rows)->values(), $headings),
+            new LaporanExport(
+                collect($rows)->values(),
+                $headings,
+                $headerInfo
+            ),
             $nama . '-' . date('Y-m-d') . '.xlsx'
         );
     }
@@ -147,35 +147,136 @@ class LaporanExportController extends Controller
     }
 
     /* ======================================================================
+     |  PEMBELIAN
+     * ====================================================================== */
+
+    public function laporanpembeliansExport(Request $request)
+    {
+        $query = Pembelian::with(['supplier', 'details.produk'])
+            ->whereNull('deleted_at');
+
+        // Filter tanggal
+        if ($request->filled(['startdate', 'enddate'])) {
+            $start = Carbon::parse($request->startdate)->startOfDay();
+            $end = Carbon::parse($request->enddate)->endOfDay();
+
+            $query->whereBetween('created_at', [$start, $end]);
+        }
+
+        // Filter supplier
+        if ($request->filled('supplier')) {
+            $query->where('supplier_id', $request->supplier);
+        }
+
+        // Filter barang
+        if ($request->filled('barang')) {
+            $barang = $request->barang;
+
+            $query->whereHas('details.produk', function ($q) use ($barang) {
+                $q->where('id', $barang);
+            });
+        }
+
+        $rows = $query->latest()->get()->map(function ($pembelian) {
+            $detail = $pembelian->details->map(function ($d) {
+                return '[' . ($d->tipe_transaksi_pembelian ?? '-') . '] '
+                    . ($d->produk?->nama_produk ?? '-')
+                    . ' (' . ($d->netto ?? 0)
+                    . ' ' . ($d->produk?->satuan ?? '-') . ')';
+            })->implode("\n");
+
+            return [
+                'no_transaksi' => $pembelian->no_transaksi,
+                'supplier' => $pembelian->supplier?->nama ?? '-',
+                'created_at' => $pembelian->created_at
+                    ? $pembelian->created_at->translatedFormat('d M Y')
+                    : '-',
+                'detail' => $detail,
+                'total_nominal_pembelian' => $pembelian->total_nominal_pembelian,
+                'total_nominal_terbayar' => $pembelian->total_nominal_terbayar,
+                'kekurangan' => $pembelian->kekurangan,
+                'status_pembayaran' => $pembelian->status_pembayaran,
+            ];
+        });
+
+        return $this->downloadLaporan(
+            'laporan-pembelian',
+            [
+                'No Transaksi',
+                'Supplier',
+                'Tanggal',
+                'Detail',
+                'Total Pembelian',
+                'Total Terbayar',
+                'Kekurangan',
+                'Status Pembayaran',
+            ],
+            $rows
+        );
+    }
+
+    /* ======================================================================
      |  PENJUALAN
      * ====================================================================== */
     public function laporanpenjualansExport(Request $request)
     {
-        $query = Penjualan::with('customer', 'details.produk')->whereNull('deleted_at');
+        $query = Penjualan::with(['customer', 'details.produk'])
+            ->whereNull('deleted_at');
 
-        $this->applyDateFilter($query, $request);
+        // Filter tanggal
+        if ($request->filled(['startdate', 'enddate'])) {
+            $start = Carbon::parse($request->startdate)->startOfDay();
+            $end = Carbon::parse($request->enddate)->endOfDay();
 
+            $query->whereBetween('created_at', [$start, $end]);
+        }
+
+        // Filter customer
         if ($request->filled('customer')) {
             $query->where('customer_id', $request->customer);
         }
 
+        // Filter barang
         if ($request->filled('barang')) {
             $barang = $request->barang;
-            $query->whereHas('details.produk', fn($q) => $q->where('id', $barang));
+
+            $query->whereHas('details.produk', function ($q) use ($barang) {
+                $q->where('id', $barang);
+            });
         }
 
-        $rows = $query->latest()->get()->map(fn($p) => [
-            $p->no_transaksi_penjualan,
-            $p->customer?->nama ?? '-',
-            $p->tanggal(),
-            $p->details->map(
-                fn($d) => '[' . $d->tipe . '] ' . ($d->produk?->nama_produk ?? '-')
-            )->implode(', '),
-        ]);
+        $rows = $query->latest()->get()->map(function ($penjualan) {
+            $detail = $penjualan->details->map(function ($d) {
+                return '[' . ($d->tipe ?? '-') . '] '
+                    . ($d->produk?->nama_produk ?? '-')
+                    . ' (' . ($d->netto ?? 0)
+                    . ' ' . ($d->produk?->satuan ?? '-') . ')';
+            })->implode("\n");
+
+            return [
+                'no_transaksi_penjualan' => $penjualan->no_transaksi_penjualan,
+                'customer' => $penjualan->customer?->nama ?? '-',
+                'created_at' => $penjualan->tanggal(),
+                'detail' => $detail,
+                'jumlah' => $penjualan->invoiceJumlah(),
+                'ppn' => $penjualan->invoicePpn(),
+                'pph' => $penjualan->invoicePph22(),
+                'total' => $penjualan->invoiceTotalDibayar(),
+            ];
+        });
 
         return $this->downloadLaporan(
-            'penjualans',
-            ['No Transaksi', 'Customer', 'Tanggal', 'Detail'],
+            'laporan-penjualan',
+            [
+                'No Transaksi',
+                'Customer',
+                'Tanggal',
+                'Detail',
+                'Jumlah',
+                'PPN',
+                'PPh 22',
+                'Total Dibayar',
+            ],
             $rows
         );
     }
@@ -421,11 +522,22 @@ class LaporanExportController extends Controller
 
         $rows = $this->rowsFromUnion($pengeluaran->unionAll($pembelian));
 
+        $totalNominal = 0;
+        foreach ($rows as $row) {
+            $totalNominal += $row[1];
+        }
+
+        // dd($totalNominal);
+        
         return $this->downloadLaporan(
             'transaksi-bank',
             ['Transaksi', 'Nominal', 'Sumber', 'Tanggal'],
-            $rows
+            $rows,
+            [
+                'Total Nominal' => number_format($totalNominal, 0, ',', '.'),
+            ]
         );
+
     }
 
     /* ======================================================================
