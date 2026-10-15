@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         $settings = [
-            ['key' => 'TIK', 'value' => 'temp_tik', 'description' => 'TIK yang digunakan pada xml Coretax'],
+            ['key' => 'TIN', 'value' => 'temp_tin', 'description' => 'TIN yang digunakan pada xml Coretax'],
             ['key' => 'IdTKU', 'value' => 'temp_idtku', 'description' => 'IdTKU yang digunakan pada xml Coretax'],
         ];
         foreach ($settings as $setting) {
@@ -27,7 +27,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('settings', function (Blueprint $table) {
-            DB::table('settings')->whereIn('key', ['TIK', 'IdTKU'])->delete();
+            DB::table('settings')->whereIn('key', ['TIN', 'IdTKU'])->delete();
         });
     }
 };

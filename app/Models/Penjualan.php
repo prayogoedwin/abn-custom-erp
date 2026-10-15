@@ -7,17 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Penjualan extends Model
 {
     use SoftDeletes;
-    // Schema::create('penjualans', function (Blueprint $table) {
-    //         $table->id();
-    //         $table->string('no_transaksi_penjualan');
-    //         $table->foreignId('pengiriman_id')->constrained('pengirimans');
-    //         $table->foreignId('customer_id')->constrained('customers');
-    //         $table->timestamps();
-    //         $table->softDeletes();
-    //         $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-    //         $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-    //         $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
-    //     });
 
     protected $table = 'penjualans';
 

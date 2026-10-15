@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Exports\PenjualanExport;
@@ -9,10 +8,13 @@ use App\Models\PengirimanDetail;
 use App\Models\Penjualan;
 use App\Models\PenjualanDetail;
 use App\Models\Produk;
+use App\Models\Setting;
 use App\Models\SimpanPinjamSupplier;
 use App\Models\Supplier;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use DOMDocument;
 use Illuminate\Http\Request;
 
 use Illuminate\Http\RedirectResponse;
@@ -163,6 +165,189 @@ class PenjualanController extends Controller
     {
         //TODO:
         // return Excel::download(new PenjualanExport, 'penjualans-' . date('Y-m-d') . '.xlsx');
+    }
+
+    public function exportXmlCoretax(Request $request)
+    {
+        $validated = $request->validate([
+            'tanggal_mulai' => ['nullable', 'date'],
+            'tanggal_selesai' => [
+                'nullable',
+                'date',
+                'after_or_equal:tanggal_mulai',
+            ],
+        ]);
+
+        $query = Penjualan::query()
+            ->with([
+                'customer',
+                'details.produk',
+            ])
+            ->orderBy('created_at')
+            ->orderBy('id');
+
+        if (!empty($validated['tanggal_mulai'])) {
+            $query->whereDate(
+                'created_at',
+                '>=',
+                $validated['tanggal_mulai']
+            );
+        }
+
+        if (!empty($validated['tanggal_selesai'])) {
+            $query->whereDate(
+                'created_at',
+                '<=',
+                $validated['tanggal_selesai']
+            );
+        }
+
+        $penjualans = $query->get();
+
+        $tin = Setting::where('key', 'TIN')->first()?->value;
+        $idTku = Setting::where('key', 'IdTKU')->first()?->value;
+
+        if (!$tin || !$idTku) {
+            return response()->json([
+                'message' => 'TIN atau IdTKU belum dikonfigurasi.',
+            ], 422);
+        }
+
+        $xml = new DOMDocument('1.0', 'utf-8');
+        $xml->xmlStandalone = true;
+        $xml->formatOutput = true;
+
+        // Root
+        $root = $xml->createElement('SimpleBookKeepingBulk');
+        $root->setAttribute(
+            'xmlns:xsi',
+            'http://www.w3.org/2001/XMLSchema-instance'
+        );
+
+        $xml->appendChild($root);
+
+        // TIN
+        $root->appendChild(
+            $xml->createElement('TIN', $tin)
+        );
+
+        // Daftar transaksi
+        $list = $xml->createElement('ListOfTransaction');
+        $root->appendChild($list);
+
+        // Helper untuk membuat elemen dengan text aman
+        $addElement = function ($parent, $name, $value) use ($xml) {
+            $element = $xml->createElement($name);
+
+            if ($value !== null && $value !== '') {
+                $element->appendChild(
+                    $xml->createTextNode((string) $value)
+                );
+            }
+
+            $parent->appendChild($element);
+
+            return $element;
+        };
+
+        // Format angka tanpa pemisah ribuan
+        $formatNumber = function ($value) {
+            $number = number_format(
+                (float) ($value ?? 0),
+                4,
+                '.',
+                ''
+            );
+
+            return rtrim(rtrim($number, '0'), '.');
+        };
+
+        foreach ($penjualans as $penjualan) {
+            $transaction = $xml->createElement('Transaction');
+            $list->appendChild($transaction);
+
+            // Identitas transaksi
+            $addElement($transaction, 'IdTku', $idTku);
+
+            $addElement(
+                $transaction,
+                'TransactionNumber',
+                $penjualan->no_transaksi_penjualan
+            );
+
+            $tanggal = $penjualan->created_at
+                ? Carbon::parse($penjualan->created_at)
+                ->format('Y-m-d')
+                : '';
+
+            $addElement(
+                $transaction,
+                'TransactionDate',
+                $tanggal
+            );
+
+            // Sesuaikan 'nama' dengan kolom nama customer Anda
+            $customer = $penjualan->customer?->nama ?? '';
+
+            $addElement(
+                $transaction,
+                'Customer',
+                $customer
+            );
+
+            // Detail barang/jasa
+            $detailsTransaction = $xml->createElement(
+                'DetailsTransaction'
+            );
+
+            $transaction->appendChild($detailsTransaction);
+
+            foreach ($penjualan->details as $detail) {
+                $detailElement = $xml->createElement('Detail');
+
+                $detailsTransaction->appendChild($detailElement);
+
+                // Sesuaikan nama kolom produk jika berbeda
+                $namaProduk = $detail->produk?->nama_produk
+                    ?? $detail->produk?->nama
+                    ?? '';
+
+                $addElement(
+                    $detailElement,
+                    'DetailsOfGoodService',
+                    $namaProduk
+                );
+
+                // Asumsi basis_harga adalah harga per unit
+                $addElement(
+                    $detailElement,
+                    'PricePerUnit',
+                    $formatNumber($detail->basis_harga)
+                );
+
+                // Asumsi netto adalah kuantitas barang
+                $addElement(
+                    $detailElement,
+                    'Qty',
+                    $formatNumber($detail->netto)
+                );
+            }
+
+            // Model belum memiliki kolom diskon.
+            // Ubah jika diskon transaksi tersedia.
+            $addElement($transaction, 'Discount', '0');
+        }
+
+        $filename = 'penjualan-coretax-'
+            . now()->format('Ymd-His')
+            . '.xml';
+
+        return response($xml->saveXML(), 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'
+                . $filename
+                . '"',
+        ]);
     }
 
     public function create(): View
@@ -334,7 +519,7 @@ class PenjualanController extends Controller
         return view('exports.penjualan-nota-edit', compact(
             'penjualan',
             'terbilang',
-            
+
         ));
     }
 

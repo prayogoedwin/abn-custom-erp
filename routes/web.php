@@ -279,6 +279,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('penjualans', [PenjualanController::class, 'index'])->name('penjualans.index')->middleware('permission:view-penjualans');
     Route::get('penjualans/table', [PenjualanController::class, 'indexTable'])->name('penjualans.indexTable')->middleware('permission:view-penjualans');
     Route::get('penjualans/export', [PenjualanController::class, 'export'])->name('penjualans.export')->middleware('permission:download-penjualans');
+    Route::get('penjualans/export-xml-coretax', [PenjualanController::class, 'exportXmlCoretax'])->name('penjualans.exportXmlCoretax')->middleware('permission:download-penjualans');
     Route::get('penjualans/create', [PenjualanController::class, 'create'])->name('penjualans.create')->middleware('permission:create-penjualans');
 
     Route::get('penjualans/createlanjut/{penjualan}', [PenjualanController::class, 'createlanjut'])->name('penjualans.createlanjut')->middleware('permission:create-penjualans');
@@ -300,6 +301,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('penjualan.nota.edit');
     Route::post('/penjualan/nota/pdf-edit', [PenjualanController::class, 'cetakNotaEdit'])
         ->name('penjualan.nota.pdf-edit');
+
 
     Route::get('penjualandetails/create/{penjualan}', [PenjualanDetailController::class, 'create'])->name('penjualandetails.create')->middleware('permission:create-penjualandetails');
     Route::Post('penjualandetails/store', [PenjualanDetailController::class, 'store'])->name('penjualandetails.store')->middleware('permission:create-penjualandetails');
