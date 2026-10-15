@@ -32,6 +32,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Pihak3Controller;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\Settings;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\SupplierController;
@@ -180,6 +181,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('dinamisvariables/{dinamisvariable}/edit', [DinamisVariableController::class, 'edit'])->name('dinamisvariables.edit')->middleware('permission:edit-dinamisvariables');
     Route::put('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'update'])->name('dinamisvariables.update')->middleware('permission:edit-dinamisvariables');
     Route::delete('dinamisvariables/{dinamisvariable}', [DinamisVariableController::class, 'destroy'])->name('dinamisvariables.destroy')->middleware('permission:delete-dinamisvariables');
+
+    // Settings Management - dengan permission check
+    Route::get('settings', [SettingController::class, 'index'])->name('settings.index')->middleware('permission:view-dinamisvariables');
+    Route::get('settings/{setting}', [SettingController::class, 'show'])->name('settings.show')->middleware('permission:show-dinamisvariables');
+    Route::get('settings/{setting}/edit', [SettingController::class, 'edit'])->name('settings.edit')->middleware('permission:edit-dinamisvariables');
+    Route::put('settings/{setting}', [SettingController::class, 'update'])->name('settings.update')->middleware('permission:edit-dinamisvariables');
 
     // Pembelians Management - dengan permission check
     Route::get('pembelians', [PembelianController::class, 'index'])->name('pembelians.index')->middleware('permission:view-pembelians');

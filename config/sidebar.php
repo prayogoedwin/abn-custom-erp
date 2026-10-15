@@ -50,6 +50,13 @@ return [
                 'active' => 'dinamisvariables*',
                 'permission' => 'view-dinamisvariables',
             ],
+            [
+                'title' => 'Settings',
+                'icon' => 'fas-cog',
+                'route' => 'settings.index',
+                'active' => 'settings*',
+                'permission' => 'view-dinamisvariables',
+            ],
         ],
     ],
     [
