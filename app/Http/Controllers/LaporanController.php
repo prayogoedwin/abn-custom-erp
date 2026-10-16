@@ -663,8 +663,8 @@ class LaporanController extends Controller
                 $start = Carbon::parse($request->startdate)->startOfDay();
                 $end   = Carbon::parse($request->enddate)->endOfDay();
 
-                $pembelian->whereBetween('created_at', [$start, $end]);
-                $pengeluaran->whereBetween('created_at', [$start, $end]);
+                $pembelian->whereBetween('pembelians.created_at', [$start, $end]);
+                $pengeluaran->whereBetween('pengeluarans.created_at', [$start, $end]);
             }
 
             //filter sumber
@@ -766,8 +766,8 @@ class LaporanController extends Controller
                 $start = Carbon::parse($request->startdate)->startOfDay();
                 $end   = Carbon::parse($request->enddate)->endOfDay();
 
-                $pembelian->whereBetween('created_at', [$start, $end]);
-                $pengeluaran->whereBetween('created_at', [$start, $end]);
+                $pembelian->whereBetween('pembelians.created_at', [$start, $end]);
+                $pengeluaran->whereBetween('pengeluarans.created_at', [$start, $end]);
             }
 
             //filter sumber
@@ -937,8 +937,8 @@ class LaporanController extends Controller
                 $start = Carbon::parse($request->startdate)->startOfDay();
                 $end   = Carbon::parse($request->enddate)->endOfDay();
 
-                $pembelian->whereBetween('created_at', [$start, $end]);
-                $pengeluaran->whereBetween('created_at', [$start, $end]);
+                $pembelian->whereBetween('pembelians.created_at', [$start, $end]);
+                $pengeluaran->whereBetween('pengeluarans.created_at', [$start, $end]);
             }
 
             //filter sumber
