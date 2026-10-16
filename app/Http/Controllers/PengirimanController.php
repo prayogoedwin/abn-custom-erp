@@ -74,7 +74,7 @@ class PengirimanController extends Controller
 
     public function index(Request $request)
     {
-        
+
 
         $pagedata = $this->getPagedata();
 
@@ -84,7 +84,7 @@ class PengirimanController extends Controller
     public function indexTable(Request $request)
     {
         if ($request->ajax()) {
-            $data = Pengiriman::where('deleted_at', null)->get();
+            $data = Pengiriman::where('deleted_at', null);
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -94,9 +94,12 @@ class PengirimanController extends Controller
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->translatedFormat('d M Y');
                 })
+                ->orderColumn('created_at', function ($query, $order) {
+                    $query->orderBy('created_at', $order);
+                })
                 ->addColumn('detail', function ($penjualan) {
                     $produkNames = $penjualan->details->map(function ($detail) {
-                        return   ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
+                        return ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
                     })->toArray();
                     $content = implode('<br>', $produkNames);
                     return '<div style="max-height: 100px; overflow-y: auto; white-space: nowrap;">' . $content . '</div>';
