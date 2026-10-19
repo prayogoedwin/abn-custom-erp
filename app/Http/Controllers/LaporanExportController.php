@@ -55,14 +55,10 @@ class LaporanExportController extends Controller
         return $value ? Carbon::parse($value)->translatedFormat('d M Y') : '-';
     }
 
-    private function downloadLaporan(string $nama, array $headings, mixed $rows, array $headerInfo = [])
+    private function downloadLaporan(string $nama, array $headings, mixed $rows, array $headerInfo = [], array $excludeTotal = [])
     {
         return Excel::download(
-            new LaporanExport(
-                collect($rows)->values(),
-                $headings,
-                $headerInfo
-            ),
+            new LaporanExport(collect($rows)->values(), $headings, $headerInfo, $excludeTotal),
             $nama . '-' . date('Y-m-d') . '.xlsx'
         );
     }
@@ -185,17 +181,27 @@ class LaporanExportController extends Controller
                     . ' ' . ($d->produk?->satuan ?? '-') . ')';
             })->implode("\n");
 
+            // Total netto (angka murni) + satuan
+            $totalNetto = (float) $pembelian->details->sum(fn($d) => (float) ($d->netto ?? 0));
+            $satuan = $pembelian->details
+                ->map(fn($d) => $d->produk?->satuan)
+                ->filter()
+                ->unique()
+                ->implode(', ');
+
             return [
                 'no_transaksi' => $pembelian->no_transaksi,
-                'supplier' => $pembelian->supplier?->nama ?? '-',
-                'created_at' => $pembelian->created_at
+                'supplier'     => $pembelian->supplier?->nama ?? '-',
+                'created_at'   => $pembelian->created_at
                     ? $pembelian->created_at->translatedFormat('d M Y')
                     : '-',
-                'detail' => $detail,
-                'total_nominal_pembelian' => $pembelian->total_nominal_pembelian,
-                'total_nominal_terbayar' => $pembelian->total_nominal_terbayar,
-                'kekurangan' => $pembelian->kekurangan,
-                'status_pembayaran' => $pembelian->status_pembayaran,
+                'detail'       => $detail,
+                'total_netto'  => $totalNetto,
+                'satuan'       => $satuan !== '' ? $satuan : '-',
+                'total_nominal_pembelian' => (float) $pembelian->total_nominal_pembelian,
+                'total_nominal_terbayar'  => (float) $pembelian->total_nominal_terbayar,
+                'kekurangan'              => (float) $pembelian->kekurangan,
+                'status_pembayaran'       => $pembelian->status_pembayaran,
             ];
         });
 
@@ -206,6 +212,8 @@ class LaporanExportController extends Controller
                 'Supplier',
                 'Tanggal',
                 'Detail',
+                'Total Netto',
+                'Satuan',
                 'Total Pembelian',
                 'Total Terbayar',
                 'Kekurangan',
@@ -253,15 +261,25 @@ class LaporanExportController extends Controller
                     . ' ' . ($d->produk?->satuan ?? '-') . ')';
             })->implode("\n");
 
+            // Total netto (angka murni) + satuan
+            $totalNetto = (float) $penjualan->details->sum(fn($d) => (float) ($d->netto ?? 0));
+            $satuan = $penjualan->details
+                ->map(fn($d) => $d->produk?->satuan)
+                ->filter()
+                ->unique()
+                ->implode(', ');
+
             return [
                 'no_transaksi_penjualan' => $penjualan->no_transaksi_penjualan,
-                'customer' => $penjualan->customer?->nama ?? '-',
+                'customer'   => $penjualan->customer?->nama ?? '-',
                 'created_at' => $penjualan->tanggal(),
-                'detail' => $detail,
-                'jumlah' => $penjualan->invoiceJumlah(),
-                'ppn' => $penjualan->invoicePpn(),
-                'pph' => $penjualan->invoicePph22(),
-                'total' => $penjualan->invoiceTotalDibayar(),
+                'detail'     => $detail,
+                'total_netto' => $totalNetto,
+                'satuan'     => $satuan !== '' ? $satuan : '-',
+                'jumlah'     => (float) $penjualan->invoiceJumlah(),
+                'ppn'        => (float) $penjualan->invoicePpn(),
+                'pph'        => (float) $penjualan->invoicePph22(),
+                'total'      => (float) $penjualan->invoiceTotalDibayar(),
             ];
         });
 
@@ -272,6 +290,8 @@ class LaporanExportController extends Controller
                 'Customer',
                 'Tanggal',
                 'Detail',
+                'Total Netto',
+                'Satuan',
                 'Jumlah',
                 'PPN',
                 'PPh 22',
@@ -465,21 +485,27 @@ class LaporanExportController extends Controller
             $query->whereHas('produk', fn($q) => $q->where('id', $barang));
         }
 
-        $rows = $query->latest()->get()->map(fn($row) => [
-            $row->penjualan->no_transaksi_penjualan,
-            $row->penjualan->customer?->nama ?? '-',
-            $row->pengiriman_detail->pengiriman->nopol,
-            $row->produk?->nama_produk ?? '-',
-            $row->rendeman !== null ? $row->rendeman . '%' : '-',
-            $row->netto_pengiriman !== null ? $row->netto_pengiriman . ' ' . ($row->produk?->satuan ?? '') : '-',
-            $row->netto !== null ? $row->netto . ' ' . ($row->produk?->satuan ?? '') : '-',
-            $row->netto_pengiriman !== null && $row->netto !== null ? ($row->netto_pengiriman - $row->netto) . ' ' . ($row->produk?->satuan ?? '') : '-',
-            $this->formatTanggal($row->created_at),
-        ]);
+        $rows = $query->latest()->get()->map(function ($row) {
+            $netto            = $row->netto !== null ? (float) $row->netto : null;
+            $nettoPengiriman  = $row->netto_pengiriman !== null ? (float) $row->netto_pengiriman : null;
+
+            return [
+                $row->penjualan->no_transaksi_penjualan,
+                $row->penjualan->customer?->nama ?? '-',
+                $row->pengiriman_detail->pengiriman->nopol,
+                $row->produk?->nama_produk ?? '-',
+                $row->produk?->satuan ?? '-',
+                $row->rendeman !== null ? $row->rendeman . '%' : '-',
+                $nettoPengiriman ?? '-',
+                $netto ?? '-',
+                ($nettoPengiriman !== null && $netto !== null) ? ($nettoPengiriman - $netto) : '-',
+                $this->formatTanggal($row->created_at),
+            ];
+        });
 
         return $this->downloadLaporan(
             'selisih-netto',
-            ['No Transaksi', 'Customer', 'Nopol', 'Barang', 'Rendeman', 'Netto Pengiriman', 'Netto', 'Selisih', 'Tanggal'],
+            ['No Transaksi', 'Customer', 'Nopol', 'Barang', 'Satuan', 'Rendeman', 'Netto Pengiriman', 'Netto', 'Selisih', 'Tanggal'],
             $rows
         );
     }
@@ -502,14 +528,15 @@ class LaporanExportController extends Controller
             $row->penjualan->no_transaksi_penjualan,
             $row->penjualan->customer?->nama ?? '-',
             $row->produk?->nama_produk ?? '-',
+            $row->produk?->satuan ?? '-',
             $row->rendeman !== null ? $row->rendeman . '%' : '-',
-            $row->netto !== null ? $row->netto . ' ' . ($row->produk?->satuan ?? '') : '-',
+            $row->netto !== null ? (float) $row->netto : '-',
             $this->formatTanggal($row->created_at),
         ]);
 
         return $this->downloadLaporan(
             'titipan-ke-customers',
-            ['No Transaksi', 'Customer', 'Barang', 'Rendeman', 'Netto', 'Tanggal'],
+            ['No Transaksi', 'Customer', 'Barang', 'Satuan', 'Rendeman', 'Netto', 'Tanggal'],
             $rows
         );
     }
@@ -573,7 +600,7 @@ class LaporanExportController extends Controller
         }
 
         // dd($totalNominal);
-        
+
         return $this->downloadLaporan(
             'transaksi-bank',
             ['Transaksi', 'Nominal', 'Sumber', 'Tanggal'],
@@ -582,7 +609,6 @@ class LaporanExportController extends Controller
                 'Total Nominal' => number_format($totalNominal, 0, ',', '.'),
             ]
         );
-
     }
 
     /* ======================================================================
