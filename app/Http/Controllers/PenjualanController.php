@@ -114,6 +114,11 @@ class PenjualanController extends Controller
             }
 
             return DataTables::of($penjualans)
+                ->addColumn('checkbox', function ($row) {
+                    return '<input type="checkbox"
+                        class="row-checkbox"
+                        value="' . $row->id . '">';
+                })
                 ->addColumn('no_transaksi', function ($penjualan) {
                     return $penjualan->no_transaksi_penjualan;
                 })
@@ -169,7 +174,7 @@ class PenjualanController extends Controller
 
                     return $actions;
                 })
-                ->rawColumns(['actions', 'detail']) // Menandai kolom actions dan detail sebagai raw HTML
+                ->rawColumns(['actions', 'detail', 'checkbox']) // Menandai kolom actions, detail, dan checkbox sebagai raw HTML
                 ->make(true);
         }
 
@@ -216,6 +221,172 @@ class PenjualanController extends Controller
                 $validated['tanggal_selesai']
             );
         }
+
+        $penjualans = $query->get();
+
+        $tin = Setting::where('key', 'TIN')->first()?->value;
+        $idTku = Setting::where('key', 'IdTKU')->first()?->value;
+
+        if (!$tin || !$idTku) {
+            return response()->json([
+                'message' => 'TIN atau IdTKU belum dikonfigurasi.',
+            ], 422);
+        }
+
+        $xml = new DOMDocument('1.0', 'utf-8');
+        $xml->xmlStandalone = true;
+        $xml->formatOutput = true;
+
+        // Root
+        $root = $xml->createElement('SimpleBookKeepingBulk');
+        $root->setAttribute(
+            'xmlns:xsi',
+            'http://www.w3.org/2001/XMLSchema-instance'
+        );
+
+        $xml->appendChild($root);
+
+        // TIN
+        $root->appendChild(
+            $xml->createElement('TIN', $tin)
+        );
+
+        // Daftar transaksi
+        $list = $xml->createElement('ListOfTransaction');
+        $root->appendChild($list);
+
+        // Helper untuk membuat elemen dengan text aman
+        $addElement = function ($parent, $name, $value) use ($xml) {
+            $element = $xml->createElement($name);
+
+            if ($value !== null && $value !== '') {
+                $element->appendChild(
+                    $xml->createTextNode((string) $value)
+                );
+            }
+
+            $parent->appendChild($element);
+
+            return $element;
+        };
+
+        // Format angka tanpa pemisah ribuan
+        $formatNumber = function ($value) {
+            $number = number_format(
+                (float) ($value ?? 0),
+                4,
+                '.',
+                ''
+            );
+
+            return rtrim(rtrim($number, '0'), '.');
+        };
+
+        foreach ($penjualans as $penjualan) {
+            $transaction = $xml->createElement('Transaction');
+            $list->appendChild($transaction);
+
+            // Identitas transaksi
+            $addElement($transaction, 'IdTku', $idTku);
+
+            $addElement(
+                $transaction,
+                'TransactionNumber',
+                $penjualan->no_transaksi_penjualan
+            );
+
+            $tanggal = $penjualan->created_at
+                ? Carbon::parse($penjualan->created_at)
+                ->format('Y-m-d')
+                : '';
+
+            $addElement(
+                $transaction,
+                'TransactionDate',
+                $tanggal
+            );
+
+            // Sesuaikan 'nama' dengan kolom nama customer Anda
+            $customer = $penjualan->customer?->nama ?? '';
+
+            $addElement(
+                $transaction,
+                'Customer',
+                $customer
+            );
+
+            // Detail barang/jasa
+            $detailsTransaction = $xml->createElement(
+                'DetailsTransaction'
+            );
+
+            $transaction->appendChild($detailsTransaction);
+
+            foreach ($penjualan->details as $detail) {
+                $detailElement = $xml->createElement('Detail');
+
+                $detailsTransaction->appendChild($detailElement);
+
+                // Sesuaikan nama kolom produk jika berbeda
+                $namaProduk = $detail->produk?->nama_produk
+                    ?? $detail->produk?->nama
+                    ?? '';
+
+                $addElement(
+                    $detailElement,
+                    'DetailsOfGoodService',
+                    $namaProduk
+                );
+
+                // Asumsi basis_harga adalah harga per unit
+                $addElement(
+                    $detailElement,
+                    'PricePerUnit',
+                    $formatNumber($detail->basis_harga)
+                );
+
+                // Asumsi netto adalah kuantitas barang
+                $addElement(
+                    $detailElement,
+                    'Qty',
+                    $formatNumber($detail->netto)
+                );
+            }
+
+            // Model belum memiliki kolom diskon.
+            // Ubah jika diskon transaksi tersedia.
+            $addElement($transaction, 'Discount', '0');
+        }
+
+        $filename = 'penjualan-coretax-'
+            . now()->format('Ymd-His')
+            . '.xml';
+
+        return response($xml->saveXML(), 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'
+                . $filename
+                . '"',
+        ]);
+    }
+
+    public function bulkExportXml(Request $request)
+    {
+        $validated = $request->validate([
+            
+            'ids' => ['required', 'array'],
+        ]);
+
+        $query = Penjualan::query()
+            ->with([
+                'customer',
+                'details.produk',
+            ])
+            ->whereIn('id', $validated['ids'])
+            ->orderBy('created_at')
+            ->orderBy('id');
+
+        
 
         $penjualans = $query->get();
 

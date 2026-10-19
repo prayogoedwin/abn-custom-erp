@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            
+
 
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl">
 
@@ -109,7 +109,9 @@
             <table id="dynamic-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            <input type="checkbox" id="select-all">
+                        </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">No Transaksi</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
@@ -120,6 +122,10 @@
                     </tr>
                 </thead>
             </table>
+
+            <button class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm transition-all cursor-pointer h-[38px]" type="primary" id="btn-export-xml">
+                Export XML Terpilih
+            </button>
         </div>
     </div>
 
@@ -142,6 +148,12 @@
 
                 },
                 columns: [{
+                        data: 'checkbox',
+                        name: 'checkbox',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
                         data: 'no_transaksi',
                         name: 'no_transaksi'
                     },
@@ -187,6 +199,75 @@
                 ],
                 stripeClasses: ['bg-white dark:bg-gray-800', 'bg-gray-50 dark:bg-gray-900']
             });
+        });
+
+        // Select all pada halaman yang sedang tampil
+        $('#select-all').on('change', function() {
+            $('.row-checkbox').prop('checked', this.checked);
+        });
+
+        // Update Select All saat checkbox row berubah
+        $('#dynamic-table tbody').on('change', '.row-checkbox', function() {
+            let total = $('.row-checkbox').length;
+            let checked = $('.row-checkbox:checked').length;
+
+            $('#select-all').prop(
+                'checked',
+                total > 0 && total === checked
+            );
+        });
+
+        // Reset checkbox Select All saat halaman berubah
+        $('#dynamic-table').on('draw.dt', function() {
+            $('#select-all').prop('checked', false);
+        });
+
+        // Ambil ID yang dipilih
+        $('#btn-export-xml').on('click', function() {
+            let ids = $('.row-checkbox:checked').map(function() {
+                return this.value;
+            }).get();
+
+            if (ids.length === 0) {
+                alert('Pilih minimal satu data!');
+                return;
+            }
+
+            console.log(ids);
+        });
+
+        $('#btn-export-xml').on('click', function() {
+            let ids = $('.row-checkbox:checked').map(function() {
+                return this.value;
+            }).get();
+
+            if (ids.length === 0) {
+                alert('Pilih minimal satu data!');
+                return;
+            }
+
+            let form = $('<form>', {
+                action: "{{ route('penjualans.bulk-export-xml') }}",
+                method: 'POST'
+            });
+
+            form.append($('<input>', {
+                type: 'hidden',
+                name: '_token',
+                value: "{{ csrf_token() }}"
+            }));
+
+            ids.forEach(function(id) {
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'ids[]',
+                    value: id
+                }));
+            });
+
+            $('body').append(form);
+            form.submit();
+            form.remove();
         });
 
         document.addEventListener('DOMContentLoaded', function() {

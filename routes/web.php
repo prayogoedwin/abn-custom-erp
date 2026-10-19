@@ -280,6 +280,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('penjualans/table', [PenjualanController::class, 'indexTable'])->name('penjualans.indexTable')->middleware('permission:view-penjualans');
     Route::get('penjualans/export', [PenjualanController::class, 'export'])->name('penjualans.export')->middleware('permission:download-penjualans');
     Route::get('penjualans/export-xml-coretax', [PenjualanController::class, 'exportXmlCoretax'])->name('penjualans.exportXmlCoretax')->middleware('permission:download-penjualans');
+    Route::post('penjualans/bulk-export-xml', [PenjualanController::class, 'bulkExportXml'])->name('penjualans.bulk-export-xml')->middleware('permission:download-penjualans');
     Route::get('penjualans/create', [PenjualanController::class, 'create'])->name('penjualans.create')->middleware('permission:create-penjualans');
 
     Route::get('penjualans/createlanjut/{penjualan}', [PenjualanController::class, 'createlanjut'])->name('penjualans.createlanjut')->middleware('permission:create-penjualans');
