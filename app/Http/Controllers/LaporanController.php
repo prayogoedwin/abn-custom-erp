@@ -104,6 +104,14 @@ class LaporanController extends Controller
                 });
             }
 
+            //filter type
+            if ($request->filled('type')) {
+                $type = $request->type;
+                $pembelians->whereHas('details', function ($q) use ($type) {
+                    $q->where('tipe_transaksi_pembelian', $type);
+                });
+            }
+
 
 
             return DataTables::of($pembelians)
@@ -176,6 +184,14 @@ class LaporanController extends Controller
                 $barang = $request->barang;
                 $penjualans->whereHas('details.produk', function ($q) use ($barang) {
                     $q->where('id', $barang);
+                });
+            }
+
+            //filter type
+            if ($request->filled('type')) {
+                $type = $request->type;
+                $penjualans->whereHas('details', function ($q) use ($type) {
+                    $q->where('tipe', $type);
                 });
             }
 

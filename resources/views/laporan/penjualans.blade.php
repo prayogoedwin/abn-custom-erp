@@ -81,6 +81,25 @@
             </div>
 
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
+                <!-- Tipe Select Group -->
+                <div class="flex-1">
+                    <label for="type" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                        Tipe
+                    </label>
+                    <div class="relative">
+                        <select id="type" name="type" class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 transition-colors">
+                            <option value="">Semua Tipe</option>
+                            @foreach(['Titip', 'Jual'] as $type)
+                            <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
+                                {{ $type }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
                 <!-- Barang Select Group -->
                 <div class="flex-1">
                     <label for="barang" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
@@ -172,6 +191,7 @@
                         d.startdate = $('#startdate').val();
                         d.enddate = $('#enddate').val();
                         d.barang = $('#barang').val();
+                        d.type = $('#type').val();
                     }
                 },
                 //columns : no_transaksi_penjualan, customer, created_at, detail
