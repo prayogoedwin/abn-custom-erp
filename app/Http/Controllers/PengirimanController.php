@@ -11,7 +11,7 @@ use App\Models\Supplier;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -85,6 +85,15 @@ class PengirimanController extends Controller
     {
         if ($request->ajax()) {
             $data = Pengiriman::where('deleted_at', null);
+
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $data->whereBetween('created_at', [$start, $end]);
+            }
 
             return DataTables::of($data)
                 ->addIndexColumn()

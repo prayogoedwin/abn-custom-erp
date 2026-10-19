@@ -12,6 +12,7 @@ use App\Models\Supplier;
 use App\Models\TitipSupplier;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use Illuminate\Http\RedirectResponse;
@@ -119,6 +120,15 @@ class PembelianController extends Controller
                 ->where('pembelians.isactive', true)
                 ;
             // dd($pembelians);
+
+
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $pembelians->whereBetween('pembelians.created_at', [$start, $end]);
+            }
 
             return DataTables::of($pembelians)
                 ->editColumn('kekurangan', function ($pembelian) {

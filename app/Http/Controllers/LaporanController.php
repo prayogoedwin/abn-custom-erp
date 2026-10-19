@@ -542,8 +542,8 @@ class LaporanController extends Controller
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->translatedFormat('d M Y');
                 })
-                
-            
+
+
                 ->addColumn('rendeman', function ($row) {
                     return $row->rendeman !== null ? $row->rendeman . '%' : '-';
                 })
@@ -561,7 +561,7 @@ class LaporanController extends Controller
 
         $customers = Customer::where('deleted_at', null)->get();
         $barangs = Produk::where('deleted_at', null)->get();
-    
+
         return view('laporan.selisihnetto', compact('customers', 'barangs'));
     }
 
@@ -1087,6 +1087,9 @@ class LaporanController extends Controller
 
                 ->editColumn('created_at', function ($row) {
                     return Carbon::parse($row->created_at)->translatedFormat('d M Y');
+                })
+                ->orderColumn('created_at', function ($query, $order) {
+                    $query->orderBy('created_at', $order);
                 })
                 ->rawColumns(['nominal'])
                 ->with([

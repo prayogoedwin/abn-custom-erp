@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Exports\PenjualanExport;
@@ -104,6 +105,14 @@ class PenjualanController extends Controller
             $penjualans = Penjualan::with('customer', 'details.produk')
                 ->select('penjualans.*');
 
+            //filter tanggal
+            if ($request->filled(['startdate', 'enddate'])) {
+                $start = Carbon::parse($request->startdate)->startOfDay();
+                $end   = Carbon::parse($request->enddate)->endOfDay();
+
+                $penjualans->whereBetween('penjualans.created_at', [$start, $end]);
+            }
+
             return DataTables::of($penjualans)
                 ->addColumn('no_transaksi', function ($penjualan) {
                     return $penjualan->no_transaksi_penjualan;
@@ -130,6 +139,12 @@ class PenjualanController extends Controller
                     $query->whereHas('details.produk', function ($q) use ($keyword) {
                         $q->where('nama_produk', 'like', "%{$keyword}%");
                     });
+                })
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at->translatedFormat('d M Y');
+                })
+                ->orderColumn('created_at', function ($query, $order) {
+                    $query->orderBy('created_at', $order);
                 })
 
 
