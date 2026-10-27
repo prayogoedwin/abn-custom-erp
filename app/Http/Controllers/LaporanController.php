@@ -112,6 +112,11 @@ class LaporanController extends Controller
                 });
             }
 
+            $totalNetto = (clone $pembelians)
+                ->withSum('details as total_netto', 'netto')
+                ->get()
+                ->sum('total_netto');
+
 
 
             return DataTables::of($pembelians)
@@ -150,6 +155,10 @@ class LaporanController extends Controller
 
 
                 ->rawColumns(['detail', 'total_nominal_pembelian', 'total_nominal_terbayar', 'kekurangan'])
+                ->with([
+                    'total_netto' => number_format($totalNetto, 0, ',', '.'),
+
+                ])
                 ->make(true);
         }
 
@@ -195,7 +204,10 @@ class LaporanController extends Controller
                 });
             }
 
-
+            $totalNetto = (clone $penjualans)
+                ->withSum('details as total_netto', 'netto')
+                ->get()
+                ->sum('total_netto');
 
             return DataTables::of($penjualans)
 
@@ -239,6 +251,10 @@ class LaporanController extends Controller
 
 
                 ->rawColumns(['detail', 'jumlah', 'ppn', 'pph', 'total'])
+                ->with([
+                    'total_netto' => number_format($totalNetto, 0, ',', '.'),
+
+                ])
                 ->make(true);
         }
 
@@ -699,11 +715,16 @@ class LaporanController extends Controller
                 $pembelian = $pembelian->whereRaw('1 = 0');
             }
 
-            $query = $pengeluaran->unionAll($pembelian);
+            $union = $pengeluaran->unionAll($pembelian);
+
+            // Bungkus jadi derived table
+            $query = DB::table(DB::raw("({$union->toSql()}) as t"))
+                ->mergeBindings($union->getQuery())   // penting agar binding ikut
+                ->select('t.*');
 
             // dd($query->get());
 
-            $totalNominal = $query->sum('nominal');
+            $totalNominal = (clone $query)->sum('nominal');
 
 
 
@@ -724,7 +745,7 @@ class LaporanController extends Controller
 
 
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at->translatedFormat('d M Y');
+                    return Carbon::parse($row->created_at)->format('d M Y');
                 })
                 ->with([
                     'total_nominal' => $totalNominal,
@@ -768,10 +789,10 @@ class LaporanController extends Controller
             $pembelian = Pembelian::whereNotNull('ambil_transfer')
                 ->where('ambil_transfer', '>', 0)
                 ->select([
-                    'id',
-                    'no_transaksi as transaksi',
-                    'ambil_transfer as nominal',
-                    'created_at',
+                    'pembelians.id as id',
+                    'pembelians.no_transaksi as transaksi',
+                    'pembelians.ambil_transfer as nominal',
+                    'pembelians.created_at',
                 ])
                 ->selectRaw("' ' as kategori")
                 ->selectRaw("'pembelian' as sumber");
@@ -802,13 +823,16 @@ class LaporanController extends Controller
                 $pembelian = $pembelian->whereRaw('1 = 0');
             }
 
-            $query = $pengeluaran->unionAll($pembelian);
+            $union = $pengeluaran->unionAll($pembelian);
+
+            // Bungkus jadi derived table
+            $query = DB::table(DB::raw("({$union->toSql()}) as t"))
+                ->mergeBindings($union->getQuery())   // penting agar binding ikut
+                ->select('t.*');
 
             // dd($query->get());
 
-            $totalNominal = $query->sum('nominal');
-
-
+            $totalNominal = (clone $query)->sum('nominal');
 
             return DataTables::of($query)
                 ->editColumn('nominal', function ($row) {
@@ -826,8 +850,9 @@ class LaporanController extends Controller
                 })
 
 
+
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at->translatedFormat('d M Y');
+                    return Carbon::parse($row->created_at)->translatedFormat('d M Y');
                 })
                 ->with([
                     'total_nominal' => $totalNominal,

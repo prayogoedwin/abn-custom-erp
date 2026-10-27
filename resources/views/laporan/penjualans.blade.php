@@ -147,6 +147,15 @@
 
             </span>
         </div>
+
+        <div class="grid grid-cols-1  gap-4 p-5">
+            <div class="bg-blue-600 rounded-lg p-5 text-white shadow-sm">
+                <p class="text-blue-100 text-sm font-medium uppercase">Total Netto</p>
+                <h3 class="text-2xl font-bold mt-1" id="totalNetto">0</h3>
+            </div>
+
+        </div>
+
         <div class="p-4">
             <div class="w-full overflow-x-auto">
                 <table id="dynamic-table"
@@ -192,7 +201,16 @@
                         d.enddate = $('#enddate').val();
                         d.barang = $('#barang').val();
                         d.type = $('#type').val();
-                    }
+                    },
+                    dataSrc: function(json) {
+
+                        $('#totalNetto').text(
+                            json.total_netto
+                        );
+
+
+                        return json.data;
+                    },
                 },
                 //columns : no_transaksi_penjualan, customer, created_at, detail
                 columns: [{

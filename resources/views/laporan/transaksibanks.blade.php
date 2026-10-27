@@ -195,7 +195,8 @@
                     },
                     {
                         data: 'nominal',
-                        name: 'nominal'
+                        name: 'nominal',
+                        searchable: false
                     },
                     {
                         data: 'sumber',
@@ -209,7 +210,8 @@
                     },
                     {
                         data: 'created_at',
-                        name: 'created_at'
+                        name: 'created_at',
+                        searchable: false
                     },
                     
 
