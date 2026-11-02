@@ -45,10 +45,16 @@ class BonPihak3Controller extends Controller
                 ->editColumn('created_at', function ($bonSupplier) {
                     return $bonSupplier->created_at->translatedFormat('d M Y');
                 })
-                ->editColumn('sisa', function ($bonSupplier) {
-                    return $bonSupplier->generateSisa();
+                ->editColumn('masuk', function ($bonSupplier) {
+                    return '<div style="text-align: right;">' . number_format($bonSupplier->masuk, 0, ',', '.') . '</div>';;
                 })
-                ->rawColumns(['actions'])
+                ->editColumn('keluar', function ($bonSupplier) {
+                    return '<div style="text-align: right;">' . number_format($bonSupplier->keluar, 0, ',', '.') . '</div>';;
+                })
+                ->editColumn('sisa', function ($bonSupplier) {
+                    return '<div style="text-align: right;">' . number_format($bonSupplier->generateSisa(), 0, ',', '.') . '</div>';
+                })
+                ->rawColumns(['actions', 'masuk', 'keluar', 'sisa'])
                 ->make(true);
         }
     }
