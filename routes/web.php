@@ -406,10 +406,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('ambilsuppliers/export', [AmbilSupplierController::class, 'export'])->name('ambilsuppliers.export')->middleware('permission:download-ambil-suppliers');
     Route::get('ambilsuppliers/create', [AmbilSupplierController::class, 'create'])->name('ambilsuppliers.create')->middleware('permission:create-ambil-suppliers');
     Route::post('ambilsuppliers', [AmbilSupplierController::class, 'store'])->name('ambilsuppliers.store')->middleware('permission:create-ambil-suppliers');
-    Route::get('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'show'])->name('ambilsuppliers.show')->middleware('permission:show-ambil-suppliers');
-    Route::get('ambilsuppliers/{ambilsupplier}/edit', [AmbilSupplierController::class, 'edit'])->name('ambilsuppliers.edit')->middleware('permission:edit-ambil-suppliers');
-    Route::put('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'update'])->name('ambilsuppliers.update')->middleware('permission:edit-ambil-suppliers');
-    Route::delete('ambilsuppliers/{ambilsupplier}', [AmbilSupplierController::class, 'destroy'])->name('ambilsuppliers.destroy')->middleware('permission:delete-ambil-suppliers');
+    Route::get('ambilsuppliers/{ambilSupplier}', [AmbilSupplierController::class, 'show'])->name('ambilsuppliers.show')->middleware('permission:show-ambil-suppliers');
+    Route::get('ambilsuppliers/{ambilSupplier}/edit', [AmbilSupplierController::class, 'edit'])->name('ambilsuppliers.edit')->middleware('permission:edit-ambil-suppliers');
+    Route::put('ambilsuppliers/{ambilSupplier}', [AmbilSupplierController::class, 'update'])->name('ambilsuppliers.update')->middleware('permission:edit-ambil-suppliers');
+    Route::delete('ambilsuppliers/{ambilSupplier}', [AmbilSupplierController::class, 'destroy'])->name('ambilsuppliers.destroy')->middleware('permission:delete-ambil-suppliers');
 
     //Stok Titipan==================================================================================================================
     Route::get('stoktitipans', [StokTitipanController::class, 'index'])->name('stoktitipans.index')->middleware('permission:view-stok-titipans');

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Supplier extends Model
 {
@@ -20,6 +21,8 @@ class Supplier extends Model
     //         $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
     //         $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
     //     });
+
+    use SoftDeletes;
 
     protected $fillable = [
         'user_id',

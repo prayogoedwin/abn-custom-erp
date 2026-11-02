@@ -25,12 +25,10 @@
                 </x-button>
             </a>
             @endif
-            @if(auth()->user()->hasPermission('create-titip-supplier'))
-            @if (($canCreate ?? true) !== false)
-            <a href="{{ route('titip-supplier.create') }}">
+            @if(auth()->user()->hasPermission('create-titip-suppliers'))
+            <a href="{{ route('titipsuppliers.create') }}">
                 <x-button type="primary">{{ __('Create Titip Supplier') }}</x-button>
             </a>
-            @endif
             @endif
 
 
@@ -47,6 +45,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nominal Titip</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Keterangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
 
 
 
@@ -73,6 +72,7 @@
                     { data: 'nominal_titip', name: 'nominal_titip' },
                     { data: 'keterangan', name: 'keterangan' },
                     { data: 'tanggal', name: 'tanggal' },
+                    { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 
                 language: {

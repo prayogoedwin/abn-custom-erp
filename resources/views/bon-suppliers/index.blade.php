@@ -118,6 +118,7 @@
             $('#dynamic-table').DataTable({
                 processing: true,
                 serverSide: true,
+                searching: false,
                 ajax: {
                     url: '{{ route("bon-suppliers.indexTable") }}',
                     data: function(d) {
@@ -135,23 +136,29 @@
                     },
                     {
                         data: 'keterangan',
-                        name: 'keterangan'
+                        name: 'keterangan',
+                        sortable: false
                     },
                     {
                         data: 'masuk',
-                        name: 'masuk'
+                        name: 'masuk',
+                        sortable: false
                     },
                     {
                         data: 'keluar',
-                        name: 'keluar'
+                        name: 'keluar',
+                        sortable: false
                     },
                     {
                         data: 'sisa',
-                        name: 'sisa'
+                        name: 'sisa',
+                        sortable: false
                     },
                     {
                         data: 'actions',
-                        name: 'actions'
+                        name: 'actions',
+                        sortable: false,
+                        searchable: false
                     }
 
 

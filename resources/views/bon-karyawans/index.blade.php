@@ -38,7 +38,7 @@
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
                 <!-- Supplier Select Group -->
                 <div class="flex-1">
-                        <label for="karyawan" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                    <label for="karyawan" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
                         Karyawan
                     </label>
                     <div class="relative">
@@ -118,6 +118,8 @@
             $('#dynamic-table').DataTable({
                 processing: true,
                 serverSide: true,
+                searching: false,
+
                 ajax: {
                     url: '{{ route("bon-karyawans.indexTable") }}',
                     data: function(d) {
@@ -131,27 +133,39 @@
                     },
                     {
                         data: 'created_at',
-                        name: 'created_at'
+                        name: 'created_at',
+                        sortable: false
                     },
                     {
                         data: 'keterangan',
-                        name: 'keterangan'
+                        name: 'keterangan',
+                        sortable: false
+
                     },
                     {
                         data: 'masuk',
-                        name: 'masuk'
+                        name: 'masuk',
+                        sortable: false
+
                     },
                     {
                         data: 'keluar',
-                        name: 'keluar'
+                        name: 'keluar',
+                        sortable: false
+
                     },
                     {
                         data: 'sisa',
-                        name: 'sisa'
+                        name: 'sisa',
+                        sortable: false
+
                     },
                     {
                         data: 'actions',
-                        name: 'actions'
+                        name: 'actions',
+                        sortable: false,
+                        searchable: false
+
                     }
 
 
