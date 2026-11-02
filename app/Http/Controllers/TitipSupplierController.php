@@ -100,6 +100,9 @@ class TitipSupplierController extends Controller
 
     public function destroy(TitipSupplier $titipSupplier)
     {
+        if (!$titipSupplier) {
+            return redirect()->route('titipsuppliers.index');
+        }
         $titipSupplier->delete();
         return redirect()->route('titipsuppliers.index')->with('status', 'Titip supplier deleted successfully.');
     }

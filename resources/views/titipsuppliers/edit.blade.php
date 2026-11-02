@@ -22,7 +22,7 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="p-6">
-            <form action="{{ route('titipsuppliers.update', ['titipSupplier' => $ambilSupplier]) }}" method="POST" class="max-w-2xl">
+            <form action="{{ route('titipsuppliers.update', ['titipSupplier' => $titipSupplier]) }}" method="POST" class="max-w-2xl">
                 @csrf
                 @method('PUT')
 
@@ -39,7 +39,7 @@
                         <option value="">{{ __('Select Supplier') }}</option>
                         @foreach($supplierOptions as $option)
                         
-                        <option value="{{ $option['value'] }}" {{ $ambilSupplier->supplier_id == $option['value'] ? 'selected' : '' }}>
+                        <option value="{{ $option['value'] }}" {{ $titipSupplier->supplier_id == $option['value'] ? 'selected' : '' }}>
                             {{ $option['label'] }}
                         </option>
                         @endforeach
@@ -51,11 +51,11 @@
                 </div>
 
                 <div class="mb-4">
-                    <x-forms.input label="Nominal" name="nominal_titip" type="number" value="{{ old('nominal_titip', $ambilSupplier->nominal_ambil) }}" />
+                    <x-forms.input label="Nominal" name="nominal_titip" type="number" value="{{ old('nominal_titip', $titipSupplier->nominal_titip) }}" />
                 </div>
 
                 <div class="mb-4">
-                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="{{ old('keterangan', $ambilSupplier->keterangan) }}" />
+                    <x-forms.input label="Keterangan" name="keterangan" type="text" value="{{ old('keterangan', $titipSupplier->keterangan) }}" />
                 </div>
 
 

@@ -395,10 +395,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('titipsuppliers/export', [TitipSupplierController::class, 'export'])->name('titipsuppliers.export')->middleware('permission:download-titip-suppliers');
     Route::get('titipsuppliers/create', [TitipSupplierController::class, 'create'])->name('titipsuppliers.create')->middleware('permission:create-titip-suppliers');
     Route::post('titipsuppliers', [TitipSupplierController::class, 'store'])->name('titipsuppliers.store')->middleware('permission:create-titip-suppliers');
-    Route::get('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'show'])->name('titipsuppliers.show')->middleware('permission:show-titip-suppliers');
-    Route::get('titipsuppliers/{titipsupplier}/edit', [TitipSupplierController::class, 'edit'])->name('titipsuppliers.edit')->middleware('permission:edit-titip-suppliers');
-    Route::put('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'update'])->name('titipsuppliers.update')->middleware('permission:edit-titip-suppliers');
-    Route::delete('titipsuppliers/{titipsupplier}', [TitipSupplierController::class, 'destroy'])->name('titipsuppliers.destroy')->middleware('permission:delete-titip-suppliers');
+    Route::get('titipsuppliers/{titipSupplier}', [TitipSupplierController::class, 'show'])->name('titipsuppliers.show')->middleware('permission:show-titip-suppliers');
+    Route::get('titipsuppliers/{titipSupplier}/edit', [TitipSupplierController::class, 'edit'])->name('titipsuppliers.edit')->middleware('permission:edit-titip-suppliers');
+    Route::put('titipsuppliers/{titipSupplier}', [TitipSupplierController::class, 'update'])->name('titipsuppliers.update')->middleware('permission:edit-titip-suppliers');
+    Route::delete('titipsuppliers/{titipSupplier}', [TitipSupplierController::class, 'destroy'])->name('titipsuppliers.destroy')->middleware('permission:delete-titip-suppliers');
 
     //Ambil Supplier==================================================================================================
     Route::get('ambilsuppliers', [AmbilSupplierController::class, 'index'])->name('ambilsuppliers.index')->middleware('permission:view-ambil-suppliers');
