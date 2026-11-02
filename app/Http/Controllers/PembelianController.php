@@ -377,7 +377,7 @@ class PembelianController extends Controller
 
         $nominalPotong = $pembayarancashbon ? $pembayarancashbon->keluar : 0;
 
-        $cashbonsebelum = $pembayarancashbon->generateSisa() + $nominalPotong;
+        $cashbonsebelum = ($pembayarancashbon ? $pembayarancashbon->generateSisa() : 0) + $nominalPotong;
 
         $terbilang = $this->konversiTerbilang($pembelian->total_nominal_pembelian) . " Rupiah";
         // dd($pembelian, $pembayarancashbon, $cashbonsebelum);
