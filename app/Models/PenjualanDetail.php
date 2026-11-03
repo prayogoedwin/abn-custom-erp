@@ -76,6 +76,10 @@ class PenjualanDetail extends Model
                 }
             }
         });
+
+        static::deleting(function ($detail) {
+            $detail->stok()->delete();
+        });
     }
 
     public function pengiriman_detail()
@@ -110,5 +114,10 @@ class PenjualanDetail extends Model
         }
 
         return (int) round(((int) $this->sub_total) / $netto);
+    }
+
+    public function stok()
+    {
+        return $this->hasMany(Stok::class);
     }
 }

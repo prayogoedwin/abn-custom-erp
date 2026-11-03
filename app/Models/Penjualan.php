@@ -21,6 +21,15 @@ class Penjualan extends Model
         'deleted_by',
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function ($penjualan) {
+            $penjualan->details->each(function ($detail) {
+                $detail->delete();
+            });
+        });
+    }
+
     public function pengiriman()
     {
         return $this->belongsTo(Pengiriman::class);

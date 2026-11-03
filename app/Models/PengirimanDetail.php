@@ -39,6 +39,15 @@ class PengirimanDetail extends Model
         'deleted_by',
     ];
 
+    protected static function booted()
+    {
+        
+
+        static::deleting(function ($detail) {
+            $detail->stok()->delete();
+        });
+    }
+
         
 
     public function pengiriman()
@@ -49,5 +58,10 @@ class PengirimanDetail extends Model
     public function produk()
     {
         return $this->belongsTo(Produk::class);
+    }
+
+    public function stok()
+    {
+        return $this->hasMany(Stok::class);
     }
 }

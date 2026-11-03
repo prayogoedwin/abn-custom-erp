@@ -41,6 +41,12 @@ class Pengiriman extends Model
             $pengiriman->no_transaksi = "{$pengiriman->id}-{$pengiriman->nopol}-{$random}";
             $pengiriman->save();
         });
+
+        static::deleting(function ($pengiriman) {
+            $pengiriman->detail->each(function ($detail) {
+                $detail->delete();
+            });
+        });
     }
 
     public function customer()
