@@ -311,7 +311,8 @@ class PembelianDetailController extends Controller
     //soft delete
     public function destroy(PembelianDetail $pembelian): RedirectResponse
     {
-        $pembelian->update(['isactive' => false, 'deleted_by' => auth()->id(), 'deleted_at' => now()]);
+        $pembelian->update(['isactive' => false, 'deleted_by' => auth()->id()]);
+        $pembelian->delete();
 
 
         return to_route('pembeliandetails.index')->with('status', 'PembelianDetail deleted successfully.');

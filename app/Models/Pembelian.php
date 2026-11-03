@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pembelian extends Model
 {
-    
+    use SoftDeletes;
 
     protected $table = 'pembelians';
 
@@ -50,6 +51,12 @@ class Pembelian extends Model
             $pembelian->updateQuietly([
                 'no_transaksi' => $transactionNumber,
             ]);
+        });
+
+        static::deleting(function ($pembelian) {
+            $pembelian->details->each(function ($detail) {
+                $detail->delete();
+            });
         });
     }
 

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PembelianDetail extends Model
 {
+    use SoftDeletes;
     
     protected $fillable = [
         'pembelian_id',
@@ -92,6 +94,10 @@ class PembelianDetail extends Model
                 ]);
             }
         });
+
+        static::deleting(function ($pembelianDetail) {
+            $pembelianDetail->stok()->delete();
+        });
     }
 
     public function pembelian()
@@ -101,5 +107,10 @@ class PembelianDetail extends Model
     public function produk()
     {
         return $this->belongsTo(Produk::class);
+    }
+
+    public function stok()
+    {
+        return $this->hasMany(Stok::class);
     }
 }
