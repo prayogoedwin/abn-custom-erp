@@ -73,4 +73,17 @@ class Produk extends Model
     {
         return $this->belongsTo(KategoriProduk::class, 'kategori_produk_id');
     }
+
+    public function stoksSekarang(): int
+    {
+        // hitung semua stok masuk - stok keluar
+        $countMasuk = $this->stoks()->where('tipe_stok', 'Masuk')->sum('stok');
+        $countKeluar = $this->stoks()->where('tipe_stok', 'Keluar')->sum('stok');
+        return $countMasuk - $countKeluar;
+    }
+
+    public function stoks()
+    {
+        return $this->hasMany(Stok::class);
+    }
 }

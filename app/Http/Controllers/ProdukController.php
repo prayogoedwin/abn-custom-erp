@@ -55,7 +55,7 @@ class ProdukController extends Controller
                     'kategori_produks.nama as kategori'
                 )
                 ->where('produks.isactive', true)
-                ->get();
+                ;
             // dd($produks);
 
             return DataTables::of($produks)
@@ -66,6 +66,9 @@ class ProdukController extends Controller
                 ->editColumn('harga_basis_penjualan', function ($produk) {
                     // Formats to: Rp 1.500.000 (0 decimals)
                     return number_format($produk->harga_basis_penjualan, 0, ',', '.');
+                })
+                ->editColumn('stok_akhir', function ($produk) {
+                    return number_format($produk->stoksSekarang(), 0, ',', '.');
                 })
 
                 ->addColumn('actions', function ($produk) {
@@ -122,7 +125,7 @@ class ProdukController extends Controller
             'kategori_produk_id' => $request->input('kategori_produk_id'),
             'satuan' => $request->input('satuan'),
             'harga_basis_pembelian' => $request->input('harga_basis_pembelian'),
-            'stok_akhir' => $request->input('stok_akhir'),
+            // 'stok_akhir' => $request->input('stok_akhir'),
 
             'created_by' => auth()->id(),
         ];
@@ -133,7 +136,7 @@ class ProdukController extends Controller
             'kategori_produk_id' => ['required'],
             'satuan' => ['required', 'string', 'max:50'],
             'harga_basis_pembelian' => ['required', 'numeric'],
-            'stok_akhir' => ['required', 'integer'],
+            // 'stok_akhir' => ['required', 'integer'],
             'created_by' => ['required', 'integer']
         ]);
 
