@@ -57,6 +57,7 @@ class Pembelian extends Model
             $pembelian->details->each(function ($detail) {
                 $detail->delete();
             });
+            $pembelian->stokTitipan()->delete();
         });
     }
 
@@ -78,5 +79,10 @@ class Pembelian extends Model
     public function titipSupplier()
     {
         return $this->hasOne(TitipSupplier::class);
+    }
+
+    public function stokTitipan()
+    {
+        return $this->hasMany(StokTitipan::class);
     }
 }

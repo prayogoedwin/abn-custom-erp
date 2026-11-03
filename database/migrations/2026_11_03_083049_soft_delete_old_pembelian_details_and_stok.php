@@ -43,6 +43,13 @@ return new class extends Migration
                 ->whereIn('pembelian_detail_id', $detailIds)
                 ->delete();
 
+            DB::table('stok_titipans')
+                ->whereIn('pembelian_id', $pembelianIds)
+                ->update([
+                    'deleted_at' => $now,
+                    'updated_at' => $now,
+                ]);
+
             
         });
     }
