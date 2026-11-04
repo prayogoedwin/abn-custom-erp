@@ -80,7 +80,14 @@ class LaporanController extends Controller
 
 
 
-            $pembelians = Pembelian::with('supplier', 'details.produk')->whereNull('deleted_at');
+            $pembelians = Pembelian::with('supplier', 'details.produk')
+                ->whereNull('deleted_at')
+                // ->where('tipe_transaksi_pembelian','jual')
+            ;
+
+            $pembelians->whereHas('details', function ($q) {
+                $q->where('tipe_transaksi_pembelian', 'jual');
+            });
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
@@ -104,13 +111,13 @@ class LaporanController extends Controller
                 });
             }
 
-            //filter type
-            if ($request->filled('type')) {
-                $type = $request->type;
-                $pembelians->whereHas('details', function ($q) use ($type) {
-                    $q->where('tipe_transaksi_pembelian', $type);
-                });
-            }
+            // //filter type
+            // if ($request->filled('type')) {
+            //     $type = $request->type;
+            //     $pembelians->whereHas('details', function ($q) use ($type) {
+            //         $q->where('tipe_transaksi_pembelian', $type);
+            //     });
+            // }
 
             $totalNetto = (clone $pembelians)
                 ->withSum('details as total_netto', 'netto')
@@ -129,6 +136,8 @@ class LaporanController extends Controller
                 })
                 ->addColumn('detail', function ($penjualan) {
                     $produkNames = $penjualan->details->map(function ($detail) {
+                        //skip if not jual
+                        if($detail->tipe_transaksi_pembelian != 'jual') return '';
                         return   '[' . $detail->tipe_transaksi_pembelian . '] ' . ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
                     })->toArray();
                     $content = implode('<br>', $produkNames);

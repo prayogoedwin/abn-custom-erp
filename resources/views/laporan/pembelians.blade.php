@@ -80,8 +80,8 @@
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
-                <!-- Tipe Select Group -->
+            <!-- <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
+                
                 <div class="flex-1">
                     <label for="type" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
                         Tipe
@@ -97,7 +97,7 @@
                         </select>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <div class="flex flex-col sm:flex-row sm:items-end gap-4 max-w-3xl mb-4">
                 <!-- Barang Select Group -->
