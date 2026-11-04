@@ -419,6 +419,16 @@ class LaporanController extends Controller
                 });
             }
 
+            $totalStokMasuk = (clone $titipanbarangs)
+                ->where('tipe_stok', 'masuk')
+                ->get()
+                ->sum('jumlah');
+            $totalStokKeluar = (clone $titipanbarangs)
+                ->where('tipe_stok', 'keluar')
+                ->get()
+                ->sum('jumlah');
+            $totalStok = $totalStokMasuk - $totalStokKeluar;
+
             return DataTables::of($titipanbarangs)
                 // Fix Fitur Pencarian untuk kolom Relasi Produk
                 ->filterColumn('produk.nama_produk', function ($query, $keyword) {
@@ -444,6 +454,9 @@ class LaporanController extends Controller
                     return $row->tanggal(); // Format tanggal sesuai kebutuhan
                 })
                 ->rawColumns(['jumlah']) // Enable raw HTML for the 'jumlah' column
+                ->with([
+                    'total_stok' => number_format($totalStok, 0, ',', '.'),
+                ])
                 ->make(true);
         }
 

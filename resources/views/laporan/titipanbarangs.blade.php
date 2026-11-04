@@ -128,6 +128,15 @@
 
             </span>
         </div>
+
+        <div class="grid grid-cols-1  gap-4 p-5">
+            <div class="bg-blue-600 rounded-lg p-5 text-white shadow-sm">
+                <p class="text-blue-100 text-sm font-medium uppercase">Total Stok</p>
+                <h3 class="text-2xl font-bold mt-1" id="totalStok">0</h3>
+            </div>
+
+        </div>
+
         <div class="p-4">
             <table id="dynamic-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900">
@@ -164,7 +173,16 @@
                         d.startdate = $('#startdate').val();
                         d.enddate = $('#enddate').val();
                         d.barang = $('#barang').val();
-                    }
+                    },
+                    dataSrc: function(json) {
+
+                        $('#totalStok').text(
+                            json.total_stok
+                        );
+
+
+                        return json.data;
+                    },
                 },
                 //columns : produk.nama_produk, supplier.nama, tipe_stok, jumlah, keterangan, created_at
                 columns: [{
