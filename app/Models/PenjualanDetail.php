@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PenjualanDetail extends Model
 {
+    use \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $fillable = [
         'penjualan_id',
