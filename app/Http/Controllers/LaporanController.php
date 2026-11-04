@@ -16,6 +16,7 @@ use App\Models\Produk;
 use App\Models\Customer;
 use App\Models\Karyawan;
 use App\Models\KategoriPengeluaran;
+use App\Models\PembelianDetail;
 use App\Models\Pengeluaran;
 use App\Models\Pengiriman;
 use App\Models\PenjualanDetail;
@@ -119,10 +120,11 @@ class LaporanController extends Controller
             //     });
             // }
 
-            $totalNetto = (clone $pembelians)
-                ->withSum('details as total_netto', 'netto')
-                ->get()
-                ->sum('total_netto');
+            //total netto hanya menghitung jual
+
+            $pembeliansId = $pembelians->pluck('id');
+
+            $totalNetto = PembelianDetail::whereIn('pembelian_id', $pembeliansId)->where('tipe_transaksi_pembelian','jual')->sum('netto');
 
 
 
@@ -134,10 +136,10 @@ class LaporanController extends Controller
                 ->editColumn('created_at', function ($pembelian) {
                     return $pembelian->created_at->translatedFormat('d M Y');
                 })
-                ->addColumn('detail', function ($penjualan) {
-                    $produkNames = $penjualan->details->map(function ($detail) {
+                ->addColumn('detail', function ($pembelian) {
+                    $produkNames = $pembelian->details->map(function ($detail) use ($pembelian) {
                         //skip if not jual
-                        if($detail->tipe_transaksi_pembelian != 'jual') return '';
+                        if($detail->tipe_transaksi_pembelian != 'jual') return '<a style="color:green" href="'. route('pembelians.show', $pembelian->id) .'">lihat titipan</a>';
                         return   '[' . $detail->tipe_transaksi_pembelian . '] ' . ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
                     })->toArray();
                     $content = implode('<br>', $produkNames);
