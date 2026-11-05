@@ -126,7 +126,7 @@ class StokTitipanController extends Controller
 
 
         $validate = Validator::make($store_data, [
-            'nopol' => ['required', 'string', 'max:255'],
+            'nopol' => ['nullable', 'string', 'max:255'],
             'supplier_id' => ['required', 'integer', 'exists:suppliers,id'],
             'stok_titipan_id' => ['required', 'integer', 'exists:stok_titipans,id'],
 

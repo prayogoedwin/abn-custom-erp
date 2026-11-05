@@ -228,7 +228,7 @@ class PembelianController extends Controller
 
 
         $validate = Validator::make($store_data, [
-            'nopol' => ['required', 'string', 'max:255'],
+            'nopol' => ['nullable', 'string', 'max:255'],
             'supplier_id' => ['required', 'integer', 'max:255'],
 
             'created_by' => ['required', 'integer']
@@ -476,7 +476,7 @@ class PembelianController extends Controller
 
 
         $validate = Validator::make($store_data, [
-            'nopol' => ['required', 'string', 'max:255'],
+            'nopol' => ['nullable', 'string', 'max:255'],
             'supplier_id' => ['required', 'integer', 'max:255'],
 
             'created_by' => ['required', 'integer']
