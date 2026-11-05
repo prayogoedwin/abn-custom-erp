@@ -112,7 +112,7 @@ class Pihak3Controller extends Controller
         $validate = Validator::make($store_data, [
             'nama' => ['required', 'string', 'max:255'],
             'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
+            'alamat' => ['required', 'string'],
             
             'created_by' => ['required', 'integer']
         ]);
@@ -190,7 +190,7 @@ class Pihak3Controller extends Controller
         $validate = Validator::make($store_data, [
             'nama' => ['required', 'string', 'max:255'],
             'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
+            'alamat' => ['required', 'string'],
             
             'updated_by' => ['required', 'integer']
         ]);

@@ -113,7 +113,7 @@ class CustomerController extends Controller
         $validate = Validator::make($store_data, [
             'nama' => ['required', 'string', 'max:255'],
             'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
+            'alamat' => ['required', 'string'],
             'npwp' => ['nullable', 'string', 'max:50'],
             
             'created_by' => ['required', 'integer']
@@ -192,7 +192,7 @@ class CustomerController extends Controller
         $validate = Validator::make($store_data, [
             'nama' => ['required', 'string', 'max:255'],
             'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
+            'alamat' => ['required', 'string'],
             'npwp' => ['nullable', 'string', 'max:50'],
             'updated_by' => ['required', 'integer']
         ]);

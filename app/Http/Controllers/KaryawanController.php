@@ -113,7 +113,7 @@ class KaryawanController extends Controller
             'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
+            'alamat' => ['required', 'string'],
         ]);
 
         // 2. Add the extra data after validation
@@ -195,7 +195,7 @@ class KaryawanController extends Controller
             'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['nullable', 'confirmed', Password::default()],
             'kontak' => ['required'],
-            'alamat' => ['required', 'string', 'max:50'],
+            'alamat' => ['required', 'string'],
 
             'updated_by' => ['required', 'integer']
         ]);
