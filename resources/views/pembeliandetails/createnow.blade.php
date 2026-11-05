@@ -60,7 +60,7 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="container-netto">
-                                    <x-forms.input label="Netto" name="netto[]" type="number" class="input-netto" />
+                                    <x-forms.input label="Netto" name="netto[]" type="number" step="0.01" class="input-netto" />
                                     <span class="text-xs text-gray-500 label-satuan block mt-1"></span>
                                 </div>
 
