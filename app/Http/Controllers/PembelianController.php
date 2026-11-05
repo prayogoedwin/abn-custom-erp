@@ -105,7 +105,7 @@ class PembelianController extends Controller
 
     public function index(Request $request)
     {
-        
+
 
         $pagedata = $this->getPagedata();
 
@@ -117,17 +117,16 @@ class PembelianController extends Controller
         if ($request->ajax()) {
             // dd('masuk ajax');
             $pembelians = Pembelian::with('supplier')
-                ->where('pembelians.isactive', true)
-                ;
+                ->where('pembelians.isactive', true);
             // dd($pembelians);
 
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
-                $pembelians->whereBetween('pembelians.created_at', [$start, $end]);
+                $pembelians->whereBetween('pembelians.tanggal', [$start, $end]);
             }
 
             return DataTables::of($pembelians)
@@ -222,6 +221,7 @@ class PembelianController extends Controller
         $store_data = [
             'nopol' => $request->input('nopol'),
             'supplier_id' => $request->input('supplier_id'),
+            'tanggal' => $request->input('tanggal'),
 
             'created_by' => auth()->id(),
         ];
@@ -230,6 +230,7 @@ class PembelianController extends Controller
         $validate = Validator::make($store_data, [
             'nopol' => ['nullable', 'string', 'max:255'],
             'supplier_id' => ['required', 'integer', 'max:255'],
+            'tanggal' => ['required', 'date'],
 
             'created_by' => ['required', 'integer']
         ]);
@@ -269,7 +270,7 @@ class PembelianController extends Controller
 
         if ($store_data['potong_bon'] > $saldoCashbon) {
             return back()
-                ->withErrors(['potong_bon' => 'Pengurangan cashbon tidak boleh melebihi sisa cashbon supplier (Rp '.number_format($saldoCashbon, 0, ',', '.').').'])
+                ->withErrors(['potong_bon' => 'Pengurangan cashbon tidak boleh melebihi sisa cashbon supplier (Rp ' . number_format($saldoCashbon, 0, ',', '.') . ').'])
                 ->withInput();
         }
 
@@ -394,7 +395,7 @@ class PembelianController extends Controller
         // 1. Load relasi yang dibutuhkan
         $pembelian->load('details.produk', 'supplier');
 
-        
+
         $totalNettoTitipan = $pembelian->details->where('tipe_transaksi_pembelian', 'titip')->sum('netto');
 
 
@@ -470,6 +471,7 @@ class PembelianController extends Controller
         $store_data = [
             'nopol' => $request->input('nopol'),
             'supplier_id' => $request->input('supplier_id'),
+            'tanggal' => $request->input('tanggal'),
 
             'created_by' => auth()->id(),
         ];
@@ -478,6 +480,7 @@ class PembelianController extends Controller
         $validate = Validator::make($store_data, [
             'nopol' => ['nullable', 'string', 'max:255'],
             'supplier_id' => ['required', 'integer', 'max:255'],
+            'tanggal' => ['required', 'date'],
 
             'created_by' => ['required', 'integer']
         ]);

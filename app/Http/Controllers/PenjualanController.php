@@ -107,10 +107,10 @@ class PenjualanController extends Controller
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
-                $penjualans->whereBetween('penjualans.created_at', [$start, $end]);
+                $penjualans->whereBetween('penjualans.tanggal', [$start, $end]);
             }
 
             return DataTables::of($penjualans)
@@ -567,6 +567,7 @@ class PenjualanController extends Controller
 
         $store_data = [
             'pengiriman_id' => $request->input('pengiriman_id'),
+            'tanggal' => $request->input('tanggal'),
 
             'created_by' => auth()->id(),
         ];
@@ -578,7 +579,7 @@ class PenjualanController extends Controller
 
         $validate = Validator::make($store_data, [
             'pengiriman_id' => ['required', 'integer', 'max:255'],
-
+            'tanggal' => ['required', 'date'],
             'created_by' => ['required', 'integer']
         ]);
 
@@ -770,7 +771,7 @@ class PenjualanController extends Controller
     public function update(Request $request, Penjualan $penjualan): RedirectResponse
     {
         $store_data = [
-
+            'tanggal' => $request->input('tanggal'),
             'created_by' => auth()->id(),
         ];
 
@@ -780,6 +781,7 @@ class PenjualanController extends Controller
 
 
         $validate = Validator::make($store_data, [
+            'tanggal' => ['required', 'date'],
             'created_by' => ['required', 'integer']
         ]);
 

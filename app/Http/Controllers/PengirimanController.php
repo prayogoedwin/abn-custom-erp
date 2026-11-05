@@ -89,10 +89,10 @@ class PengirimanController extends Controller
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
-                $data->whereBetween('created_at', [$start, $end]);
+                $data->whereBetween('tanggal', [$start, $end]);
             }
 
             return DataTables::of($data)
@@ -161,6 +161,7 @@ class PengirimanController extends Controller
         $store_data = [
             'nopol' => $request->input('nopol'),
             'customer_id' => $request->input('customer_id'),
+            'tanggal' => $request->input('tanggal'),
 
             'created_by' => auth()->id(),
         ];
@@ -171,6 +172,7 @@ class PengirimanController extends Controller
 
         $validate = Validator::make($store_data, [
             'nopol' => ['required', 'string', 'max:255'],
+            'tanggal' => ['required', 'date'],
 
             'created_by' => ['required', 'integer']
         ]);
@@ -231,6 +233,7 @@ class PengirimanController extends Controller
         $store_data = [
             'nopol' => $request->input('nopol'),
             'customer_id' => $request->input('customer_id'),
+            'tanggal' => $request->input('tanggal'),
 
             'updated_by' => auth()->id(),
         ];
@@ -242,6 +245,7 @@ class PengirimanController extends Controller
         $validate = Validator::make($store_data, [
             'nopol' => ['required', 'string', 'max:255'],
             'customer_id' => ['required', 'integer', 'max:255'],
+            'tanggal' => ['required', 'date'],
 
             'updated_by' => ['required', 'integer']
         ]);

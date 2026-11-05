@@ -242,8 +242,8 @@
                         name: 'supplier'
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'tanggal',
+                        name: 'tanggal'
                     },
                     {
                         data: 'detail',

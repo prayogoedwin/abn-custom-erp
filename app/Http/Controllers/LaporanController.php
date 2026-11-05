@@ -92,10 +92,10 @@ class LaporanController extends Controller
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
-                $pembelians->whereBetween('created_at', [$start, $end]);
+                $pembelians->whereBetween('tanggal', [$start, $end]);
             }
 
             //filter supplier
@@ -124,7 +124,7 @@ class LaporanController extends Controller
 
             $pembeliansId = $pembelians->pluck('id');
 
-            $totalNetto = PembelianDetail::whereIn('pembelian_id', $pembeliansId)->where('tipe_transaksi_pembelian','jual')->sum('netto');
+            $totalNetto = PembelianDetail::whereIn('pembelian_id', $pembeliansId)->where('tipe_transaksi_pembelian', 'jual')->sum('netto');
 
 
 
@@ -133,13 +133,14 @@ class LaporanController extends Controller
                 ->addColumn('supplier', function ($pembelian) {
                     return $pembelian->supplier?->nama ?? '-';
                 })
-                ->editColumn('created_at', function ($pembelian) {
-                    return $pembelian->created_at->translatedFormat('d M Y');
+
+                ->editColumn('tanggal', function ($pembelian) {
+                    return Carbon::parse($pembelian->tanggal)->translatedFormat('d M Y');
                 })
                 ->addColumn('detail', function ($pembelian) {
                     $produkNames = $pembelian->details->map(function ($detail) use ($pembelian) {
                         //skip if not jual
-                        if($detail->tipe_transaksi_pembelian != 'jual') return '<a style="color:green" href="'. route('pembelians.show', $pembelian->id) .'">lihat titipan</a>';
+                        if ($detail->tipe_transaksi_pembelian != 'jual') return '<a style="color:green" href="' . route('pembelians.show', $pembelian->id) . '">lihat titipan</a>';
                         return   '[' . $detail->tipe_transaksi_pembelian . '] ' . ($detail->produk?->nama_produk ?? '-') . ' (' . $detail->netto . ' ' . ($detail->produk?->satuan ?? '-') . ')';
                     })->toArray();
                     $content = implode('<br>', $produkNames);
@@ -191,7 +192,7 @@ class LaporanController extends Controller
             if ($request->filled(['startdate', 'enddate'])) {
                 $start = Carbon::parse($request->startdate)->startOfDay();
                 $end   = Carbon::parse($request->enddate)->endOfDay();
-                $penjualans->whereBetween('created_at', [$start, $end]);
+                $penjualans->whereBetween('tanggal', [$start, $end]);
             }
             //filter supplier
             if ($request->filled('customer')) {
@@ -225,8 +226,8 @@ class LaporanController extends Controller
                 ->addColumn('customer', function ($penjualan) {
                     return $penjualan->customer?->nama ?? '-';
                 })
-                ->editColumn('created_at', function ($penjualan) {
-                    return $penjualan->tanggal();
+                ->editColumn('tanggal', function ($penjualan) {
+                    return Carbon::parse($penjualan->tanggal)->translatedFormat('d M Y');
                 })
                 ->addColumn('detail', function ($penjualan) {
                     $produkNames = $penjualan->details->map(function ($detail) {
@@ -518,10 +519,10 @@ class LaporanController extends Controller
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
-                $ritans->whereBetween('pengirimans.created_at', [$start, $end]);
+                $ritans->whereBetween('pengirimans.tanggal', [$start, $end]);
             }
 
             //filter nopol
@@ -552,8 +553,8 @@ class LaporanController extends Controller
                     });
                 })
 
-                ->editColumn('created_at', function ($ritan) {
-                    return $ritan->created_at->translatedFormat('d M Y');
+                ->editColumn('tanggal', function ($ritans) {
+                    return Carbon::parse($ritans->tanggal)->translatedFormat('d M Y');
                 })
                 ->rawColumns(['detail'])
                 ->make(true);
@@ -579,11 +580,11 @@ class LaporanController extends Controller
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
                 $query->whereHas('penjualan', function ($q) use ($start, $end) {
-                    $q->whereBetween('created_at', [$start, $end]);
+                    $q->whereBetween('tanggal', [$start, $end]);
                 });
             }
 
@@ -595,8 +596,11 @@ class LaporanController extends Controller
             }
 
             return datatables()->of($query)
-                ->editColumn('created_at', function ($row) {
-                    return $row->created_at->translatedFormat('d M Y');
+                ->editColumn('tanggal', function ($row) {
+                    return Carbon::parse($row->penjualan->tanggal)->translatedFormat('d M Y');
+                })
+                ->orderColumn('tanggal', function ($query, $order) {
+                    $query->orderBy('created_at', $order);
                 })
 
 
@@ -635,11 +639,11 @@ class LaporanController extends Controller
 
             // Filter tanggal berdasarkan tanggal penjualan
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
                 $query->whereHas('penjualan', function ($q) use ($start, $end) {
-                    $q->whereBetween('created_at', [$start, $end]);
+                    $q->whereBetween('tanggal', [$start, $end]);
                 });
             }
 
@@ -652,8 +656,8 @@ class LaporanController extends Controller
             }
 
             return datatables()->of($query)
-                ->editColumn('created_at', function ($row) {
-                    return $row->penjualan->created_at
+                ->editColumn('tanggal', function ($row) {
+                    return Carbon::parse($row->penjualan->tanggal)
                         ->translatedFormat('d M Y');
                 })
                 ->addColumn('customer', function ($row) {
@@ -696,7 +700,7 @@ class LaporanController extends Controller
                     'pengeluarans.id',
                     'pengeluarans.nama_pengeluaran as transaksi',
                     'pengeluarans.nominal',
-                    'pengeluarans.created_at',
+                    'pengeluarans.tanggal',
                     'kategori_pengeluarans.nama_kategori as kategori',
                 ])
                 ->selectRaw("'pengeluaran' as sumber");
@@ -708,7 +712,7 @@ class LaporanController extends Controller
                     'id',
                     'no_transaksi as transaksi',
                     'ambil_tunai as nominal',
-                    'created_at',
+                    'tanggal',
                 ])
                 ->selectRaw("' ' as kategori")
                 ->selectRaw("'pembelian' as sumber");
@@ -716,11 +720,11 @@ class LaporanController extends Controller
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
-                $pembelian->whereBetween('pembelians.created_at', [$start, $end]);
-                $pengeluaran->whereBetween('pengeluarans.created_at', [$start, $end]);
+                $pembelian->whereBetween('pembelians.tanggal', [$start, $end]);
+                $pengeluaran->whereBetween('pengeluarans.tanggal', [$start, $end]);
             }
 
             //filter sumber
@@ -768,8 +772,8 @@ class LaporanController extends Controller
                 })
 
 
-                ->editColumn('created_at', function ($row) {
-                    return Carbon::parse($row->created_at)->format('d M Y');
+                ->editColumn('tanggal', function ($row) {
+                    return Carbon::parse($row->tanggal)->format('d M Y');
                 })
                 ->with([
                     'total_nominal' => $totalNominal,
@@ -804,7 +808,7 @@ class LaporanController extends Controller
                     'pengeluarans.id',
                     'pengeluarans.nama_pengeluaran as transaksi',
                     'pengeluarans.nominal',
-                    'pengeluarans.created_at',
+                    'pengeluarans.tanggal',
                     'kategori_pengeluarans.nama_kategori as kategori',
                 ])
                 ->selectRaw("'pengeluaran' as sumber");
@@ -816,7 +820,7 @@ class LaporanController extends Controller
                     'pembelians.id as id',
                     'pembelians.no_transaksi as transaksi',
                     'pembelians.ambil_transfer as nominal',
-                    'pembelians.created_at',
+                    'pembelians.tanggal',
                 ])
                 ->selectRaw("' ' as kategori")
                 ->selectRaw("'pembelian' as sumber");
@@ -824,11 +828,11 @@ class LaporanController extends Controller
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
-                $pembelian->whereBetween('pembelians.created_at', [$start, $end]);
-                $pengeluaran->whereBetween('pengeluarans.created_at', [$start, $end]);
+                $pembelian->whereBetween('pembelians.tanggal', [$start, $end]);
+                $pengeluaran->whereBetween('pengeluarans.tanggal', [$start, $end]);
             }
 
             //filter sumber
@@ -875,8 +879,8 @@ class LaporanController extends Controller
 
 
 
-                ->editColumn('created_at', function ($row) {
-                    return Carbon::parse($row->created_at)->translatedFormat('d M Y');
+                ->editColumn('tanggal', function ($row) {
+                    return Carbon::parse($row->tanggal)->translatedFormat('d M Y');
                 })
                 ->with([
                     'total_nominal' => $totalNominal,
@@ -980,7 +984,7 @@ class LaporanController extends Controller
                     'pengeluarans.id',
                     'pengeluarans.nama_pengeluaran as transaksi',
                     'pengeluarans.nominal',
-                    'pengeluarans.created_at',
+                    'pengeluarans.tanggal',
                     'kategori_pengeluarans.nama_kategori as kategori',
                 ])
                 ->selectRaw("'pengeluaran' as sumber");
@@ -992,18 +996,18 @@ class LaporanController extends Controller
                     'id',
                     'no_transaksi as transaksi',
                     'total_nominal_terbayar as nominal',
-                    'created_at',
+                    'tanggal',
                 ])
                 ->selectRaw("' ' as kategori")
                 ->selectRaw("'pembelian' as sumber");
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
-                $pembelian->whereBetween('pembelians.created_at', [$start, $end]);
-                $pengeluaran->whereBetween('pengeluarans.created_at', [$start, $end]);
+                $pembelian->whereBetween('pembelians.tanggal', [$start, $end]);
+                $pengeluaran->whereBetween('pengeluarans.tanggal', [$start, $end]);
             }
 
             //filter sumber
@@ -1038,8 +1042,8 @@ class LaporanController extends Controller
                     return '<div style="text-align: right;">' . number_format($row->nominal, 0, ',', '.') . '</div>';
                 })
 
-                ->editColumn('created_at', function ($row) {
-                    return $row->created_at->translatedFormat('d M Y');
+                ->editColumn('tanggal', function ($row) {
+                    return Carbon::parse($row->tanggal)->format('d M Y');
                 })
                 ->rawColumns(['nominal'])
                 ->with([
@@ -1069,7 +1073,7 @@ class LaporanController extends Controller
                 'id',
                 'nama_pengeluaran as transaksi',
                 'nominal',
-                'created_at',
+                'tanggal',
             ])
                 ->selectRaw("'pengeluaran' as sumber");
 
@@ -1080,7 +1084,7 @@ class LaporanController extends Controller
                     'id',
                     'no_transaksi as transaksi',
                     'total_nominal_terbayar as nominal',
-                    'created_at',
+                    'tanggal',
                 ])
 
                 ->selectRaw("'pembelian' as sumber");
@@ -1099,19 +1103,19 @@ class LaporanController extends Controller
                         ),
                     'nominal'
                 )
-                ->selectRaw('penjualans.created_at as created_at')
+                ->selectRaw('penjualans.tanggal as tanggal')
                 ->selectRaw("'penjualan' as sumber");
 
 
 
             //filter tanggal
             if ($request->filled(['startdate', 'enddate'])) {
-                $start = Carbon::parse($request->startdate)->startOfDay();
-                $end   = Carbon::parse($request->enddate)->endOfDay();
+                $start = Carbon::parse($request->startdate)->toDateString();
+                $end   = Carbon::parse($request->enddate)->toDateString();
 
-                $pembelian->whereBetween('created_at', [$start, $end]);
-                $pengeluaran->whereBetween('created_at', [$start, $end]);
-                $penjualan->whereBetween('created_at', [$start, $end]);
+                $pembelian->whereBetween('tanggal', [$start, $end]);
+                $pengeluaran->whereBetween('tanggal', [$start, $end]);
+                $penjualan->whereBetween('tanggal', [$start, $end]);
             }
 
             $query = $pengeluaran->unionAll($pembelian)->unionAll($penjualan);
@@ -1150,11 +1154,11 @@ class LaporanController extends Controller
                     return '<div style="text-align: right;">' . number_format((float) $row->nominal, 0, ',', '.') . '</div>';
                 })
 
-                ->editColumn('created_at', function ($row) {
-                    return Carbon::parse($row->created_at)->translatedFormat('d M Y');
+                ->editColumn('tanggal', function ($row) {
+                    return Carbon::parse($row->tanggal)->translatedFormat('d M Y');
                 })
-                ->orderColumn('created_at', function ($query, $order) {
-                    $query->orderBy('created_at', $order);
+                ->orderColumn('tanggal', function ($query, $order) {
+                    $query->orderBy('tanggal', $order);
                 })
                 ->rawColumns(['nominal'])
                 ->with([

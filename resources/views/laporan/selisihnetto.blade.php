@@ -189,8 +189,8 @@
                         name: 'pengiriman_detail.pengiriman.nopol'
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'tanggal',
+                        name: 'tanggal'
                     },
                     {
                         data: 'produk.nama_produk',

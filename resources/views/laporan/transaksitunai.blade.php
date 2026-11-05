@@ -208,8 +208,8 @@
                         searchable: false,
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'tanggal',
+                        name: 'tanggal'
                     },
                     
 

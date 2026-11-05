@@ -14,6 +14,7 @@ class Penjualan extends Model
         'no_transaksi_penjualan',
         'pengiriman_id',
         'customer_id',
+        'tanggal',
 
         'deleted_at',
         'created_by',

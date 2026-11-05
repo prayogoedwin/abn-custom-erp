@@ -28,6 +28,7 @@ class Pengiriman extends Model
         'customer_id',
         'nopol',
         'no_transaksi',
+        'tanggal',
         'created_by',
         'updated_by',
         'deleted_at',

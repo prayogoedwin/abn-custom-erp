@@ -90,6 +90,16 @@
                 @endif
                 @endforeach
 
+                <!-- tanggal -->
+                <!-- default tanggal sekarang -->
+                 <div class="mb-5">
+                    <label class="block ml-1 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tanggal</label>
+                    <input type="date" name="tanggal" value="{{ old('tanggal', $data->tanggal) }}" class="w-full px-4 py-1.5 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded-s-lg rounded-e-lg">
+                    @error('tanggal')
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
 
 
                 <div class="mt-2 flex gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">

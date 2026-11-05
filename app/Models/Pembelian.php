@@ -26,6 +26,7 @@ class Pembelian extends Model
         'tipe_pembayaran',
         'keterangan',
         'isactive',
+        'tanggal',
         'created_by',
         'updated_by',
         'deleted_at',
@@ -45,7 +46,10 @@ class Pembelian extends Model
         });
 
         static::created(function ($pembelian) {
-            $date = $pembelian->created_at?->format('Ymd') ?? now()->format('Ymd');
+            $date = $pembelian->tanggal
+                ? \Carbon\Carbon::parse($pembelian->tanggal)->format('Ymd')
+                : now()->format('Ymd');
+
             $transactionNumber = "TRX-{$date}-" . str_pad((string) $pembelian->id, 6, '0', STR_PAD_LEFT);
 
             $pembelian->updateQuietly([
